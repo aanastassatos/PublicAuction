@@ -47,6 +47,11 @@
               <item name="PublicAuction" type="b2602c69:ProjectViewProjectNode" />
               <item name="PublicAuction" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="PublicAuction" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PublicAuction" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -170,12 +175,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1510951793748</updated>
-      <workItem from="1510951798167" duration="603000" />
+      <workItem from="1510951798167" duration="787000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="603000" />
+    <option name="totallyTimeSpent" value="787000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="64" y="-11" width="1537" height="912" extended-state="6" />
