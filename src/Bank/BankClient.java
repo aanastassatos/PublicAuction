@@ -38,9 +38,22 @@ public class BankClient extends Thread
       } catch (Exception e)
       {
         e.printStackTrace();
-        break;
       }
       if(o instanceof CreateBankAccountMessage) handleMessage((CreateBankAccountMessage)o);
+      else if(o instanceof WithdrawFundsMessage) handleMessage((WithdrawFundsMessage)o);
+      else if(o instanceof ModifyBlockedFundsMessage) handleMessage((ModifyBlockedFundsMessage)o);
+      else if(o instanceof CloseConnectionMessage)
+      {
+        try
+        {
+          objectInputStream.close();
+          socket.close();
+        } catch (IOException e)
+        {
+          e.printStackTrace();
+        }
+        return;
+      }
     }
   }
 
@@ -54,5 +67,19 @@ public class BankClient extends Thread
     {
       e.printStackTrace();
     }
+  }
+
+  private void handleMessage(final WithdrawFundsMessage message)
+  {
+    bank.withdrawFunds(message.getAccountNumber(), message.getAmount());
+  }
+
+  private void handleMessage(final ModifyBlockedFundsMessage message)
+  {
+    if(message.getType() == ModifyBlockedFundsMessage.TransactionType.Add)
+    {
+      bank.blockFunds(message.getAccountNumber(), message.getAmount());
+    }
+    else bank.unblockFunds(message.getAccountNumber(), message.getAmount());
   }
 }

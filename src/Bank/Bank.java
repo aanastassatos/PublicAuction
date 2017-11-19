@@ -86,26 +86,31 @@ public class Bank extends Thread
     if(fundMap.get(accountNumber) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
     nameMap.put(accountNumber, name);
     fundMap.put(accountNumber, new Fund(initialBalance));
+    System.out.println("Created bank account " + accountNumber + " for " + name);
     return accountNumber;
   }
 
-  private void blockFunds(final int accountNumber, final int amount)
+  void withdrawFunds(final int accountNumber, final int amount)
+  {
+    fundMap.get(accountNumber).withdraw(amount);
+    System.out.println("Withdrew " + amount + " from account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+  }
+
+  void blockFunds(final int accountNumber, final int amount)
   {
     if(fundMap.get(accountNumber).getAvailable() < amount)
     {
       System.out.println(nameMap.get(accountNumber) + "attempted to bid over current available funds");
     }
     fundMap.get(accountNumber).addBlocked(amount);
+    System.out.println("Blocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
   }
 
-  private void unblockFunds(final int accountNumber, final int amount)
+  void unblockFunds(final int accountNumber, final int amount)
   {
     fundMap.get(accountNumber).removeBlocked(amount);
+    System.out.println("Unblocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
   }
 
-  private void withdrawFunds(final int accountNumber, final int amount)
-  {
-    fundMap.get(accountNumber).withdraw(amount);
-  }
 
 }

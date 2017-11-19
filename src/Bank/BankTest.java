@@ -14,21 +14,34 @@ public class BankTest
     System.out.print("Enter bank host name: ");
     final String hostname = in.nextLine();
 
-    test(hostname, "asd");
-    test(hostname, "qwe");
+    new Thread(() -> test(hostname, "Dylan", 123)).start();
+    new Thread(() -> test(hostname, "foo", 321)).start();
   }
 
-  private static void test(final String hostname, final String name) throws IOException, ClassNotFoundException
+  private static void test(final String hostname, final String name, final int initialBalance)// throws IOException, ClassNotFoundException
   {
-    final Socket s = new Socket(hostname, Bank.PORT);
-    final ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-    final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+    try
+    {
+      final Socket s = new Socket(hostname, Bank.PORT);
+      final ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+      final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
 
-    oos.writeObject(new CreateBankAccountMessage(name, 321));
+      oos.writeObject(new CreateBankAccountMessage(name, initialBalance));
 
-    Object n;
+      Object n;
 
-    n = ois.readObject();
-    System.out.println("Name: " + name + "\nAccount number: " + n);
+      n = ois.readObject();
+      System.out.println("Name: " + name + "\nAccount number: " + n);
+
+      oos.writeObject(new ModifyBlockedFundsMessage((int) n, 12, ModifyBlockedFundsMessage.TransactionType.Add));
+      oos.writeObject(new ModifyBlockedFundsMessage((int) n, 12, ModifyBlockedFundsMessage.TransactionType.Remove));
+      oos.writeObject(new WithdrawFundsMessage((int) n, 12));
+      oos.writeObject(new CloseConnectionMessage());
+
+      s.close();
+    }catch (Exception e)
+    {
+      e.printStackTrace();
+    }
   }
 }

@@ -21,11 +21,18 @@ class Fund
 
   synchronized void removeBlocked(final int amount)
   {
+    if(amount > blocked) throw new RuntimeException("Attempt to unblock more than blocked.");
     blocked -= amount;
   }
 
   synchronized void withdraw(final int amount)
   {
     total -= amount;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "Total: " + total + " Blocked: " + blocked + " Available: " + getAvailable();
   }
 }
