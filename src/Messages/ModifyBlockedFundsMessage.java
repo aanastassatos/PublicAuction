@@ -1,10 +1,10 @@
-package Bank;
+package Messages;
 
 import java.io.Serializable;
 
 public class ModifyBlockedFundsMessage implements Serializable
 {
-  enum TransactionType
+  public enum TransactionType
   {
     Add, Remove;
   };

@@ -19,12 +19,12 @@ public class Bank extends Thread
   public static void main(String agrs[])
   {
     Bank b = new Bank();
-//    b.printInfo();
+    b.printInfo();
     b.start();
   }
 
   // static port number
-  public final static int PORT = 5555;
+  public final static int PORT = 55555;
 
   private final HashMap<Integer, Fund> fundMap = new HashMap<>();
   private final HashMap<Integer, String> nameMap = new HashMap<>();
@@ -96,14 +96,16 @@ public class Bank extends Thread
     System.out.println("Withdrew " + amount + " from account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
   }
 
-  void blockFunds(final int accountNumber, final int amount)
+  boolean blockFunds(final int accountNumber, final int amount)
   {
     if(fundMap.get(accountNumber).getAvailable() < amount)
     {
-      System.out.println(nameMap.get(accountNumber) + "attempted to bid over current available funds");
+      System.out.println(nameMap.get(accountNumber) + " attempted to bid over current available funds");
+      return false;
     }
     fundMap.get(accountNumber).addBlocked(amount);
     System.out.println("Blocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    return true;
   }
 
   void unblockFunds(final int accountNumber, final int amount)

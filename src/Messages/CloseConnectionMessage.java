@@ -1,4 +1,4 @@
-package Bank;
+package Messages;
 
 import java.io.Serializable;
 

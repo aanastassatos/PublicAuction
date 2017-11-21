@@ -1,5 +1,7 @@
 package Bank;
 
+import Messages.*;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,17 +30,30 @@ public class BankTest
 
       oos.writeObject(new CreateBankAccountMessage(name, initialBalance));
 
-      Object n;
+      Object o = ois.readObject();
+      int accountNumber = ((BankAccountInfoMessage)o).getAccountNumber();
+      System.out.println("Name: " + name + "\nAccount number: " + accountNumber);
 
-      n = ois.readObject();
-      System.out.println("Name: " + name + "\nAccount number: " + n);
+      int amount = 12;
 
-      oos.writeObject(new ModifyBlockedFundsMessage((int) n, 12, ModifyBlockedFundsMessage.TransactionType.Add));
-      oos.writeObject(new ModifyBlockedFundsMessage((int) n, 12, ModifyBlockedFundsMessage.TransactionType.Remove));
-      oos.writeObject(new WithdrawFundsMessage((int) n, 12));
+      oos.writeObject(new ModifyBlockedFundsMessage(accountNumber, amount, ModifyBlockedFundsMessage.TransactionType.Add));
+      o = ois.readObject();
+      boolean succeeded = ((BlockFundsResultMessage)o).getResult();
+      System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : " failed"));
+
+      amount = 100000;
+
+      oos.writeObject(new ModifyBlockedFundsMessage(accountNumber, amount, ModifyBlockedFundsMessage.TransactionType.Add));
+      o = ois.readObject();
+      succeeded = ((BlockFundsResultMessage)o).getResult();
+      System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
+
+      amount = 5;
+
+      oos.writeObject(new WithdrawFundsMessage(accountNumber, amount));
       oos.writeObject(new CloseConnectionMessage());
 
-      s.close();
+//      s.close();
     }catch (Exception e)
     {
       e.printStackTrace();
