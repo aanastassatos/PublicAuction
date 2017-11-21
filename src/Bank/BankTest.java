@@ -16,8 +16,12 @@ public class BankTest
     System.out.print("Enter bank host name: ");
     final String hostname = in.nextLine();
 
-    new Thread(() -> test(hostname, "Dylan", 123)).start();
-    new Thread(() -> test(hostname, "foo", 321)).start();
+    for(char i = 'A'; i < 'z'; i++)
+    {
+      final String name = Character.toString(i);
+      final int balance = i;
+      new Thread(() -> test(hostname, name, balance * 100)).start();
+    }
   }
 
   private static void test(final String hostname, final String name, final int initialBalance)// throws IOException, ClassNotFoundException
@@ -39,7 +43,7 @@ public class BankTest
       oos.writeObject(new ModifyBlockedFundsMessage(accountNumber, amount, ModifyBlockedFundsMessage.TransactionType.Add));
       o = ois.readObject();
       boolean succeeded = ((BlockFundsResultMessage)o).getResult();
-      System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : " failed"));
+      System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
 
       amount = 100000;
 
