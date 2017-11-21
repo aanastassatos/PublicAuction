@@ -1,5 +1,7 @@
 package Bank;
 
+import Messages.*;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -38,22 +40,29 @@ public class BankClient extends Thread
       } catch (Exception e)
       {
         e.printStackTrace();
+        return;
       }
       if(o instanceof CreateBankAccountMessage) handleMessage((CreateBankAccountMessage)o);
       else if(o instanceof WithdrawFundsMessage) handleMessage((WithdrawFundsMessage)o);
       else if(o instanceof ModifyBlockedFundsMessage) handleMessage((ModifyBlockedFundsMessage)o);
       else if(o instanceof CloseConnectionMessage)
       {
-        try
-        {
-          objectInputStream.close();
-          socket.close();
-        } catch (IOException e)
-        {
-          e.printStackTrace();
-        }
+        closeConnection();
         return;
       }
+      else throw new RuntimeException("Received unknown message");
+    }
+  }
+
+  private void closeConnection()
+  {
+    try
+    {
+      objectInputStream.close();
+      socket.close();
+    } catch (IOException e)
+    {
+      e.printStackTrace();
     }
   }
 
@@ -62,7 +71,7 @@ public class BankClient extends Thread
     final int accountNumber = bank.openAccount(message.getName(), message.getInitialBalance());
     try
     {
-      objectOutputStream.writeObject(accountNumber);
+      objectOutputStream.writeObject(new BankAccountInfoMessage(accountNumber));
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -76,10 +85,18 @@ public class BankClient extends Thread
 
   private void handleMessage(final ModifyBlockedFundsMessage message)
   {
+    boolean succeeded = true;
     if(message.getType() == ModifyBlockedFundsMessage.TransactionType.Add)
     {
-      bank.blockFunds(message.getAccountNumber(), message.getAmount());
+      succeeded = bank.blockFunds(message.getAccountNumber(), message.getAmount());
     }
     else bank.unblockFunds(message.getAccountNumber(), message.getAmount());
+    try
+    {
+       objectOutputStream.writeObject(new BlockFundsResultMessage(succeeded));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
   }
 }
