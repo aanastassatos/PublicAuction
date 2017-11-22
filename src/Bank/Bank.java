@@ -24,7 +24,7 @@ public class Bank extends Thread
   }
 
   // static port number
-  public final static int PORT = 123;
+  public final static int PORT = 55555;
 
   private final HashMap<Integer, Fund> fundMap = new HashMap<>();
   private final HashMap<Integer, String> nameMap = new HashMap<>();
@@ -80,32 +80,39 @@ public class Bank extends Thread
   /**
    * Create a new account
    */
-  int openAccount(final String name, final int initialBalance)
+  synchronized int openAccount(final String name, final int initialBalance)
   {
     final int accountNumber = name.hashCode();
     if(fundMap.get(accountNumber) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
     nameMap.put(accountNumber, name);
     fundMap.put(accountNumber, new Fund(initialBalance));
+    System.out.println("Created bank account " + accountNumber + " for " + name);
     return accountNumber;
   }
 
-  private void blockFunds(final int accountNumber, final int amount)
+  synchronized void withdrawFunds(final int accountNumber, final int amount)
+  {
+    fundMap.get(accountNumber).withdraw(amount);
+    System.out.println("Withdrew " + amount + " from account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+  }
+
+  synchronized boolean blockFunds(final int accountNumber, final int amount)
   {
     if(fundMap.get(accountNumber).getAvailable() < amount)
     {
-      System.out.println(nameMap.get(accountNumber) + "attempted to bid over current available funds");
+      System.out.println(nameMap.get(accountNumber) + " attempted to bid over current available funds");
+      return false;
     }
     fundMap.get(accountNumber).addBlocked(amount);
+    System.out.println("Blocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    return true;
   }
 
-  private void unblockFunds(final int accountNumber, final int amount)
+  synchronized void unblockFunds(final int accountNumber, final int amount)
   {
     fundMap.get(accountNumber).removeBlocked(amount);
+    System.out.println("Unblocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
   }
 
-  private void withdrawFunds(final int accountNumber, final int amount)
-  {
-    fundMap.get(accountNumber).withdraw(amount);
-  }
 
 }
