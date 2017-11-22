@@ -35,8 +35,7 @@ public class AuctionClient extends Thread
     while(true)
     {
       o = null;
-  
-      System.out.println("poop");
+      
       try
       {
         o = ois.readObject();
