@@ -11,16 +11,18 @@ import java.util.Scanner;
 
 public class BankTest
 {
+  private final static Random rand = new Random();
   public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException
   {
     final Scanner in = new Scanner(System.in);
     System.out.print("Enter bank host name: ");
     final String hostname = in.nextLine();
 
-    for(char i = 'A'; i < 'R'; i++)
+    for(char i = 'A'; i < 'Z'; i++)
     {
       final String name = Character.toString(i);
       new Thread(() -> test(hostname, name)).start();
+      Thread.sleep(getVal(rand, 1));
     }
   }
 
@@ -39,8 +41,8 @@ public class BankTest
       final ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
       // input stream from which objects sent from the bank are received
       final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-      final Random rand = new Random();
-      final int initialBalance = 1000;
+      final int initialBalance = getVal(rand, 5000);
+      final int timeBound = 2500;
 
       int amount = getVal(rand, initialBalance);
 
@@ -54,7 +56,7 @@ public class BankTest
       int secretKey = ((BankAccountInfoMessage)o).getSecretKey();
       System.out.println("Name: " + name + "\nAccount number: " + accountNumber + "\nSecret Key: " + secretKey);
 
-      Thread.sleep(getVal(rand, 5000));
+      Thread.sleep(getVal(rand, timeBound));
 
       // send bank a message requesting a block be placed on given account for given amount, specifying that a block
       // is being added
@@ -65,23 +67,26 @@ public class BankTest
       boolean succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
 
-      Thread.sleep(getVal(rand, 5000));
+      Thread.sleep(getVal(rand, timeBound));
 
       // invalid block request
-      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, initialBalance + 1,
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, initialBalance - amount + 1,
               ModifyBlockedFundsMessage.TransactionType.Add));
       o = ois.readObject();
       // in this case the message returns a false as the block request was too large
       succeeded = ((BlockFundsResultMessage)o).getResult();
-      System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
+      System.out.println("Attempt to block " + (initialBalance - amount + 1) + " " + (succeeded ? "succeeded" : "failed"));
 
+
+      Thread.sleep(getVal(rand, timeBound));
       // block remove
       oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Remove));
       o = ois.readObject();
-      succeeded = ((BlockFundsResultMessage)o).getResult();
+      succeeded = ((BlockFundsResultMessage) o).getResult();
       System.out.println("Attempt to unblock " + amount + " " + (succeeded ? "succeeded" : "failed"));
 
-      Thread.sleep(getVal(rand, 5000));
+
+      Thread.sleep(getVal(rand, timeBound));
 
       amount = getVal(rand, initialBalance);
 
