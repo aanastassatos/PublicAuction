@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="afea3584-487c-4c17-94ab-62d221a78068" name="Default" comment="">
+<<<<<<< HEAD
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" afterPath="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" />
+=======
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/Agent/AgentAuctionCentral.java" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/Agent/AgentBankAccount.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -48,6 +52,10 @@
       <file leaf-file-name="AuctionCentral.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+            <state relative-caret-position="1206">
+              <caret line="67" column="26" lean-forward="true" selection-start-line="67" selection-start-column="26" selection-end-line="67" selection-end-column="26" />
+=======
             <state relative-caret-position="220">
               <caret line="18" column="2" lean-forward="false" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
               <folding />
@@ -60,6 +68,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="325">
               <caret line="19" column="74" lean-forward="false" selection-start-line="19" selection-start-column="74" selection-end-line="19" selection-end-column="74" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -67,11 +76,41 @@
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
+      <file leaf-file-name="HouseItems.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/AuctionHouse/HouseItems.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="90">
+              <caret line="7" column="6" lean-forward="false" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AuctionHouse.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/AuctionHouse/AuctionHouse.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="342">
+              <caret line="31" column="26" lean-forward="true" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BankConnection.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/AuctionCentral/BankConnection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="303">
+              <caret line="28" column="5" lean-forward="false" selection-start-line="28" selection-start-column="5" selection-end-line="28" selection-end-column="5" />
+=======
       <file leaf-file-name="AgentBankAccount.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Agent/AgentBankAccount.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="506">
               <caret line="23" column="17" lean-forward="false" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,8 +121,13 @@
       <file leaf-file-name="Fund.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Bank/Fund.java">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+            <state relative-caret-position="-72">
+              <caret line="23" column="61" lean-forward="false" selection-start-line="23" selection-start-column="61" selection-end-line="23" selection-end-column="61" />
+=======
             <state relative-caret-position="44">
               <caret line="2" column="3" lean-forward="false" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="3" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
               <folding>
                 <element signature="e#580#581#0" expanded="false" />
                 <element signature="e#612#613#0" expanded="false" />
@@ -180,12 +224,25 @@
         <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java" />
         <option value="$PROJECT_DIR$/src/AuctionCentral/AgentInfo.java" />
         <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionHouseInfo.java" />
+<<<<<<< HEAD
+        <option value="$PROJECT_DIR$/src/Messages/AgentInfoMessage.java" />
+        <option value="$PROJECT_DIR$/src/Messages/DeregisterAuctionHouseResultMessage.java" />
+        <option value="$PROJECT_DIR$/src/Messages/AuctionHouseInfoMessage.java" />
+        <option value="$PROJECT_DIR$/src/Messages/DeregisterAuctionHouseMessage.java" />
+        <option value="$PROJECT_DIR$/src/Messages/RegisterAgentMessage.java" />
+        <option value="$PROJECT_DIR$/src/Messages/RegisterAuctionHouseMessage.java" />
+        <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" />
+        <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionCentralTest.java" />
+        <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java" />
+        <option value="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" />
+=======
         <option value="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" />
         <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" />
         <option value="$PROJECT_DIR$/src/Messages/SecretKeyInfoMessage.java" />
         <option value="$PROJECT_DIR$/src/Agent/AgentBankAccount.java" />
         <option value="$PROJECT_DIR$/src/Agent/Agent.java" />
         <option value="$PROJECT_DIR$/src/Agent/AgentAuctionCentral.java" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
       </list>
     </option>
   </component>
@@ -195,11 +252,19 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+<<<<<<< HEAD
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="598" />
+    <option name="y" value="14" />
+    <option name="width" value="764" />
+    <option name="height" value="832" />
+=======
   <component name="ProjectFrameBounds">
     <option name="x" value="157" />
     <option name="y" value="22" />
     <option name="width" value="1088" />
     <option name="height" value="778" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -653,6 +718,9 @@
       <option name="presentableId" value="Default" />
       <updated>1510951793748</updated>
       <workItem from="1510951798167" duration="1566000" />
+<<<<<<< HEAD
+      <workItem from="1511204569579" duration="30884000" />
+=======
       <workItem from="1511204569579" duration="13178000" />
     </task>
     <task id="LOCAL-00001" summary="Communicates to bank">
@@ -661,12 +729,17 @@
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
       <updated>1511328531344</updated>
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
+    <option name="totallyTimeSpent" value="32450000" />
+=======
     <option name="totallyTimeSpent" value="14744000" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
   </component>
   <component name="ToolWindowManager">
     <frame x="157" y="22" width="1088" height="778" extended-state="0" />
@@ -838,8 +911,12 @@
         <state relative-caret-position="242">
           <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding>
+<<<<<<< HEAD
+            <marker date="1511339943568" expanded="true" signature="47965:47982" ph="..." />
+=======
             <element signature="e#681#682#0" expanded="false" />
             <element signature="e#730#731#0" expanded="false" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
           </folding>
         </state>
       </provider>
@@ -1049,6 +1126,9 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/ChatRoom_src/ChatServer/RemoteClient.java">
+=======
     <entry file="file://$PROJECT_DIR$/src/Messages/SecretKeyInfoMessage.java" />
     <entry file="file://$PROJECT_DIR$/src/Messages/BankAccountInfoMessage.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1064,6 +1144,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Bank/BankClient.java">
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
           <caret line="9" column="3" lean-forward="false" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="3" />
@@ -1103,18 +1184,43 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionCentralTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="26" column="5" lean-forward="false" selection-start-line="26" selection-start-column="5" selection-end-line="26" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-72">
+          <caret line="23" column="61" lean-forward="false" selection-start-line="23" selection-start-column="61" selection-end-line="23" selection-end-column="61" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+=======
     <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
           <caret line="18" column="2" lean-forward="false" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
           <folding />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Agent/Agent.java">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="303">
+          <caret line="28" column="5" lean-forward="false" selection-start-line="28" selection-start-column="5" selection-end-line="28" selection-end-column="5" />
+=======
         <state relative-caret-position="110">
           <caret line="5" column="9" lean-forward="false" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
           <folding>
             <element signature="e#72#73#0" expanded="true" />
             <element signature="e#135#136#0" expanded="true" />
@@ -1122,20 +1228,42 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1206">
+          <caret line="67" column="26" lean-forward="true" selection-start-line="67" selection-start-column="26" selection-end-line="67" selection-end-column="26" />
+=======
     <entry file="file://$PROJECT_DIR$/src/Agent/AgentAuctionCentral.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="325">
           <caret line="19" column="74" lean-forward="false" selection-start-line="19" selection-start-column="74" selection-end-line="19" selection-end-column="74" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/src/AuctionHouse/HouseItems.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="7" column="6" lean-forward="false" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AuctionHouse/AuctionHouse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="31" column="26" lean-forward="true" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+=======
     <entry file="file://$PROJECT_DIR$/src/Agent/AgentBankAccount.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="506">
           <caret line="23" column="17" lean-forward="false" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+>>>>>>> d76c2d664d5ef839f47fc2b65edba287567c004b
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
