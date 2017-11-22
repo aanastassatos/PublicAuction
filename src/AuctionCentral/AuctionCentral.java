@@ -1,26 +1,24 @@
 package AuctionCentral;
 
-import java.io.BufferedReader;
-import AuctionHouse.AuctionHouse;
+import Messages.*;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 public class AuctionCentral extends Thread
 {
+  public static Random rand = new Random();
   public final static int PORT = 7777;
   
   //This creates an AuctionCentral and instantiates it with a port.
   public static void main(String[] args)
   {
-    System.out.println("Enter port number: ");
+//    System.out.println("Enter port number: ");
     try
     {
       new AuctionCentral(PORT).start();
@@ -31,56 +29,78 @@ public class AuctionCentral extends Thread
   }
   
   private ServerSocket auctionCentralSocket;
+  private final BankConnection bankConnection;
   
   public AuctionCentral(int port) throws IOException
   {
+    String hostName = "localhost";
     auctionCentralSocket = new ServerSocket(port);
+    bankConnection = new BankConnection(hostName, this);
+    bankConnection.start();
     printInfo();
   }
   
-  private final HashMap<Integer, AuctionHouseInfo> auctionHouses = new HashMap<>();
-  private final HashMap<Integer, AgentInfo> agents = new HashMap<>();
+  private final HashMap<Integer, String> auctionHouseNames = new HashMap<>();
+  private final HashMap<Integer, Integer> auctionHouseKeys = new HashMap<>();
+  private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
+  private final HashMap<Integer, String> agentNames = new HashMap<>();
+  private final HashMap<Integer, Integer> agentBankKeys = new HashMap<>();
+  private final HashMap<Integer, AuctionClient> agentClients = new HashMap<>();
   
   @Override
   public void run()
   {
-    try
+    while(true)
     {
-      Socket socket = auctionCentralSocket.accept();
-      AuctionClient client = new AuctionClient(socket, this);
-      client.start();
-    } catch (IOException e)
-    {
-      e.printStackTrace();
+      try
+      {
+        Socket socket = auctionCentralSocket.accept();
+        AuctionClient client = new AuctionClient(socket, this);
+        client.start();
+      } catch (IOException e)
+      {
+        e.printStackTrace();
+      }
     }
   }
   
-  AuctionHouseInfo registerAuctionHouse(final String name)
+  synchronized AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
   {
     int publicID = name.hashCode();
-    AuctionHouseInfo auctionHouseInfo = new AuctionHouseInfo(name, publicID);
-    auctionHouses.put(publicID, auctionHouseInfo);
+    int secretKey = rand.nextInt();
+    AuctionHouseInfoMessage auctionHouseInfo = new AuctionHouseInfoMessage(publicID, secretKey);
+    auctionHouseNames.put(publicID, name);
+    auctionHouseKeys.put(publicID, auctionHouseInfo.getSecretKey());
+    auctionHouseClients.put(auctionHouseKeys.get(publicID), auctionHouse);
     System.out.println("Auction house "+name+" has registered under the public publicID "+publicID);
     return auctionHouseInfo;
   }
   
-  void deRegisterAuctionHouse(final int publicID, final UUID secretKey)
+  synchronized DeregisterAuctionHouseResultMessage deRegisterAuctionHouse(final int publicID, final int secretKey)
   {
-    if(auctionHouses.get(publicID).getSecretKey() == secretKey)
+    boolean result = false;
+    
+    if(auctionHouseNames.get(publicID) != null)
     {
-      AuctionHouseInfo auctionHouse = auctionHouses.get(publicID);
-      auctionHouses.remove(auctionHouses.get(publicID));
-      System.out.println("Auction house "+auctionHouse.getName()+" has deregistered from the public publicID "+publicID);
+      String auctionHouse = auctionHouseNames.get(publicID);
+      auctionHouseNames.remove(publicID);
+      auctionHouseKeys.remove(publicID);
+      agentClients.remove(secretKey);
+      System.out.println("Auction house " + auctionHouse + " has deregistered from the public publicID " + publicID);
+      result = true;
     }
+    return new DeregisterAuctionHouseResultMessage(result);
   }
   
-  int registerAgent(final String name, final int bankKey)
+  synchronized AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
   {
     int biddingKey = name.hashCode();
-    AgentInfo agentInfo = new AgentInfo(name, bankKey);
-    agents.put(biddingKey, agentInfo);
+    AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
+    agentNames.put(biddingKey, name);
+    agentBankKeys.put(biddingKey, bankKey);
+    agentClients.put(biddingKey, agent);
     System.out.println("Agent "+name+" registered under the bidding key "+biddingKey+" and the bank key "+bankKey);
-    return biddingKey;
+    return agentInfo;
   }
   
   public void printInfo()

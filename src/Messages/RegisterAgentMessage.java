@@ -1,24 +1,24 @@
-package AuctionCentral;
+package Messages;
 
 import java.io.Serializable;
 
-public class AgentInfo implements Serializable
+public class RegisterAgentMessage implements Serializable
 {
   private final String name;
   private final int bankKey;
   
-  AgentInfo(final String name, final int bankKey)
+  public RegisterAgentMessage(String name, int bankKey)
   {
     this.name = name;
     this.bankKey = bankKey;
   }
   
-  String getName()
+  public String getName()
   {
     return name;
   }
   
-  int getBankKey()
+  public int getBankKey()
   {
     return bankKey;
   }
