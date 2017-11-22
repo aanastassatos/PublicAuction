@@ -3,7 +3,6 @@ package Bank;
 import Messages.BankAccountInfoMessage;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.util.Pair;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -15,7 +14,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 /**
  * The bank is capable of performing three operations:
@@ -48,20 +46,20 @@ public class Bank extends Thread
   /**
    * Instantiates server
    */
-  public Bank()
+  private Bank()
   {
     try
     {
       bankSocket = new ServerSocket(PORT);
-      new JFXPanel();
-      Platform.runLater(() -> gui = new BankGui(new LinkedList<>(keyMap.values())));
+      new JFXPanel(); // init jfx
+      Platform.runLater(() -> gui = new BankGui());
     } catch (IOException e)
     {
       e.printStackTrace();
     }
   }
 
-  public void printInfo()
+  private void printInfo()
   {
     try
     {
@@ -80,7 +78,7 @@ public class Bank extends Thread
   @Override
   public void run()
   {
-    while(true)
+    while(!Thread.currentThread().isInterrupted())
     {
       try
       {

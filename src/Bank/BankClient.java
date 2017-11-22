@@ -35,9 +35,9 @@ public class BankClient extends Thread
   @Override
   public void run()
   {
-    while(true)
+    while(!Thread.currentThread().isInterrupted())
     {
-      Object o = null;
+      Object o;
       try
       {
         // read message in

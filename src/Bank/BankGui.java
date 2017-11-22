@@ -2,54 +2,43 @@ package Bank;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.LinkedList;
-import java.util.List;
 
-public class BankGui extends Stage
+class BankGui extends Stage
 {
   private final ObservableList<BankAccount> accountList;
-  private final ObservableList<String> infoList;
-  private final Text accountInfo = new Text();
-  private final Timeline timeline = new Timeline();
+  private final ObservableList<Fund> infoList;
 
-  private BankAccount currentlySelected;
-
-  BankGui(final List<BankAccount> accounts)
+  BankGui()
   {
-    accountList = FXCollections.observableList(accounts);
+    accountList = FXCollections.observableList(new LinkedList<>());
     infoList = FXCollections.observableList(new LinkedList<>());
 
-    accountInfo.setFont(new Font(24));
-
-    BorderPane bp = new BorderPane();
+    SplitPane sp = new SplitPane();
     ListView<BankAccount> alv = new ListView<>(accountList);
-    ListView<String> ilv = new ListView<>(infoList);
+    ListView<Fund> ilv = new ListView<>(infoList);
 
     ilv.setPrefWidth(1080/2);
-    bp.setCenter(alv);
-    bp.setRight(ilv);
-    setScene(new Scene(bp));
+    sp.getItems().addAll(alv, ilv);
+    setScene(new Scene(sp));
     setWidth(1080);
     setHeight(720);
     setAlwaysOnTop(true);
     setTitle("Bank");
     show();
 
+    Timeline timeline = new Timeline();
     timeline.setCycleCount(Timeline.INDEFINITE);
-    timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1/60d), event -> updateText()));
+    timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1/60d), event -> refreshFunds()));
     timeline.playFromStart();
 
     ScrollBar alvsb = (ScrollBar)alv.lookup(".scroll-bar");
@@ -59,10 +48,10 @@ public class BankGui extends Stage
 
   }
 
-  private void updateText()
+  private void refreshFunds()
   {
     infoList.clear();
-    accountList.forEach(x -> infoList.add(x.getFund().toString()));
+    accountList.forEach(x -> infoList.add(x.getFund()));
   }
 
   void addAccount(final BankAccount account)
