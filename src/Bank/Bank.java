@@ -1,10 +1,17 @@
 package Bank;
 
+import Messages.BankAccountInfoMessage;
+import javafx.util.Pair;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -15,8 +22,10 @@ import java.util.HashMap;
  */
 public class Bank extends Thread
 {
-
-  public static void main(String agrs[])
+  /*
+    Banks run in their own processes, independent of other components
+   */
+  public static void main(String args[])
   {
     Bank b = new Bank();
     b.printInfo();
@@ -26,8 +35,9 @@ public class Bank extends Thread
   // static port number
   public final static int PORT = 55555;
 
-  private final HashMap<Integer, Fund> fundMap = new HashMap<>();
-  private final HashMap<Integer, String> nameMap = new HashMap<>();
+  // map of secret keys to user accounts, Secret keys are the only method of referencing accounts as it is the
+  // only bank information given to AuctionCentral
+  private final HashMap<Integer, BankAccount> keyMap = new HashMap<>();
 
   private ServerSocket bankSocket;
 
@@ -49,6 +59,7 @@ public class Bank extends Thread
   {
     try
     {
+      // Note that when running the entire application on the same machine only the port number is relevant
       System.out.println("Bank Ip: " + InetAddress.getLocalHost());
       System.out.println("Bank host name: " + InetAddress.getLocalHost().getHostName());
     } catch (UnknownHostException e)
@@ -67,7 +78,9 @@ public class Bank extends Thread
     {
       try
       {
+        // Continuously looking to accept new clients, either Agent or AuctionCentral
         Socket socket = bankSocket.accept();
+        // instantiate client with reference to their socket and the bank
         BankClient client = new BankClient(socket, this);
         client.start();
       } catch (Exception e)
@@ -80,39 +93,75 @@ public class Bank extends Thread
   /**
    * Create a new account
    */
-  synchronized int openAccount(final String name, final int initialBalance)
+  synchronized BankAccountInfoMessage openAccount(final String name, final int initialBalance)
   {
+    // account number is only used for displaying account info,
     final int accountNumber = name.hashCode();
-    if(fundMap.get(accountNumber) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
-    nameMap.put(accountNumber, name);
-    fundMap.put(accountNumber, new Fund(initialBalance));
+    // all functional ability resides in the secret key
+    final int secretKey = getKey(accountNumber);
+
+    // Secret keys are generated based on names, can't have secret key conflicts
+    if(keyMap.get(secretKey) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
+    // create bank account and populate map allowing account information and funds to be modified when given a key
+    BankAccount account = new BankAccount(new Fund(initialBalance), accountNumber, name);
+    keyMap.put(secretKey, account);
+
     System.out.println("Created bank account " + accountNumber + " for " + name);
-    return accountNumber;
+    return new BankAccountInfoMessage(accountNumber, secretKey);
   }
 
-  synchronized void withdrawFunds(final int accountNumber, final int amount)
+  /*
+  Called only when a auction has been successful, in theory the nature of setting blocks should prevent
+  attempted overdrawing at this point
+   */
+  synchronized void withdrawFunds(final int secretKey, final int amount)
   {
-    fundMap.get(accountNumber).withdraw(amount);
-    System.out.println("Withdrew " + amount + " from account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    keyMap.get(secretKey).getFund().withdraw(amount);
+    System.out.println("Withdrew " + amount + " from account " + keyMap.get(secretKey).getAccountNumber()
+            + " leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
-  synchronized boolean blockFunds(final int accountNumber, final int amount)
+  /*
+  When a agent places a bid on an auction, a block is placed on their funds for that amount
+  If the auction ends with the agent winning, the block is removed, then the amount for the auction is withdrawn
+  from the account. As the money being withdrawn should be made fully available right before by the block being
+  released, the only place where insufficient funds should occur is when placing blocks.
+   */
+  synchronized boolean blockFunds(final int secretKey, final int amount)
   {
-    if(fundMap.get(accountNumber).getAvailable() < amount)
+    if(keyMap.get(secretKey).getFund().getAvailable() < amount)
     {
-      System.out.println(nameMap.get(accountNumber) + " attempted to bid over current available funds");
+      System.out.println(keyMap.get(secretKey).getAccountNumber() + " attempted to block more than current available funds");
       return false;
     }
-    fundMap.get(accountNumber).addBlocked(amount);
-    System.out.println("Blocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    keyMap.get(secretKey).getFund().addBlocked(amount);
+    System.out.println("Blocked " + amount + " on account " + keyMap.get(secretKey).getAccountNumber() +
+            " leaving " + keyMap.get(secretKey).getFund().toString());
     return true;
   }
 
-  synchronized void unblockFunds(final int accountNumber, final int amount)
+  synchronized void unblockFunds(final int secretKey, final int amount)
   {
-    fundMap.get(accountNumber).removeBlocked(amount);
-    System.out.println("Unblocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    keyMap.get(secretKey).getFund().removeBlocked(amount);
+    System.out.println("Unblocked " + amount + " on account " + keyMap.get(secretKey).getAccountNumber()
+            + " Leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
-
+  // When given an account number produce a unique key
+  private int getKey(final int accountNumber)
+  {
+    MessageDigest digest = null;
+    try
+    {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e)
+    {
+      e.printStackTrace();
+    }
+    assert digest != null;
+    // int to byte array
+    byte[] hash = digest.digest(ByteBuffer.allocate(4).putInt(accountNumber).array());
+    // byte array to int
+    return Arrays.hashCode(hash);
+  }
 }
