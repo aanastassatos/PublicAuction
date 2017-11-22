@@ -1,5 +1,9 @@
 package Bank;
 
+/**
+ * Represents the state of an account created with the bank holing the accounts fund, as well as the name of the
+ * agent and the account number. The secret key is already related to the account through the bank's map
+ */
 public class BankAccount
 {
   final private Fund fund;

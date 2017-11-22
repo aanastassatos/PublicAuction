@@ -22,6 +22,9 @@ import java.util.HashMap;
  */
 public class Bank extends Thread
 {
+  /*
+    Banks run in their own processes, independent of other components
+   */
   public static void main(String args[])
   {
     Bank b = new Bank();
@@ -32,6 +35,8 @@ public class Bank extends Thread
   // static port number
   public final static int PORT = 55555;
 
+  // map of secret keys to user accounts, Secret keys are the only method of referencing accounts as it is the
+  // only bank information given to AuctionCentral
   private final HashMap<Integer, BankAccount> keyMap = new HashMap<>();
 
   private ServerSocket bankSocket;
@@ -54,6 +59,7 @@ public class Bank extends Thread
   {
     try
     {
+      // Note that when running the entire application on the same machine only the port number is relevant
       System.out.println("Bank Ip: " + InetAddress.getLocalHost());
       System.out.println("Bank host name: " + InetAddress.getLocalHost().getHostName());
     } catch (UnknownHostException e)
@@ -72,7 +78,9 @@ public class Bank extends Thread
     {
       try
       {
+        // Continuously looking to accept new clients, either Agent or AuctionCentral
         Socket socket = bankSocket.accept();
+        // instantiate client with reference to their socket and the bank
         BankClient client = new BankClient(socket, this);
         client.start();
       } catch (Exception e)
@@ -87,10 +95,14 @@ public class Bank extends Thread
    */
   synchronized BankAccountInfoMessage openAccount(final String name, final int initialBalance)
   {
+    // account number is only used for displaying account info,
     final int accountNumber = name.hashCode();
+    // all functional ability resides in the secret key
     final int secretKey = getKey(accountNumber);
 
+    // Secret keys are generated based on names, can't have secret key conflicts
     if(keyMap.get(secretKey) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
+    // create bank account and populate map allowing account information and funds to be modified when given a key
     BankAccount account = new BankAccount(new Fund(initialBalance), accountNumber, name);
     keyMap.put(secretKey, account);
 
@@ -98,6 +110,10 @@ public class Bank extends Thread
     return new BankAccountInfoMessage(accountNumber, secretKey);
   }
 
+  /*
+  Called only when a auction has been successful, in theory the nature of setting blocks should prevent
+  attempted overdrawing at this point
+   */
   synchronized void withdrawFunds(final int secretKey, final int amount)
   {
     keyMap.get(secretKey).getFund().withdraw(amount);
@@ -105,6 +121,12 @@ public class Bank extends Thread
             + " leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
+  /*
+  When a agent places a bid on an auction, a block is placed on their funds for that amount
+  If the auction ends with the agent winning, the block is removed, then the amount for the auction is withdrawn
+  from the account. As the money being withdrawn should be made fully available right before by the block being
+  released, the only place where insufficient funds should occur is when placing blocks.
+   */
   synchronized boolean blockFunds(final int secretKey, final int amount)
   {
     if(keyMap.get(secretKey).getFund().getAvailable() < amount)
@@ -125,6 +147,7 @@ public class Bank extends Thread
             + " Leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
+  // When given an account number produce a unique key
   private int getKey(final int accountNumber)
   {
     MessageDigest digest = null;
@@ -136,7 +159,9 @@ public class Bank extends Thread
       e.printStackTrace();
     }
     assert digest != null;
+    // int to byte array
     byte[] hash = digest.digest(ByteBuffer.allocate(4).putInt(accountNumber).array());
+    // byte array to int
     return Arrays.hashCode(hash);
   }
 }
