@@ -1,13 +1,13 @@
 package AuctionHouse;
 
-import AuctionCentral.*;
-import Messages.RegisterAuctionHouse;
+import Messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
 public class AuctionHouse
 {
   private Socket socket;
@@ -21,7 +21,7 @@ public class AuctionHouse
       socket = new Socket(address, port);
       final ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
       final ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-      oos.writeObject(new RegisterAuctionHouse(name));
+      oos.writeObject(new RegisterAuctionHouseMessage(name));
       Object o = ois.readObject();
     } catch (Exception e)
     {
