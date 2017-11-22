@@ -1,5 +1,6 @@
 package Bank;
 
+import Messages.BankAccountInfoMessage;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.HashMap;
  */
 public class Bank extends Thread
 {
-  public static void main(String agrs[])
+  public static void main(String args[])
   {
     Bank b = new Bank();
     b.printInfo();
@@ -31,9 +32,7 @@ public class Bank extends Thread
   // static port number
   public final static int PORT = 55555;
 
-  private final HashMap<Integer, Fund> fundMap = new HashMap<>();
-  private final HashMap<Integer, String> nameMap = new HashMap<>();
-  private final HashMap<Integer, Integer> accountMap = new HashMap<>();
+  private final HashMap<Integer, BankAccount> keyMap = new HashMap<>();
 
   private ServerSocket bankSocket;
 
@@ -86,43 +85,44 @@ public class Bank extends Thread
   /**
    * Create a new account
    */
-  synchronized Pair<Integer, Integer> openAccount(final String name, final int initialBalance)
+  synchronized BankAccountInfoMessage openAccount(final String name, final int initialBalance)
   {
     final int accountNumber = name.hashCode();
     final int secretKey = getKey(accountNumber);
-    if(fundMap.get(secretKey) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
-    nameMap.put(secretKey, name);
-    fundMap.put(secretKey, new Fund(initialBalance));
-    accountMap.put(secretKey, accountNumber);
+
+    if(keyMap.get(secretKey) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
+    BankAccount account = new BankAccount(new Fund(initialBalance), accountNumber, name);
+    keyMap.put(secretKey, account);
+
     System.out.println("Created bank account " + accountNumber + " for " + name);
-    return new Pair<>(accountNumber, secretKey);
+    return new BankAccountInfoMessage(accountNumber, secretKey);
   }
 
   synchronized void withdrawFunds(final int secretKey, final int amount)
   {
-    fundMap.get(secretKey).withdraw(amount);
-    System.out.println("Withdrew " + amount + " from account " + accountMap.get(secretKey)
-            + " Leaving " + fundMap.get(secretKey).toString());
+    keyMap.get(secretKey).getFund().withdraw(amount);
+    System.out.println("Withdrew " + amount + " from account " + keyMap.get(secretKey).getAccountNumber()
+            + " leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
   synchronized boolean blockFunds(final int secretKey, final int amount)
   {
-    if(fundMap.get(secretKey).getAvailable() < amount)
+    if(keyMap.get(secretKey).getFund().getAvailable() < amount)
     {
-      System.out.println(nameMap.get(secretKey) + " attempted to block more than current available funds");
+      System.out.println(keyMap.get(secretKey).getAccountNumber() + " attempted to block more than current available funds");
       return false;
     }
-    fundMap.get(secretKey).addBlocked(amount);
-    System.out.println("Blocked " + amount + " on account " + accountMap.get(secretKey) +
-            " Leaving " + fundMap.get(secretKey).toString());
+    keyMap.get(secretKey).getFund().addBlocked(amount);
+    System.out.println("Blocked " + amount + " on account " + keyMap.get(secretKey).getAccountNumber() +
+            " leaving " + keyMap.get(secretKey).getFund().toString());
     return true;
   }
 
   synchronized void unblockFunds(final int secretKey, final int amount)
   {
-    fundMap.get(secretKey).removeBlocked(amount);
-    System.out.println("Unblocked " + amount + " on account " + accountMap.get(secretKey)
-            + " Leaving " + fundMap.get(secretKey).toString());
+    keyMap.get(secretKey).getFund().removeBlocked(amount);
+    System.out.println("Unblocked " + amount + " on account " + keyMap.get(secretKey).getAccountNumber()
+            + " Leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
   private int getKey(final int accountNumber)
@@ -135,8 +135,8 @@ public class Bank extends Thread
     {
       e.printStackTrace();
     }
+    assert digest != null;
     byte[] hash = digest.digest(ByteBuffer.allocate(4).putInt(accountNumber).array());
     return Arrays.hashCode(hash);
   }
-
 }
