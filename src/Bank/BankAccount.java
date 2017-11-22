@@ -31,4 +31,10 @@ public class BankAccount
   {
     return name;
   }
+
+  @Override
+  public String toString()
+  {
+    return name + "'s account";
+  }
 }

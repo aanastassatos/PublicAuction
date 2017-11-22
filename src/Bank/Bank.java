@@ -1,6 +1,8 @@
 package Bank;
 
 import Messages.BankAccountInfoMessage;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * The bank is capable of performing three operations:
@@ -38,6 +41,7 @@ public class Bank extends Thread
   // map of secret keys to user accounts, Secret keys are the only method of referencing accounts as it is the
   // only bank information given to AuctionCentral
   private final HashMap<Integer, BankAccount> keyMap = new HashMap<>();
+  private BankGui gui;
 
   private ServerSocket bankSocket;
 
@@ -49,6 +53,8 @@ public class Bank extends Thread
     try
     {
       bankSocket = new ServerSocket(PORT);
+      new JFXPanel();
+      Platform.runLater(() -> gui = new BankGui(new LinkedList<>(keyMap.values())));
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -105,6 +111,7 @@ public class Bank extends Thread
     // create bank account and populate map allowing account information and funds to be modified when given a key
     BankAccount account = new BankAccount(new Fund(initialBalance), accountNumber, name);
     keyMap.put(secretKey, account);
+    Platform.runLater(() -> gui.addAccount(account));
 
     System.out.println("Created bank account " + accountNumber + " for " + name);
     return new BankAccountInfoMessage(accountNumber, secretKey);

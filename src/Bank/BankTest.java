@@ -11,13 +11,13 @@ import java.util.Scanner;
 
 public class BankTest
 {
-  public static void main(String args[]) throws IOException, ClassNotFoundException
+  public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException
   {
     final Scanner in = new Scanner(System.in);
     System.out.print("Enter bank host name: ");
     final String hostname = in.nextLine();
 
-    for(char i = 'A'; i < 'C'; i++)
+    for(char i = 'A'; i < 'R'; i++)
     {
       final String name = Character.toString(i);
       new Thread(() -> test(hostname, name)).start();
@@ -54,6 +54,8 @@ public class BankTest
       int secretKey = ((BankAccountInfoMessage)o).getSecretKey();
       System.out.println("Name: " + name + "\nAccount number: " + accountNumber + "\nSecret Key: " + secretKey);
 
+      Thread.sleep(getVal(rand, 5000));
+
       // send bank a message requesting a block be placed on given account for given amount, specifying that a block
       // is being added
       oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Add));
@@ -62,6 +64,8 @@ public class BankTest
       // extract result
       boolean succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
+
+      Thread.sleep(getVal(rand, 5000));
 
       // invalid block request
       oos.writeObject(new ModifyBlockedFundsMessage(secretKey, initialBalance + 1,
@@ -76,6 +80,8 @@ public class BankTest
       o = ois.readObject();
       succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to unblock " + amount + " " + (succeeded ? "succeeded" : "failed"));
+
+      Thread.sleep(getVal(rand, 5000));
 
       amount = getVal(rand, initialBalance);
 
