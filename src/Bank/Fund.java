@@ -27,6 +27,7 @@ class Fund
 
   synchronized void withdraw(final int amount)
   {
+    if(amount > getAvailable()) throw new RuntimeException("Overdraw");
     total -= amount;
   }
 

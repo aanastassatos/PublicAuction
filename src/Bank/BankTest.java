@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Random;
 import java.util.Scanner;
 
 public class BankTest
@@ -16,48 +17,60 @@ public class BankTest
     System.out.print("Enter bank host name: ");
     final String hostname = in.nextLine();
 
-    for(char i = 'A'; i < 'z'; i++)
+    for(char i = 'A'; i < 'C'; i++)
     {
       final String name = Character.toString(i);
-      final int balance = i;
-      new Thread(() -> test(hostname, name, balance * 100)).start();
+      new Thread(() -> test(hostname, name)).start();
     }
   }
 
-  private static void test(final String hostname, final String name, final int initialBalance)// throws IOException, ClassNotFoundException
+  private static int getVal(final Random rand, final int bound)
+  {
+    return Math.abs(rand.nextInt() % bound);
+  }
+
+  private static void test(final String hostname, final String name)// throws IOException, ClassNotFoundException
   {
     try
     {
       final Socket s = new Socket(hostname, Bank.PORT);
       final ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
       final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+      final Random rand = new Random();
+      final int initialBalance = 1000;
+
+      int amount = getVal(rand, initialBalance);
 
       oos.writeObject(new CreateBankAccountMessage(name, initialBalance));
 
       Object o = ois.readObject();
       int accountNumber = ((BankAccountInfoMessage)o).getAccountNumber();
-      System.out.println("Name: " + name + "\nAccount number: " + accountNumber);
+      int secretKey = ((BankAccountInfoMessage)o).getSecretKey();
+      System.out.println("Name: " + name + "\nAccount number: " + accountNumber + "\nSecret Key: " + secretKey);
 
-      int amount = 12;
-
-      oos.writeObject(new ModifyBlockedFundsMessage(accountNumber, amount, ModifyBlockedFundsMessage.TransactionType.Add));
+      // valid block request
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Add));
       o = ois.readObject();
       boolean succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
 
-      amount = 100000;
-
-      oos.writeObject(new ModifyBlockedFundsMessage(accountNumber, amount, ModifyBlockedFundsMessage.TransactionType.Add));
+      // invalid block request
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, initialBalance + 1,
+              ModifyBlockedFundsMessage.TransactionType.Add));
       o = ois.readObject();
       succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
 
-      amount = 5;
+      // block remove
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Remove));
+      o = ois.readObject();
+      succeeded = ((BlockFundsResultMessage)o).getResult();
+      System.out.println("Attempt to unblock " + amount + " " + (succeeded ? "succeeded" : "failed"));
 
-      oos.writeObject(new WithdrawFundsMessage(accountNumber, amount));
+      amount = getVal(rand, initialBalance);
+
+      oos.writeObject(new WithdrawFundsMessage(secretKey, amount));
       oos.writeObject(new CloseConnectionMessage());
-
-//      s.close();
     }catch (Exception e)
     {
       e.printStackTrace();
