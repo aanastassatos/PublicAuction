@@ -26,8 +26,8 @@ public class AuctionCentralTest extends Thread
     try
     {
       Socket socket = new Socket(hostName, 7777);
-      ois = new ObjectInputStream(socket.getInputStream());
       oos = new ObjectOutputStream(socket.getOutputStream());
+      ois = new ObjectInputStream(socket.getInputStream());
       oos.writeObject(new RegisterAgentMessage("Bob", 12345));
     } catch (IOException e) {
       e.printStackTrace();
@@ -41,8 +41,8 @@ public class AuctionCentralTest extends Thread
     try
     {
       Socket socket = new Socket(hostName, 7777);
-      ois = new ObjectInputStream(socket.getInputStream());
       oos = new ObjectOutputStream(socket.getOutputStream());
+      ois = new ObjectInputStream(socket.getInputStream());
       oos.writeObject(new RegisterAuctionHouseMessage("AuctionHouseBob"));
     } catch (IOException e) {
       e.printStackTrace();

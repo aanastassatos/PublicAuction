@@ -14,6 +14,7 @@ public class AuctionCentral extends Thread
 {
   public static Random rand = new Random();
   public final static int PORT = 7777;
+  private static BankConnection bankConnection;
   
   //This creates an AuctionCentral and instantiates it with a port.
   public static void main(String[] args)
@@ -21,7 +22,11 @@ public class AuctionCentral extends Thread
 //    System.out.println("Enter port number: ");
     try
     {
-      new AuctionCentral(PORT).start();
+      AuctionCentral auctionCentral = new AuctionCentral(PORT);
+      auctionCentral.start();
+      String hostName = "localhost";
+      bankConnection = new BankConnection(hostName, auctionCentral);
+      bankConnection.start();
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -29,14 +34,10 @@ public class AuctionCentral extends Thread
   }
   
   private ServerSocket auctionCentralSocket;
-  private final BankConnection bankConnection;
   
   public AuctionCentral(int port) throws IOException
   {
-    String hostName = "localhost";
     auctionCentralSocket = new ServerSocket(port);
-    bankConnection = new BankConnection(hostName, this);
-    bankConnection.start();
     printInfo();
   }
   
@@ -57,7 +58,7 @@ public class AuctionCentral extends Thread
         Socket socket = auctionCentralSocket.accept();
         AuctionClient client = new AuctionClient(socket, this);
         client.start();
-      } catch (IOException e)
+      } catch (Exception e)
       {
         e.printStackTrace();
       }

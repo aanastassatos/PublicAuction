@@ -18,8 +18,8 @@ public class BankConnection extends Thread
   {
     Socket socket = new Socket(address, BANKPORT);
     this.auctionCentral = auctionCentral;
-    ois = new ObjectInputStream(socket.getInputStream());
     oos = new ObjectOutputStream(socket.getOutputStream());
+    ois = new ObjectInputStream(socket.getInputStream());
   }
   
   @Override
@@ -27,7 +27,6 @@ public class BankConnection extends Thread
   {
     while(true)
     {
-    
     }
   }
 }
