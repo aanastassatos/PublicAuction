@@ -1,10 +1,16 @@
 package Bank;
 
+import javafx.util.Pair;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -15,7 +21,6 @@ import java.util.HashMap;
  */
 public class Bank extends Thread
 {
-
   public static void main(String agrs[])
   {
     Bank b = new Bank();
@@ -28,6 +33,7 @@ public class Bank extends Thread
 
   private final HashMap<Integer, Fund> fundMap = new HashMap<>();
   private final HashMap<Integer, String> nameMap = new HashMap<>();
+  private final HashMap<Integer, Integer> accountMap = new HashMap<>();
 
   private ServerSocket bankSocket;
 
@@ -80,39 +86,57 @@ public class Bank extends Thread
   /**
    * Create a new account
    */
-  synchronized int openAccount(final String name, final int initialBalance)
+  synchronized Pair<Integer, Integer> openAccount(final String name, final int initialBalance)
   {
     final int accountNumber = name.hashCode();
-    if(fundMap.get(accountNumber) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
-    nameMap.put(accountNumber, name);
-    fundMap.put(accountNumber, new Fund(initialBalance));
+    final int secretKey = getKey(accountNumber);
+    if(fundMap.get(secretKey) != null) throw new RuntimeException("Attempt to create multiple accounts for one name");
+    nameMap.put(secretKey, name);
+    fundMap.put(secretKey, new Fund(initialBalance));
+    accountMap.put(secretKey, accountNumber);
     System.out.println("Created bank account " + accountNumber + " for " + name);
-    return accountNumber;
+    return new Pair<>(accountNumber, secretKey);
   }
 
-  synchronized void withdrawFunds(final int accountNumber, final int amount)
+  synchronized void withdrawFunds(final int secretKey, final int amount)
   {
-    fundMap.get(accountNumber).withdraw(amount);
-    System.out.println("Withdrew " + amount + " from account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    fundMap.get(secretKey).withdraw(amount);
+    System.out.println("Withdrew " + amount + " from account " + accountMap.get(secretKey)
+            + " Leaving " + fundMap.get(secretKey).toString());
   }
 
-  synchronized boolean blockFunds(final int accountNumber, final int amount)
+  synchronized boolean blockFunds(final int secretKey, final int amount)
   {
-    if(fundMap.get(accountNumber).getAvailable() < amount)
+    if(fundMap.get(secretKey).getAvailable() < amount)
     {
-      System.out.println(nameMap.get(accountNumber) + " attempted to bid over current available funds");
+      System.out.println(nameMap.get(secretKey) + " attempted to block more than current available funds");
       return false;
     }
-    fundMap.get(accountNumber).addBlocked(amount);
-    System.out.println("Blocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    fundMap.get(secretKey).addBlocked(amount);
+    System.out.println("Blocked " + amount + " on account " + accountMap.get(secretKey) +
+            " Leaving " + fundMap.get(secretKey).toString());
     return true;
   }
 
-  synchronized void unblockFunds(final int accountNumber, final int amount)
+  synchronized void unblockFunds(final int secretKey, final int amount)
   {
-    fundMap.get(accountNumber).removeBlocked(amount);
-    System.out.println("Unblocked " + amount + " on account " + accountNumber + " Leaving " + fundMap.get(accountNumber).toString());
+    fundMap.get(secretKey).removeBlocked(amount);
+    System.out.println("Unblocked " + amount + " on account " + accountMap.get(secretKey)
+            + " Leaving " + fundMap.get(secretKey).toString());
   }
 
+  private int getKey(final int accountNumber)
+  {
+    MessageDigest digest = null;
+    try
+    {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e)
+    {
+      e.printStackTrace();
+    }
+    byte[] hash = digest.digest(ByteBuffer.allocate(4).putInt(accountNumber).array());
+    return Arrays.hashCode(hash);
+  }
 
 }

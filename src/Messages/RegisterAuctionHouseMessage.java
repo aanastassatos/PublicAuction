@@ -5,8 +5,8 @@ import java.io.Serializable;
 public class RegisterAuctionHouseMessage implements Serializable
 {
   private final String name;
-  
-  public RegisterAuctionHouseMessage(String name)
+
+  public RegisterAuctionHouseMessage(final String name)
   {
     this.name = name;
   }

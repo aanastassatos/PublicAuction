@@ -1,11 +1,16 @@
 package Bank;
 
 import Messages.*;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class BankClient extends Thread
 {
@@ -68,10 +73,10 @@ public class BankClient extends Thread
 
   private void handleMessage(final CreateBankAccountMessage message)
   {
-    final int accountNumber = bank.openAccount(message.getName(), message.getInitialBalance());
+    final Pair<Integer, Integer> accountInfo = bank.openAccount(message.getName(), message.getInitialBalance());
     try
     {
-      objectOutputStream.writeObject(new BankAccountInfoMessage(accountNumber));
+      objectOutputStream.writeObject(new BankAccountInfoMessage(accountInfo.getKey(), accountInfo.getValue()));
     } catch (IOException e)
     {
       e.printStackTrace();
