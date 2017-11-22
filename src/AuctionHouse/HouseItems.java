@@ -1,19 +1,28 @@
 package AuctionHouse;
 
-import sun.jvm.hotspot.runtime.Threads;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class HouseItems extends Threads
+class HouseItems
 {
-  private ArrayList<String> itemL = new ArrayList();
+  private List<String> itemL = new ArrayList();
   private List<String> houseItems = new ArrayList();
-  private int itemPrice;
-  private final int maxVal = 5000;
+  private Item item;
 
-  void makeItems()
+  HouseItems(int numItems)
+  {
+    makeItems();
+    houseItems = getNitems(numItems);
+    for(int i = 0; i < houseItems.size(); i++)
+    {
+      item = new Item(houseItems.get(i));
+      System.out.println("item name is: " +houseItems.get(i)+ "; item ID is: " + item.getID()+ "; item price is : " +item.getPrice());
+    }
+  }
+
+  private void makeItems()
   {
     for (char i = 'A'; i < 'z'; i++)
     {
@@ -22,25 +31,12 @@ public class HouseItems extends Threads
     }
   }
 
-  List<String> getNitems(ArrayList<String> allItems, int n)
+  private List<String> getNitems(int n)
   {
     makeItems();
-    List<String> copy = new ArrayList<>(allItems);
+    List<String> copy = new ArrayList<>(itemL);
     Collections.shuffle(copy);
     return copy.subList(0, n);
   }
 
-  List<String> getItemList(int numItems)
-  {
-    houseItems = getNitems(itemL, numItems);
-    return houseItems;
-  }
-
-  void getItemPrice()
-  {
-    for(int i = 0; i<houseItems.size(); i++)
-    {
-      itemPrice = (int) Math.random() * maxVal;
-    }
-  }
 }

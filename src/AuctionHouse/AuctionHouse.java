@@ -7,15 +7,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 public class AuctionHouse
 {
   private Socket socket;
+  private final int maxNumOfItems = 10;
   private int secretKey;
   private int publicID;
+  private Random r = new Random();
 
   public AuctionHouse(String address, int port, String name) throws UnknownHostException, IOException
   {
+    HouseItems houseItems = new HouseItems(r.nextInt(maxNumOfItems));
     try
     {
       socket = new Socket(address, port);
@@ -29,14 +33,13 @@ public class AuctionHouse
     }
   }
 
-  public int getSecretKey()
+  int getSecretKey()
   {
     return secretKey;
   }
 
-  public int getPublicID()
+  int getPublicID()
   {
     return publicID;
   }
-
 }
