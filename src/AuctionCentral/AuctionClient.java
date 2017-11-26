@@ -47,6 +47,7 @@ public class AuctionClient extends Thread
       if(o instanceof RegisterAgentMessage) handleMessage((RegisterAgentMessage) o);
       else if(o instanceof RegisterAuctionHouseMessage) handleMessage((RegisterAuctionHouseMessage) o);
       else if(o instanceof DeregisterAuctionHouseMessage) handleMessage((DeregisterAuctionHouseMessage) o);
+      else if(o instanceof RequestAuctionHouseListMessage) handleMessage((RequestAuctionHouseListMessage) o);
       else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
@@ -54,6 +55,11 @@ public class AuctionClient extends Thread
       }
       else throw new RuntimeException("Received unknown message");
     }
+  }
+  
+  Socket getSocket()
+  {
+    return socket;
   }
   
   private void closeConnection()
@@ -68,7 +74,7 @@ public class AuctionClient extends Thread
     }
   }
   
-  private void handleMessage(RegisterAgentMessage msg)
+  private void handleMessage(final RegisterAgentMessage msg)
   {
     try
     {
@@ -79,7 +85,7 @@ public class AuctionClient extends Thread
     }
   }
   
-  private void handleMessage(RegisterAuctionHouseMessage msg)
+  private void handleMessage(final RegisterAuctionHouseMessage msg)
   {
     try
     {
@@ -90,11 +96,22 @@ public class AuctionClient extends Thread
     }
   }
   
-  private void handleMessage(DeregisterAuctionHouseMessage msg)
+  private void handleMessage(final DeregisterAuctionHouseMessage msg)
   {
     try
     {
       oos.writeObject(auctionCentral.deRegisterAuctionHouse(msg.getPublicID(), msg.getSecretKey()));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  private void handleMessage(final RequestAuctionHouseListMessage msg)
+  {
+    try
+    {
+      oos.writeObject(auctionCentral.getAuctionHouseList());
     } catch (IOException e)
     {
       e.printStackTrace();

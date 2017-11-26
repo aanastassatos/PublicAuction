@@ -3,12 +3,12 @@ package AuctionCentral;
 import Messages.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class AuctionCentral extends Thread
 {
@@ -102,6 +102,11 @@ public class AuctionCentral extends Thread
     agentClients.put(biddingKey, agent);
     System.out.println("Agent "+name+" registered under the bidding key "+biddingKey+" and the bank key "+bankKey);
     return agentInfo;
+  }
+  
+  synchronized AuctionHouseListMessage getAuctionHouseList()
+  {
+    return new AuctionHouseListMessage(auctionHouseNames);
   }
   
   public void printInfo()
