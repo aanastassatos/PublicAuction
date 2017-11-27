@@ -44,7 +44,6 @@ public class AuctionCentral extends Thread
   private final HashMap<Integer, String> auctionHouseNames = new HashMap<>();
   private final HashMap<Integer, Integer> auctionHouseKeys = new HashMap<>();
   private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
-  private final HashMap<Integer, String> agentNames = new HashMap<>();
   private final HashMap<Integer, Integer> agentBankKeys = new HashMap<>();
   private final HashMap<Integer, AuctionClient> agentClients = new HashMap<>();
   
@@ -95,9 +94,8 @@ public class AuctionCentral extends Thread
   
   synchronized AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
   {
-    int biddingKey = name.hashCode();
+    int biddingKey = name.hashCode()*rand.nextInt(8);
     AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
-    agentNames.put(biddingKey, name);
     agentBankKeys.put(biddingKey, bankKey);
     agentClients.put(biddingKey, agent);
     System.out.println("Agent "+name+" registered under the bidding key "+biddingKey+" and the bank key "+bankKey);
@@ -107,6 +105,16 @@ public class AuctionCentral extends Thread
   synchronized AuctionHouseListMessage getAuctionHouseList()
   {
     return new AuctionHouseListMessage(auctionHouseNames);
+  }
+  
+  synchronized AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final int auctionHouseID)
+  {
+    return new AuctionHouseConnectionInfoMessage(auctionHouseClients.get(auctionHouseKeys.get(auctionHouseID)).getSocket());
+  }
+  
+  synchronized void modifyBidderFunds(final BlockBidderFunds msg)
+  {
+    bankConnection.modifyBlockedFunds(new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getBidderID()), msg.getAmount(), msg.getType()));
   }
   
   public void printInfo()

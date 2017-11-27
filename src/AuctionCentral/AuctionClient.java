@@ -48,6 +48,8 @@ public class AuctionClient extends Thread
       else if(o instanceof RegisterAuctionHouseMessage) handleMessage((RegisterAuctionHouseMessage) o);
       else if(o instanceof DeregisterAuctionHouseMessage) handleMessage((DeregisterAuctionHouseMessage) o);
       else if(o instanceof RequestAuctionHouseListMessage) handleMessage((RequestAuctionHouseListMessage) o);
+      else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
+      else if(o instanceof BlockBidderFunds) auctionCentral.modifyBidderFunds((BlockBidderFunds) o);
       else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
@@ -112,6 +114,17 @@ public class AuctionClient extends Thread
     try
     {
       oos.writeObject(auctionCentral.getAuctionHouseList());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  private void handleMessage(final RequestConnectionToAuctionHouseMessage msg)
+  {
+    try
+    {
+      oos.writeObject(auctionCentral.connectClientToAuctionHouse(msg.getAuctionHouseID()));
     } catch (IOException e)
     {
       e.printStackTrace();

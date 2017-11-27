@@ -1,9 +1,6 @@
 package AuctionCentral;
 
-import Messages.BlockFundsResultMessage;
-import Messages.CloseConnectionMessage;
-import Messages.ModifyBlockedFundsMessage;
-import Messages.WithdrawFundsMessage;
+import Messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -43,8 +40,8 @@ public class BankConnection extends Thread
         e.printStackTrace();
         return;
       }
-      if(o instanceof ModifyBlockedFundsMessage) handleMessage((ModifyBlockedFundsMessage)o);
-      else if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage) o);
+//      if(o instanceof ModifyBlockedFundsMessage) handleMessage((ModifyBlockedFundsMessage)o);
+      if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage) o);
       else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
@@ -79,5 +76,16 @@ public class BankConnection extends Thread
   private void handleMessage(final BlockFundsResultMessage msg)
   {
     System.out.println(msg.getResult());
+  }
+  
+  void modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
+  {
+    try
+    {
+      oos.writeObject(msg);
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
   }
 }
