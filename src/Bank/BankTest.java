@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class BankTest
 {
@@ -46,6 +47,8 @@ public class BankTest
 
       int amount = getVal(rand, initialBalance);
 
+      final UUID transactionId = UUID.randomUUID();
+
       // create an account with the bank
       oos.writeObject(new CreateBankAccountMessage(name, initialBalance));
 
@@ -60,7 +63,7 @@ public class BankTest
 
       // send bank a message requesting a block be placed on given account for given amount, specifying that a block
       // is being added
-      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Add));
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Add, transactionId));
       // read reply to previous action, whether the block was successful or failed
       o = ois.readObject();
       // extract result
@@ -71,7 +74,7 @@ public class BankTest
 
       // invalid block request
       oos.writeObject(new ModifyBlockedFundsMessage(secretKey, initialBalance - amount + 1,
-              ModifyBlockedFundsMessage.TransactionType.Add));
+              ModifyBlockedFundsMessage.TransactionType.Add, transactionId));
       o = ois.readObject();
       // in this case the message returns a false as the block request was too large
       succeeded = ((BlockFundsResultMessage)o).getResult();
@@ -80,7 +83,7 @@ public class BankTest
 
       Thread.sleep(getVal(rand, timeBound));
       // block remove
-      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Remove));
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Remove, transactionId));
       o = ois.readObject();
       succeeded = ((BlockFundsResultMessage) o).getResult();
       System.out.println("Attempt to unblock " + amount + " " + (succeeded ? "succeeded" : "failed"));

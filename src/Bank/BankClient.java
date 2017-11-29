@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.UUID;
 
 /**
  * Each time the bank receives a new connection, a client is created to monitor the connection and
@@ -95,6 +96,7 @@ public class BankClient extends Thread
   private void handleMessage(final ModifyBlockedFundsMessage message)
   {
     boolean succeeded = true;
+    final UUID transactionId = message.getTransactionId();
     if(message.getType() == ModifyBlockedFundsMessage.TransactionType.Add)
     {
       succeeded = bank.blockFunds(message.getAccountNumber(), message.getAmount());
@@ -102,7 +104,7 @@ public class BankClient extends Thread
     else bank.unblockFunds(message.getAccountNumber(), message.getAmount());
     try
     {
-       objectOutputStream.writeObject(new BlockFundsResultMessage(succeeded));
+       objectOutputStream.writeObject(new BlockFundsResultMessage(succeeded, transactionId));
     } catch (IOException e)
     {
       e.printStackTrace();
