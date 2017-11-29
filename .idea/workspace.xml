@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="51a91c68-a0c0-4353-8208-7c24dc2bf853" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" afterPath="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,7 +14,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="378">
@@ -48,7 +46,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AuctionClient.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AuctionClient.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-618">
@@ -81,8 +79,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -251,12 +249,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1511987515959</updated>
-      <workItem from="1511987526545" duration="288000" />
+      <workItem from="1511987526545" duration="352000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="288000" />
+    <option name="totallyTimeSpent" value="352000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="598" y="14" width="1537" height="912" extended-state="6" />
@@ -301,14 +299,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="21" column="6" lean-forward="false" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Messages/BlockFundsResultMessage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
@@ -355,6 +345,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-618">
           <caret line="10" column="13" lean-forward="false" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="21" column="6" lean-forward="false" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
           <folding />
         </state>
       </provider>
