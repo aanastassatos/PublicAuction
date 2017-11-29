@@ -1,45 +1,84 @@
 package AuctionHouse;
 
-import Messages.*;
+import AuctionCentral.AuctionClient;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
+import java.util.HashMap;
 
-public class AuctionHouse
+public class AuctionHouse extends Thread
 {
-  private Socket socket;
-  private final int maxNumOfItems = 10;
-  private int secretKey;
-  private int publicID;
-  private Random r = new Random();
+  public final static int PORT = 1113;
 
-  public AuctionHouse(String address, int port, String name) throws UnknownHostException, IOException
+  private ServerSocket auctionHouseSocket;
+  private AuctionHouseCentral central;
+  private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
+
+  public static void main(String[] args)
   {
-    HouseItems houseItems = new HouseItems(r.nextInt(maxNumOfItems));
     try
     {
-      socket = new Socket(address, port);
-      final ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-      final ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-      oos.writeObject(new RegisterAuctionHouseMessage(name));
-      Object o = ois.readObject();
-    } catch (Exception e)
+      AuctionHouse auctionHouse= new AuctionHouse(args[0], Integer.parseInt(args[1]), args[2], PORT);
+
+      auctionHouse.start();
+      String hostName = "localhost";
+    } catch (IOException e)
     {
       e.printStackTrace();
     }
   }
 
-  int getSecretKey()
+  public AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
-    return secretKey;
+    auctionHouseSocket = new ServerSocket(port);
+    central = new AuctionHouseCentral(centralAddress, centralPort, name);
+    printInfo();
   }
 
-  int getPublicID()
+  @Override
+  public void run()
   {
-    return publicID;
+    while(true)
+    {
+      try
+      {
+        Socket socket = auctionHouseSocket.accept();
+        AuctionHouseClient client = new AuctionHouseClient(socket, this);
+
+        client.start();
+      } catch (Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
   }
+
+  /*synchronized AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
+  {
+    int biddingKey = name.hashCode();
+    AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
+    agentNames.put(biddingKey, name);
+    agentBankKeys.put(biddingKey, bankKey);
+    agentClients.put(biddingKey, agent);
+    System.out.println("Agent "+name+" registered under the bidding key "+biddingKey+" and the bank key "+bankKey);
+    return agentInfo;
+  }*/
+
+  public void printInfo()
+  {
+    try
+    {
+      System.out.println("Server Ip: " + InetAddress.getLocalHost());
+      System.out.println("Server host name: " + InetAddress.getLocalHost().getHostName());
+    }
+    catch (UnknownHostException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+
 }

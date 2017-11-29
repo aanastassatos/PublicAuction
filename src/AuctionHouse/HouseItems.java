@@ -1,40 +1,46 @@
 package AuctionHouse;
 
+import Messages.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class HouseItems
-{
-  private List<String> itemL = new ArrayList();
-  private List<String> houseItems = new ArrayList();
-  private Item item;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
-  HouseItems(int numItems)
+
+class HouseItems extends Thread
+{
+  private List<Item> itemL = new ArrayList();
+  private List<Item> houseItems = new ArrayList();
+  private final Socket socket;
+  private final AuctionHouseCentral auctionHouse;
+
+  HouseItems(int numItems, Socket socket, AuctionHouseCentral auctionHouse)
   {
+    this.socket = socket;
+    this.auctionHouse = auctionHouse;
     makeItems();
     houseItems = getNitems(numItems);
-    for(int i = 0; i < houseItems.size(); i++)
-    {
-      item = new Item(houseItems.get(i));
-      System.out.println("item name is: " +houseItems.get(i)+ "; item ID is: " + item.getID()+ "; item price is : " +item.getPrice());
-    }
   }
 
   private void makeItems()
   {
     for (char i = 'A'; i < 'z'; i++)
     {
-      final String item = Character.toString(i);
+      final String anItem = Character.toString(i);
+      final Item item = new Item(anItem);
       itemL.add(item);
     }
   }
 
-  private List<String> getNitems(int n)
+  private List<Item> getNitems(int n)
   {
     makeItems();
-    List<String> copy = new ArrayList<>(itemL);
+    List<Item> copy = new ArrayList<>(itemL);
     Collections.shuffle(copy);
     return copy.subList(0, n);
   }

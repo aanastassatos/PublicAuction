@@ -1,9 +1,11 @@
 package Messages;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class ModifyBlockedFundsMessage implements Serializable
 {
+
   public enum TransactionType
   {
     Add, Remove;
@@ -12,12 +14,14 @@ public class ModifyBlockedFundsMessage implements Serializable
   private final int amount;
   private final int accountNumber;
   private final TransactionType type;
+  private final UUID transactionId;
 
-  public ModifyBlockedFundsMessage(final int account, final int amount, TransactionType type)
+  public ModifyBlockedFundsMessage(final int account, final int amount, final TransactionType type, final UUID transactionId)
   {
     this.amount = amount;
     this.accountNumber = account;
     this.type = type;
+    this.transactionId = transactionId;
   }
 
   public int getAmount()
@@ -33,5 +37,10 @@ public class ModifyBlockedFundsMessage implements Serializable
   public TransactionType getType()
   {
     return type;
+  }
+
+  public UUID getTransactionId()
+  {
+    return transactionId;
   }
 }

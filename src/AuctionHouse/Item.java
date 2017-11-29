@@ -12,6 +12,9 @@ class Item
   private static int idInc = 1;
   private Random r = new Random();
 
+  private int minimumBid;
+  private int currentBid;
+
   Item(String item)
   {
     this.item = item;
@@ -38,5 +41,11 @@ class Item
   long getID()
   {
     return itemID;
+  }
+
+  int initBid()
+  {
+    minimumBid = r.nextInt(itemPrice/10);
+    return minimumBid;
   }
 }

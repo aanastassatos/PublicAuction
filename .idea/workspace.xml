@@ -2,13 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5c666d5b-6129-4ab7-875a-6364c6f7dbaa" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/Messages/BlockBidderFunds.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/Messages/TransferFundsMessage.java" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/AuctionHouse/AuctionHouseCentral.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/AuctionHouse/AuctionHouseClient.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/Messages/ItemNoLongerAvailableMessage.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" afterPath="$PROJECT_DIR$/src/AuctionCentral/AuctionCentral.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java" afterPath="$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" afterPath="$PROJECT_DIR$/src/AuctionCentral/BankConnection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Messages/DeregisterAuctionHouseResultMessage.java" afterPath="$PROJECT_DIR$/src/Messages/DeregisterAuctionHouseResultMessage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionHouse/AuctionHouse.java" afterPath="$PROJECT_DIR$/src/AuctionHouse/AuctionHouse.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionHouse/HouseItems.java" afterPath="$PROJECT_DIR$/src/AuctionHouse/HouseItems.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AuctionHouse/Item.java" afterPath="$PROJECT_DIR$/src/AuctionHouse/Item.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Bank/BankClient.java" afterPath="$PROJECT_DIR$/src/Bank/BankClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Bank/BankTest.java" afterPath="$PROJECT_DIR$/src/Bank/BankTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Messages/BlockFundsResultMessage.java" afterPath="$PROJECT_DIR$/src/Messages/BlockFundsResultMessage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Messages/ModifyBlockedFundsMessage.java" afterPath="$PROJECT_DIR$/src/Messages/ModifyBlockedFundsMessage.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -37,7 +45,7 @@
         <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2971">
-              <caret line="173" column="5" lean-forward="true" selection-start-line="173" selection-start-column="5" selection-end-line="173" selection-end-column="5" />
+              <caret line="173" column="5" lean-forward="false" selection-start-line="173" selection-start-column="5" selection-end-line="173" selection-end-column="5" />
               <folding>
                 <element signature="e#2123#2124#0" expanded="true" />
                 <element signature="e#2146#2147#0" expanded="true" />
@@ -49,8 +57,8 @@
       <file leaf-file-name="Bank.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Bank/Bank.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+            <state relative-caret-position="378">
+              <caret line="34" column="0" lean-forward="true" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -111,6 +119,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
@@ -203,6 +212,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -296,6 +306,18 @@
       <envs />
       <patterns />
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="PublicAuction" />
+      <envs />
+    </configuration>
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
@@ -357,15 +379,16 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1511676225953</updated>
-      <workItem from="1511676231387" duration="20810000" />
+      <workItem from="1511676231387" duration="21248000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20810000" />
+    <option name="totallyTimeSpent" value="21248000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="598" y="14" width="1537" height="912" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -380,7 +403,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2495114" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2495114" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -662,7 +685,7 @@
     <entry file="file://$PROJECT_DIR$/src/AuctionCentral/AuctionClient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2971">
-          <caret line="173" column="5" lean-forward="true" selection-start-line="173" selection-start-column="5" selection-end-line="173" selection-end-column="5" />
+          <caret line="173" column="5" lean-forward="false" selection-start-line="173" selection-start-column="5" selection-end-line="173" selection-end-column="5" />
           <folding>
             <element signature="e#2123#2124#0" expanded="true" />
             <element signature="e#2146#2147#0" expanded="true" />
@@ -672,8 +695,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Bank/Bank.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+        <state relative-caret-position="378">
+          <caret line="34" column="0" lean-forward="true" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
           <folding />
         </state>
       </provider>
