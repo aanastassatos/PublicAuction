@@ -13,14 +13,13 @@ public class BankConnection extends Thread
   private static final int BANKPORT = 55555;
   private final ObjectInputStream ois;
   private final ObjectOutputStream oos;
-  private final Socket socket;
-  private final AuctionCentral auctionCentral;
+  private final AuctionClient auctionClient;
   
   
-  BankConnection(final String address, final AuctionCentral auctionCentral) throws UnknownHostException, IOException
+  BankConnection(final String address, final AuctionClient auctionClient) throws UnknownHostException, IOException
   {
-    socket = new Socket(address, BANKPORT);
-    this.auctionCentral = auctionCentral;
+    Socket socket = new Socket(address, BANKPORT);
+    this.auctionClient = auctionClient;
     oos = new ObjectOutputStream(socket.getOutputStream());
     ois = new ObjectInputStream(socket.getInputStream());
   }
@@ -55,7 +54,6 @@ public class BankConnection extends Thread
     try
     {
       ois.close();
-      socket.close();
     } catch (IOException e)
     {
       e.printStackTrace();

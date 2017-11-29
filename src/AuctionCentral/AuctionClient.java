@@ -1,5 +1,6 @@
 package AuctionCentral;
 
+import Bank.Bank;
 import Messages.*;
 
 import java.io.IOException;
@@ -10,18 +11,20 @@ import java.net.Socket;
 public class AuctionClient extends Thread
 {
   private final AuctionCentral auctionCentral;
-  private ObjectInputStream ois;
-  private ObjectOutputStream oos;
+  private ObjectInputStream client_ois;
+  private ObjectOutputStream client_oos;
+  private ObjectInputStream bank_ois = null;
+  private ObjectOutputStream bank_oos = null;
   private final Socket socket;
   
   AuctionClient(final Socket socket, final AuctionCentral auctionCentral)
   {
-    this.socket = socket;
     this.auctionCentral = auctionCentral;
+    this.socket = socket;
     try
     {
-      ois = new ObjectInputStream(socket.getInputStream());
-      oos = new ObjectOutputStream(socket.getOutputStream());
+      client_ois = new ObjectInputStream(socket.getInputStream());
+      client_oos = new ObjectOutputStream(socket.getOutputStream());
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -37,7 +40,7 @@ public class AuctionClient extends Thread
       o = null;
       try
       {
-        o = ois.readObject();
+        o = client_ois.readObject();
       } catch (Exception e)
       {
         e.printStackTrace();
@@ -49,7 +52,9 @@ public class AuctionClient extends Thread
       else if(o instanceof DeregisterAuctionHouseMessage) handleMessage((DeregisterAuctionHouseMessage) o);
       else if(o instanceof RequestAuctionHouseListMessage) handleMessage((RequestAuctionHouseListMessage) o);
       else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
-      else if(o instanceof BlockBidderFunds) auctionCentral.modifyBidderFunds((BlockBidderFunds) o);
+      else if(o instanceof ModifyBlockedFundsMessage) handleMessage((ModifyBlockedFundsMessage) o);
+      else if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage) o);
+      else if(o instanceof WithdrawFundsMessage) handleMessage((WithdrawFundsMessage) o);
       else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
@@ -68,7 +73,13 @@ public class AuctionClient extends Thread
   {
     try
     {
-      ois.close();
+      client_oos.writeObject(new CloseConnectionMessage());
+      client_ois.close();
+      if(bank_ois != null)
+      {
+        bank_oos.writeObject(new CloseConnectionMessage());
+        bank_ois.close();
+      }
       socket.close();
     } catch (IOException e)
     {
@@ -80,7 +91,7 @@ public class AuctionClient extends Thread
   {
     try
     {
-      oos.writeObject(auctionCentral.registerAgent(msg.getName(), msg.getBankKey(), this));
+      client_oos.writeObject(auctionCentral.registerAgent(msg.getName(), msg.getBankKey(), this));
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -91,7 +102,10 @@ public class AuctionClient extends Thread
   {
     try
     {
-      oos.writeObject(auctionCentral.registerAuctionHouse(msg.getName(), this));
+      Socket bankSocket = new Socket(AuctionCentral.BANK_ADDRESS, Bank.PORT);
+      bank_ois = new ObjectInputStream(bankSocket.getInputStream());
+      bank_oos = new ObjectOutputStream(bankSocket.getOutputStream());
+      client_oos.writeObject(auctionCentral.registerAuctionHouse(msg.getName(), this));
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -102,7 +116,8 @@ public class AuctionClient extends Thread
   {
     try
     {
-      oos.writeObject(auctionCentral.deRegisterAuctionHouse(msg.getPublicID(), msg.getSecretKey()));
+      client_oos.writeObject(auctionCentral.deRegisterAuctionHouse(msg.getPublicID(), msg.getSecretKey()));
+      closeConnection();
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -113,7 +128,7 @@ public class AuctionClient extends Thread
   {
     try
     {
-      oos.writeObject(auctionCentral.getAuctionHouseList());
+      client_oos.writeObject(auctionCentral.getAuctionHouseList());
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -124,7 +139,40 @@ public class AuctionClient extends Thread
   {
     try
     {
-      oos.writeObject(auctionCentral.connectClientToAuctionHouse(msg.getAuctionHouseID()));
+      client_oos.writeObject(auctionCentral.connectClientToAuctionHouse(msg.getAuctionHouseID()));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  private void handleMessage(final ModifyBlockedFundsMessage msg)
+  {
+    try
+    {
+      bank_oos.writeObject(auctionCentral.modifyBlockedFunds(msg));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  private void handleMessage(final BlockFundsResultMessage msg)
+  {
+    try
+    {
+      client_oos.writeObject(msg);
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  private void handleMessage(final WithdrawFundsMessage msg)
+  {
+    try
+    {
+      bank_oos.writeObject(auctionCentral.withdrawFunds(msg));
     } catch (IOException e)
     {
       e.printStackTrace();

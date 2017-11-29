@@ -1,8 +1,12 @@
 package AuctionCentral;
 
+import ChatClient.ChatClient;
+import ChatServer.ChatServer;
 import Messages.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,32 +16,37 @@ import java.util.*;
 
 public class AuctionCentral extends Thread
 {
+  public static final boolean DEBUG = true;
   public static Random rand = new Random();
-  public final static int PORT = 7777;
-  private static BankConnection bankConnection;
+  public static final int PORT = 7777;
+  public static BufferedReader reader;
+  static String BANK_ADDRESS;
   
   //This creates an AuctionCentral and instantiates it with a port.
   public static void main(String[] args)
   {
-//    System.out.println("Enter port number: ");
-    try
+    System.out.print("Enter the bank address (use localhost if server is on same computer as this client): ");
+    try{
+      reader = new BufferedReader(new InputStreamReader(System.in));
+      String bank_address = reader.readLine();
+      new AuctionCentral(bank_address);
+    }
+    catch(NumberFormatException e)
     {
-      AuctionCentral auctionCentral = new AuctionCentral(PORT);
-      auctionCentral.start();
-      String hostName = "localhost";
-      bankConnection = new BankConnection(hostName, auctionCentral);
-      bankConnection.start();
-    } catch (IOException e)
+      System.out.println("You must enter a proper port number!");
+    }
+    catch(IOException ex)
     {
-      e.printStackTrace();
+      ex.printStackTrace();
     }
   }
   
   private ServerSocket auctionCentralSocket;
   
-  public AuctionCentral(int port) throws IOException
+  public AuctionCentral(final String bank_address) throws IOException
   {
-    auctionCentralSocket = new ServerSocket(port);
+    BANK_ADDRESS = bank_address;
+    auctionCentralSocket = new ServerSocket(PORT);
     printInfo();
   }
   
@@ -50,6 +59,7 @@ public class AuctionCentral extends Thread
   @Override
   public void run()
   {
+    
     while(true)
     {
       try
@@ -64,7 +74,7 @@ public class AuctionCentral extends Thread
     }
   }
   
-  synchronized AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
+  AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
   {
     int publicID = name.hashCode();
     int secretKey = rand.nextInt();
@@ -76,7 +86,7 @@ public class AuctionCentral extends Thread
     return auctionHouseInfo;
   }
   
-  synchronized DeregisterAuctionHouseResultMessage deRegisterAuctionHouse(final int publicID, final int secretKey)
+  DeregisterAuctionHouseResultMessage deRegisterAuctionHouse(final int publicID, final int secretKey)
   {
     boolean result = false;
     
@@ -92,7 +102,7 @@ public class AuctionCentral extends Thread
     return new DeregisterAuctionHouseResultMessage(result);
   }
   
-  synchronized AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
+  AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
   {
     int biddingKey = name.hashCode()*rand.nextInt(8);
     AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
@@ -102,19 +112,24 @@ public class AuctionCentral extends Thread
     return agentInfo;
   }
   
-  synchronized AuctionHouseListMessage getAuctionHouseList()
+  AuctionHouseListMessage getAuctionHouseList()
   {
     return new AuctionHouseListMessage(auctionHouseNames);
   }
   
-  synchronized AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final int auctionHouseID)
+  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final int auctionHouseID)
   {
     return new AuctionHouseConnectionInfoMessage(auctionHouseClients.get(auctionHouseKeys.get(auctionHouseID)).getSocket());
   }
   
-  synchronized void modifyBidderFunds(final BlockBidderFunds msg)
+  ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
   {
-    bankConnection.modifyBlockedFunds(new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getBidderID()), msg.getAmount(), msg.getType()));
+    return new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount(), msg.getType());
+  }
+  
+  WithdrawFundsMessage withdrawFunds(final WithdrawFundsMessage msg)
+  {
+    return new WithdrawFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount());
   }
   
   public void printInfo()

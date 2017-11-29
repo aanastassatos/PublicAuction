@@ -11,7 +11,7 @@ public class DeregisterAuctionHouseResultMessage implements Serializable
     this.result = result;
   }
   
-  public boolean isResult()
+  public boolean getResult()
   {
     return result;
   }
