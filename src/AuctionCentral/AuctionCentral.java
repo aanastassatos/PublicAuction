@@ -1,7 +1,5 @@
 package AuctionCentral;
 
-import ChatClient.ChatClient;
-import ChatServer.ChatServer;
 import Messages.*;
 
 import java.io.BufferedReader;
@@ -124,7 +122,7 @@ public class AuctionCentral extends Thread
   
   ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
   {
-    return new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount(), msg.getType());
+    return new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount(), msg.getType(), msg.getTransactionId());
   }
   
   WithdrawFundsMessage withdrawFunds(final WithdrawFundsMessage msg)
