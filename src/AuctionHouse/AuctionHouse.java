@@ -1,6 +1,9 @@
 package AuctionHouse;
 
+import AuctionCentral.AuctionCentral;
 import AuctionCentral.AuctionClient;
+import Messages.AgentInfoMessage;
+import Messages.PutHoldOnAccountMessage;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,14 +20,20 @@ public class AuctionHouse extends Thread
   private AuctionHouseCentral central;
   private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
 
+  //auction house only knows about the agents' bididng key and publicID to send to central
+  private final HashMap<Integer, Integer> agentInfo = new HashMap<>();
+  private int bidAmount;
+
   public static void main(String[] args)
   {
     try
     {
-      AuctionHouse auctionHouse= new AuctionHouse(args[0], Integer.parseInt(args[1]), args[2], PORT);
-
-      auctionHouse.start();
       String hostName = "localhost";
+      String centralAddress = hostName;
+
+      AuctionHouse auctionHouse= new AuctionHouse(centralAddress, AuctionCentral.PORT,"AA", PORT);
+//      auctionHouse.start();
+
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -33,7 +42,7 @@ public class AuctionHouse extends Thread
 
   public AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
-    auctionHouseSocket = new ServerSocket(port);
+    //auctionHouseSocket = new ServerSocket(port);
     central = new AuctionHouseCentral(centralAddress, centralPort, name);
     printInfo();
   }
@@ -48,6 +57,7 @@ public class AuctionHouse extends Thread
         Socket socket = auctionHouseSocket.accept();
         AuctionHouseClient client = new AuctionHouseClient(socket, this);
 
+        //map the client to the list of clients, get their public ID
         client.start();
       } catch (Exception e)
       {
@@ -56,15 +66,21 @@ public class AuctionHouse extends Thread
     }
   }
 
-  /*synchronized AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
+  //send the message to central that an agent sent a bid
+  synchronized PutHoldOnAccountMessage putHold(int publicID, int bidAmount)
   {
-    int biddingKey = name.hashCode();
-    AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
-    agentNames.put(biddingKey, name);
-    agentBankKeys.put(biddingKey, bankKey);
-    agentClients.put(biddingKey, agent);
-    System.out.println("Agent "+name+" registered under the bidding key "+biddingKey+" and the bank key "+bankKey);
-    return agentInfo;
+    return new PutHoldOnAccountMessage(agentInfo.get(publicID), bidAmount);
+  }
+
+  /*synchronized HigherBidPlacedMessage higherBidPlaced(int oldPublicID, int bidAmount, int newPublicID)
+  {
+    //put hold on account of new id
+    //release the hold of the old public id
+    for (HashMap<Integer,Integer> entry : map.entrySet()) {
+      if (Objects.equals(value, entry.getValue())) {
+        keys.add(entry.getKey());
+      }
+    }
   }*/
 
   public void printInfo()

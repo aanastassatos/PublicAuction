@@ -18,8 +18,10 @@ public class AuctionHouseClient extends Thread
   private Item biddedItem;
   private int currentBid;
 
-  private ObjectInputStream ois;
-  private ObjectOutputStream oos;
+  private ObjectInputStream agent_ois;
+  private ObjectOutputStream agent_oos;
+  private ObjectInputStream central_ois = null;
+  private ObjectOutputStream central_oos = null;
 
   AuctionHouseClient(final Socket socket, final AuctionHouse auctionHouse)
   {
@@ -27,13 +29,14 @@ public class AuctionHouseClient extends Thread
       this.auctionHouse = auctionHouse;
       try
       {
-        ois = new ObjectInputStream(socket.getInputStream());
-        oos = new ObjectOutputStream(socket.getOutputStream());
+        agent_ois = new ObjectInputStream(socket.getInputStream());
+        agent_oos = new ObjectOutputStream(socket.getOutputStream());
       } catch (IOException e)
       {
         e.printStackTrace();
       }
   }
+
   @Override
   public void run()
   {
@@ -42,7 +45,7 @@ public class AuctionHouseClient extends Thread
       Object o = null;
       try
       {
-        o = ois.readObject();
+        o = agent_ois.readObject();
       } catch (Exception e)
       {
         e.printStackTrace();
@@ -67,7 +70,7 @@ public class AuctionHouseClient extends Thread
   {
     try
     {
-      ois.close();
+      agent_ois.close();
       socket.close();
     } catch (IOException e)
     {
@@ -79,7 +82,7 @@ public class AuctionHouseClient extends Thread
   {
     try
     {
-      oos.writeObject(new ItemNoLongerAvailableMessage(true));
+      agent_oos.writeObject(new ItemNoLongerAvailableMessage(true));
     } catch (IOException e)
     {
       e.printStackTrace();
