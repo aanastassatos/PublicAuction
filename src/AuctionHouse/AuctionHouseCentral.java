@@ -18,14 +18,15 @@ public class AuctionHouseCentral extends Thread
   private Random r = new Random();
   private ObjectInputStream ois;
   private ObjectOutputStream oos;
+  private AuctionHouse auctionHouse;
 
   public AuctionHouseCentral(String address, int port, String name) throws UnknownHostException, IOException
   {
     try
     {
       socket = new Socket(address, port);
-      oos = new ObjectOutputStream(socket.getOutputStream());
       ois = new ObjectInputStream(socket.getInputStream());
+      oos = new ObjectOutputStream(socket.getOutputStream());
       oos.writeObject(new RegisterAuctionHouseMessage(name));
       Object o = ois.readObject();
     } catch (Exception e)
@@ -33,12 +34,6 @@ public class AuctionHouseCentral extends Thread
       e.printStackTrace();
     }
   }
-
-  //Register to Central
-  //Send messages - Bid Placed
-  //              - HigherBidPlaced
-  //              - GetHoldOnAccount
-  //              - WithdrawFromAccount
 
   @Override
   public void run()
@@ -54,16 +49,29 @@ public class AuctionHouseCentral extends Thread
         e.printStackTrace();
         return;
       }
-      /*if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
-      else if(o instanceof HigherBidPlaced) handleMessage((HigherBidPlaced)o);
-      else if(o instanceof GetBid) handleMessage((GetBid)o);
-      else if(o instanceof PlaceHoldOnAccountMessage) handleMessage((PlaceHoldOnAccountMessage)o);
-      else if(o instanceof CloseAuctionHouseMessage)
+
+      if(o instanceof PutHoldOnAccountMessage) handleMessage((PutHoldOnAccountMessage)o);
+      else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
         return;
       }
-      else throw new RuntimeException("Received unknown message");*/
+      else throw new RuntimeException("Received unknown message");
+     // else if(o instanceof HigherBidPlaced) handleMessage((HigherBidPlaced)o);
+      /*if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
+      else if(o instanceof PlaceHoldOnAccountMessage) handleMessage((PlaceHoldOnAccountMessage)o);
+      */
+    }
+  }
+
+  private void handleMessage(final PutHoldOnAccountMessage message)
+  {
+    try
+    {
+      oos.writeObject((auctionHouse.putHold(message.getPublicID(), message.getBidAmount())));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
     }
   }
 
@@ -88,4 +96,17 @@ public class AuctionHouseCentral extends Thread
   {
     return publicID;
   }
+
+  /*private void handleMessage(final HigherBidPlaced message)
+  {
+    try
+    {
+      //get the ID of the old agent, the ID of the new agent, the
+      oos.writeObject((auctionHouse.higherBidPlaced(message.getOldPublicID(), message.getBidAmount(),message.getNewPublicID());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }*/
+
 }
