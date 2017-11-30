@@ -5,7 +5,6 @@ import Messages.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -74,6 +73,7 @@ public class AuctionCentral extends Thread
   
   AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
   {
+    System.out.println("bing");
     int publicID = name.hashCode();
     int secretKey = rand.nextInt();
     AuctionHouseInfoMessage auctionHouseInfo = new AuctionHouseInfoMessage(publicID, secretKey);

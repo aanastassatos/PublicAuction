@@ -25,7 +25,7 @@ public class AuctionCentralTest extends Thread
       e.printStackTrace();
     }
     
-    new Thread(() -> testAgent()).start();
+    //new Thread(() -> testAgent()).start();
     new Thread(() -> testAuctionHouse(hostname)).start();
   }
   
@@ -62,9 +62,9 @@ public class AuctionCentralTest extends Thread
     ObjectOutputStream oos;
     try
     {
-      Socket socket = new Socket(hostName, 7777);
-      oos = new ObjectOutputStream(socket.getOutputStream());
-      ois = new ObjectInputStream(socket.getInputStream());
+      System.out.println("a");
+      oos = new ObjectOutputStream(auctionCentralSocket.getOutputStream());
+      ois = new ObjectInputStream(auctionCentralSocket.getInputStream());
       oos.writeObject(new RegisterAuctionHouseMessage("AuctionHouseBob"));
     } catch (IOException e) {
       e.printStackTrace();

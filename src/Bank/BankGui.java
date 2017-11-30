@@ -72,7 +72,7 @@ class BankGui extends Stage
     infoList.add(account.getFund());
     final Button b = new Button("History");
     b.setPrefHeight(14);
-    b.setOnMouseClicked(e -> new TransactionHistoryGUI(account.getFund().getTransactionHistory()));
+    //b.setOnMouseClicked(e -> new TransactionHistoryGUI(account.getFund().getTransactionHistory()));
     transactionHistoryList.add(b);
   }
 }
