@@ -27,7 +27,7 @@ public class AuctionCentral extends Thread
     try{
       reader = new BufferedReader(new InputStreamReader(System.in));
       String bank_address = reader.readLine();
-      new AuctionCentral(bank_address);
+      new AuctionCentral(bank_address).start();
     }
     catch(NumberFormatException e)
     {

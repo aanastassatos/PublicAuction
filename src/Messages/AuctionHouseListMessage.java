@@ -1,9 +1,10 @@
 package Messages;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AuctionHouseListMessage
+public class AuctionHouseListMessage implements Serializable
 {
   private final HashMap<Integer, String> auctionHouseList;
   

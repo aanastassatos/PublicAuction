@@ -10,11 +10,24 @@ import java.util.Scanner;
 public class AgentBankAccount extends Thread
 {
   private static int accountNumber;
-  private static String secretKey;
+  private String hostname;
+  private String name;
+  private static volatile Integer secretKey = null;
 
   int getAccountNumber() { return accountNumber; }
 
-  String getSecretKey() { return secretKey; }
+  int getSecretKey()
+  {
+    while (secretKey == null)
+    {
+
+    }
+    return secretKey;
+  }
+
+  String getHostName() { return hostname; }
+
+  String getAgentName() { return name; }
 
   private static void connectToBank(final String hostname, final String name, final int initialBalance)
   {
@@ -28,6 +41,7 @@ public class AgentBankAccount extends Thread
 
       Object o = ois.readObject();
       accountNumber = ((BankAccountInfoMessage)o).getAccountNumber();
+      secretKey = ((BankAccountInfoMessage)o).getSecretKey();
       System.out.println("Account number: " + accountNumber);
 
       oos.writeObject(new CloseConnectionMessage());
@@ -55,9 +69,9 @@ public class AgentBankAccount extends Thread
   {
     final Scanner in = new Scanner(System.in);
     System.out.print("Enter bank host name: ");
-    final String hostname = in.nextLine();
+    this.hostname = in.nextLine();
+    this.name = setName(in);
 
-    final String name = setName(in);
     final int balance = setAmount(in);
 
     new Thread(() -> connectToBank(hostname, name, balance)).start();

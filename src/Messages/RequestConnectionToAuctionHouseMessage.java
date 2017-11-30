@@ -1,6 +1,8 @@
 package Messages;
 
-public class RequestConnectionToAuctionHouseMessage
+import java.io.Serializable;
+
+public class RequestConnectionToAuctionHouseMessage implements Serializable
 {
   private final int auctionHouseID;
   

@@ -1,6 +1,8 @@
 package Messages;
 
-public class RequestAuctionHouseListMessage
+import java.io.Serializable;
+
+public class RequestAuctionHouseListMessage implements Serializable
 {
   public RequestAuctionHouseListMessage()
   {
