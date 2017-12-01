@@ -25,8 +25,8 @@ public class BankClient extends Thread
     this.socket = socket;
     try
     {
-      objectInputStream = new ObjectInputStream(socket.getInputStream());
       objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+      objectInputStream = new ObjectInputStream(socket.getInputStream());
     } catch (IOException e)
     {
       e.printStackTrace();
