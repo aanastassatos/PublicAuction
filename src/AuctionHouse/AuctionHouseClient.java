@@ -1,6 +1,6 @@
 package AuctionHouse;
 
-import Messages.ItemNoLongerAvailableMessage;
+import Messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,16 +25,16 @@ public class AuctionHouseClient extends Thread
 
   AuctionHouseClient(final Socket socket, final AuctionHouse auctionHouse)
   {
-      this.socket = socket;
-      this.auctionHouse = auctionHouse;
-      try
-      {
-        agent_ois = new ObjectInputStream(socket.getInputStream());
-        agent_oos = new ObjectOutputStream(socket.getOutputStream());
-      } catch (IOException e)
-      {
-        e.printStackTrace();
-      }
+    this.socket = socket;
+    this.auctionHouse = auctionHouse;
+    try
+    {
+      agent_ois = new ObjectInputStream(socket.getInputStream());
+      agent_oos = new ObjectOutputStream(socket.getOutputStream());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -51,17 +51,16 @@ public class AuctionHouseClient extends Thread
         e.printStackTrace();
         return;
       }
-      /*if (o instanceof ItemNoLongerAvailableMessage) handleMessage((ItemNoLongerAvailableMessage) o);
+      if (o instanceof ItemNoLongerAvailableMessage) handleMessage((ItemNoLongerAvailableMessage) o);
       else if(o instanceof InvalidBidMessage) handleMessage((InvalidBidMessage)o);
-      else if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
-      else if(o instanceof ReceivedPlacedBidMessage) handleMessage((ReceivedPlacedBidMessage)o);
+      else if(o instanceof BidReceivedMessage) handleMessage((BidReceivedMessage)o);
       else if(o instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage)o);
       else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
         return;
       }
-      else throw new RuntimeException("Received unknown message");*/
+      else throw new RuntimeException("Received unknown message");
     }
 
   }
@@ -82,7 +81,40 @@ public class AuctionHouseClient extends Thread
   {
     try
     {
-      agent_oos.writeObject(new ItemNoLongerAvailableMessage(true));
+      agent_oos.writeObject(auctionHouse.invalidItem(message.isInvalid()));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleMessage(final InvalidBidMessage message)
+  {
+    try
+    {
+      agent_oos.writeObject(auctionHouse.invalidBid());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleMessage(final BidReceivedMessage message)
+  {
+    try
+    {
+      agent_oos.writeObject(auctionHouse.recievedBid());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleMessage(final SuccessfulBidMessage message)
+  {
+    try
+    {
+      agent_oos.writeObject(auctionHouse.bidSucceeded());
     } catch (IOException e)
     {
       e.printStackTrace();

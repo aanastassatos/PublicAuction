@@ -12,21 +12,25 @@ import java.util.Random;
 public class AuctionHouseCentral extends Thread
 {
   private Socket socket;
-  private final int maxNumOfItems = 10;
+
   private int secretKey;
   private int publicID;
-  private Random r = new Random();
+
   private ObjectInputStream ois;
   private ObjectOutputStream oos;
   private AuctionHouse auctionHouse;
+
+
 
   public AuctionHouseCentral(String address, int port, String name) throws UnknownHostException, IOException
   {
     try
     {
+      auctionHouse = new AuctionHouse(address,port,name,AuctionHouse.PORT);
       socket = new Socket(address, port);
-      ois = new ObjectInputStream(socket.getInputStream());
+
       oos = new ObjectOutputStream(socket.getOutputStream());
+      ois = new ObjectInputStream(socket.getInputStream());
       oos.writeObject(new RegisterAuctionHouseMessage(name));
       Object o = ois.readObject();
     } catch (Exception e)
@@ -38,6 +42,8 @@ public class AuctionHouseCentral extends Thread
   @Override
   public void run()
   {
+    //this is to listen from central to return the result
+    //how to send messages to central?
     while(true)
     {
       Object o = null;
@@ -51,16 +57,15 @@ public class AuctionHouseCentral extends Thread
       }
 
       if(o instanceof PutHoldOnAccountMessage) handleMessage((PutHoldOnAccountMessage)o);
+      else if(o instanceof HigherBidPlacedMessage) handleMessage((HigherBidPlacedMessage)o);
+      else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
+      else if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
       else if(o instanceof CloseConnectionMessage)
       {
         closeConnection();
         return;
       }
       else throw new RuntimeException("Received unknown message");
-     // else if(o instanceof HigherBidPlaced) handleMessage((HigherBidPlaced)o);
-      /*if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
-      else if(o instanceof PlaceHoldOnAccountMessage) handleMessage((PlaceHoldOnAccountMessage)o);
-      */
     }
   }
 
@@ -68,11 +73,40 @@ public class AuctionHouseCentral extends Thread
   {
     try
     {
-      oos.writeObject((auctionHouse.putHold(message.getPublicID(), message.getBidAmount())));
+      oos.writeObject((auctionHouse.putHold(message.getBiddingKey(), message.getBidAmount())));
     } catch (IOException e)
     {
       e.printStackTrace();
     }
+  }
+
+  private void handleMessage(final HigherBidPlacedMessage message)
+  {
+    try
+    {
+      oos.writeObject((auctionHouse.higherBidPlaced(message.getOldBiddingKey(),message.getnewBidAmount(),message.getNewBiddingKey())));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleMessage(final RequestMoneySentMessage message)
+  {
+    try
+    {
+      oos.writeObject((auctionHouse.requestMoney()));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleMessage(final HoldAccountResult message)
+  {
+    // central sends message to auction house about the validity of the agent who placed the bid
+    // returns true if amount money is valid and returns the public id of the agent
+
   }
 
   private void closeConnection()
@@ -96,17 +130,5 @@ public class AuctionHouseCentral extends Thread
   {
     return publicID;
   }
-
-  /*private void handleMessage(final HigherBidPlaced message)
-  {
-    try
-    {
-      //get the ID of the old agent, the ID of the new agent, the
-      oos.writeObject((auctionHouse.higherBidPlaced(message.getOldPublicID(), message.getBidAmount(),message.getNewPublicID());
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }*/
 
 }
