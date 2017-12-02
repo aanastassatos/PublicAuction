@@ -2,15 +2,15 @@ package Messages;
 
 public class ItemNoLongerAvailableMessage
 {
-  private final boolean result;
+  private final boolean isInvalid;
 
   public ItemNoLongerAvailableMessage(boolean result)
   {
-    this.result = result;
+    this.isInvalid = result;
   }
 
-  public boolean getResult()
+  public boolean isInvalid()
   {
-    return result;
+    return isInvalid;
   }
 }

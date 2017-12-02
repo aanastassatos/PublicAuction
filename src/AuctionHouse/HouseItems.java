@@ -1,39 +1,44 @@
 package AuctionHouse;
 
-import Messages.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
-
-class HouseItems extends Thread
+class HouseItems
 {
   private List<Item> itemL = new ArrayList();
-  private List<Item> houseItems = new ArrayList();
-  private final Socket socket;
-  private final AuctionHouseCentral auctionHouse;
+  private List<String> totalListItems;
+  private final HashMap<Item, Integer> itemNPrice = new HashMap<>();
 
-  HouseItems(int numItems, Socket socket, AuctionHouseCentral auctionHouse)
+  HouseItems(int numItems)
   {
-    this.socket = socket;
-    this.auctionHouse = auctionHouse;
     makeItems();
-    houseItems = getNitems(numItems);
+    getItemNPrice(numItems);
+  }
+  private final int totalItems = ItemsList.values().length;
+
+  enum ItemsList
+  {
+    PERSONAL_ASSISTANT,CUSTOM_ARTWORK, SIGNED_CD, TRAVEL_PACKAGE, TALKSHOW_TICKETS,
+    POKEMONCARDS, VIP_INSIDERS_TOUR, SIGNED_JERSEYS, BASKETBALL_TICKETS, HANDMADE_CHAIR,
+    GOLF_LESSONS, YOGA_SESSIONS, BOXING_TICKETS, DINNER_WITH_CELEBS, CODING_LESSONS,
+    SNL_TICKETS, BEACHHOUSE_DEAL, PHOTO_SHOOT, MAGIC_LESSONS, TVs, WINE_TASTING, CAR_PARTS,
+    HAMILTON_EXPERIENCE, ONE_YEAR_FREE_OIL_CHANGE, ROUND_TRIP_FOR_TWO, DISNEY_TRIP, HOT_AIR_BALLOONS_RIDE,
+    BOATING_CRUISE
   }
 
   private void makeItems()
   {
-    for (char i = 'A'; i < 'z'; i++)
+    totalListItems = Stream.of(ItemsList.values())
+            .map(ItemsList::name)
+            .collect(Collectors.toList());
+    for(int i = 0; i< totalItems;i++)
     {
-      final String anItem = Character.toString(i);
-      final Item item = new Item(anItem);
-      itemL.add(item);
+      Item j = new Item(totalListItems.get(i));
+      itemL.add(j);
     }
   }
 
@@ -43,6 +48,19 @@ class HouseItems extends Thread
     List<Item> copy = new ArrayList<>(itemL);
     Collections.shuffle(copy);
     return copy.subList(0, n);
+  }
+
+  private HashMap<Item,Integer> getItemNPrice(int n)
+  {
+    List<Item> auctionHouseItemList = getNitems(n);
+    for(int i = 0; i < auctionHouseItemList.size();i ++)
+    {
+      Item item = auctionHouseItemList.get(i);
+      itemNPrice.put(item,item.getPrice());
+      System.out.printf("%s %d%s %-30s %s %d\n", "Item",i,": ", item, "Price: ",item.getPrice());
+    }
+
+    return itemNPrice;
   }
 
 }

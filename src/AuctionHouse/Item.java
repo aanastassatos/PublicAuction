@@ -43,9 +43,43 @@ class Item
     return itemID;
   }
 
+  String getItem()
+  {
+    return item;
+  }
+
   int initBid()
   {
     minimumBid = r.nextInt(itemPrice/10);
     return minimumBid;
+  }
+  @Override
+  public String toString()
+  {
+    return " " + getItem() + " ";
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return 31* String.valueOf(item).hashCode();
+  }
+
+  @Override
+  public boolean equals(Object str)
+  {
+    if(this == str)
+    {
+      return true;
+    }
+    if(str instanceof Item)
+    {
+      Item anotherLetter = (Item) str;
+      return (item == anotherLetter.item);
+    }
+    else
+    {
+      return false;
+    }
   }
 }
