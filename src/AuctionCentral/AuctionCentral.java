@@ -74,7 +74,7 @@ public class AuctionCentral extends Thread
   AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
   {
     int publicID = name.hashCode();
-    int secretKey = rand.nextInt();
+    int secretKey = rand.nextInt(Integer.MAX_VALUE);
     AuctionHouseInfoMessage auctionHouseInfo = new AuctionHouseInfoMessage(publicID, secretKey);
     auctionHouseNames.put(publicID, name);
     auctionHouseKeys.put(publicID, auctionHouseInfo.getSecretKey());
@@ -92,7 +92,7 @@ public class AuctionCentral extends Thread
       String auctionHouse = auctionHouseNames.get(publicID);
       auctionHouseNames.remove(publicID);
       auctionHouseKeys.remove(publicID);
-      agentClients.remove(secretKey);
+      auctionHouseClients.remove(secretKey);
       System.out.println("Auction house " + auctionHouse + " has deregistered from the public publicID " + publicID);
       result = true;
     }
@@ -101,7 +101,7 @@ public class AuctionCentral extends Thread
   
   AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
   {
-    int biddingKey = name.hashCode()*rand.nextInt(8);
+    int biddingKey = name.hashCode();
     AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
     agentBankKeys.put(biddingKey, bankKey);
     agentClients.put(biddingKey, agent);

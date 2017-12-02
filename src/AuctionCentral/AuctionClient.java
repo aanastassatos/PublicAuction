@@ -117,7 +117,6 @@ public class AuctionClient extends Thread
     try
     {
       client_oos.writeObject(auctionCentral.deRegisterAuctionHouse(msg.getPublicID(), msg.getSecretKey()));
-      closeConnection();
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -151,7 +150,11 @@ public class AuctionClient extends Thread
     try
     {
       bank_oos.writeObject(auctionCentral.modifyBlockedFunds(msg));
+      client_oos.writeObject(bank_ois.readObject());
     } catch (IOException e)
+    {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e)
     {
       e.printStackTrace();
     }
