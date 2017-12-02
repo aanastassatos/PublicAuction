@@ -1,14 +1,16 @@
 package Messages;
 
-public class PutHoldOnAccountMessage
+import java.io.Serializable;
+
+public class PutHoldOnAccountMessage implements Serializable
 {
 
-  private final int publicID;
+  private final int biddingKey;
   private final int bidAmount;
 
-  public PutHoldOnAccountMessage(final int publicID, final int bidAmount)
+  public PutHoldOnAccountMessage(final int biddingKey, final int bidAmount)
   {
-    this.publicID = publicID;
+    this.biddingKey = biddingKey;
     this.bidAmount = bidAmount;
   }
 
@@ -17,9 +19,9 @@ public class PutHoldOnAccountMessage
     return bidAmount;
   }
 
-  public int getPublicID()
+  public int getBiddingKey()
   {
-    return publicID;
+    return biddingKey;
   }
 
 }

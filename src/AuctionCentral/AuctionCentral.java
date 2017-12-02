@@ -15,7 +15,7 @@ public class AuctionCentral extends Thread
 {
   public static final boolean DEBUG = true;
   public static Random rand = new Random();
-  public static final int PORT = 7777;
+  public static final int PORT = 55556;
   public static BufferedReader reader;
   static String BANK_ADDRESS;
   
@@ -73,7 +73,6 @@ public class AuctionCentral extends Thread
   
   AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
   {
-    System.out.println("bing");
     int publicID = name.hashCode();
     int secretKey = rand.nextInt();
     AuctionHouseInfoMessage auctionHouseInfo = new AuctionHouseInfoMessage(publicID, secretKey);

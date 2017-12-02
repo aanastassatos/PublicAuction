@@ -100,7 +100,6 @@ public class AuctionClient extends Thread
   
   private void handleMessage(final RegisterAuctionHouseMessage msg)
   {
-    System.out.println("a");
     try
     {
       Socket bankSocket = new Socket(AuctionCentral.BANK_ADDRESS, Bank.PORT);
