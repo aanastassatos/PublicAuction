@@ -69,7 +69,7 @@ public class BankTest
       // extract result
       boolean succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to block " + amount + " " + (succeeded ? "succeeded" : "failed"));
-
+      assert succeeded;
       Thread.sleep(getVal(rand, timeBound));
 
       // invalid block request
@@ -79,7 +79,7 @@ public class BankTest
       // in this case the message returns a false as the block request was too large
       succeeded = ((BlockFundsResultMessage)o).getResult();
       System.out.println("Attempt to block " + (initialBalance - amount + 1) + " " + (succeeded ? "succeeded" : "failed"));
-
+      assert !succeeded;
 
       Thread.sleep(getVal(rand, timeBound));
       // block remove
@@ -87,7 +87,7 @@ public class BankTest
       o = ois.readObject();
       succeeded = ((BlockFundsResultMessage) o).getResult();
       System.out.println("Attempt to unblock " + amount + " " + (succeeded ? "succeeded" : "failed"));
-
+      assert succeeded;
 
       Thread.sleep(getVal(rand, timeBound));
 

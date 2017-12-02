@@ -1,20 +1,23 @@
 package Bank;
 
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.LinkedList;
 
-public class TransactionHistoryGUI extends Stage
+class TransactionHistoryGUI extends Stage
 {
   TransactionHistoryGUI(LinkedList<String> list)
   {
-    StringBuilder sb = new StringBuilder();
-    list.forEach(s -> sb.append(s + '\n'));
-    setScene(new Scene(new StackPane(new Text(sb.toString()))));
+    final ListView<String> lv = new ListView<>(FXCollections.observableList(list));
+    setScene(new Scene(lv));
     setTitle("Transaction History");
+    final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    setWidth(d.getWidth()/4);
+    setHeight(d.getHeight()/4);
     show();
   }
 }

@@ -26,9 +26,9 @@ public class Bank extends Thread
   /*
     Banks run in their own processes, independent of other components
    */
-  public static void main(String args[])
+  public static void main(final String args[])
   {
-    Bank b = new Bank();
+    final Bank b = new Bank();
     b.printInfo();
     b.start();
   }
@@ -54,19 +54,6 @@ public class Bank extends Thread
       new JFXPanel(); // init jfx
       Platform.runLater(() -> gui = new BankGui());
     } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }
-
-  private void printInfo()
-  {
-    try
-    {
-      // Note that when running the entire application on the same machine only the port number is relevant
-      System.out.println("Bank Ip: " + InetAddress.getLocalHost());
-      System.out.println("Bank host name: " + InetAddress.getLocalHost().getHostName());
-    } catch (UnknownHostException e)
     {
       e.printStackTrace();
     }
@@ -152,6 +139,19 @@ public class Bank extends Thread
             + " Leaving " + keyMap.get(secretKey).getFund().toString());
   }
 
+  private void printInfo()
+  {
+    try
+    {
+      // Note that when running the entire application on the same machine only the port number is relevant
+      System.out.println("Bank Ip: " + InetAddress.getLocalHost());
+      System.out.println("Bank host name: " + InetAddress.getLocalHost().getHostName());
+    } catch (UnknownHostException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
   // When given an account number produce a unique key
   private int getKey(final int accountNumber)
   {
@@ -165,7 +165,7 @@ public class Bank extends Thread
     }
     assert digest != null;
     // int to byte array
-    byte[] hash = digest.digest(ByteBuffer.allocate(4).putInt(accountNumber).array());
+    final byte[] hash = digest.digest(ByteBuffer.allocate(4).putInt(accountNumber).array());
     // byte array to int
     return Arrays.hashCode(hash);
   }
