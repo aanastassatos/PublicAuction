@@ -9,7 +9,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.Time;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class AuctionHouse extends Thread
@@ -22,11 +24,12 @@ public class AuctionHouse extends Thread
 
   private ServerSocket auctionHouseSocket;
   private AuctionHouseCentral central;
-  private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
+  //private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
 
   //auction house only knows about the agents' bidding key and publicID to send to central
-  private final HashMap<Integer, Integer> agentInfo = new HashMap<>();
+  //private final HashMap<Integer, Integer> agentInfo = new HashMap<>();
 
+  //private Time timer;
 
   public static void main(String[] args)
   {
@@ -71,25 +74,12 @@ public class AuctionHouse extends Thread
   private void auctionHouseItems()
   {
     Random rand = new Random();
-
     int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
     houseItems = new HouseItems(randomNumItems);
+    //how to return the list of items
   }
 
   //CENTRAL
-  synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
-  {
-    return new PutHoldOnAccountMessage(agentInfo.get(biddingKey), bidAmount);
-  }
-
-  synchronized HigherBidPlacedMessage higherBidPlaced(int oldBiddingKey, int newBidAmount, int newBiddingKey)
-  {
-    /* put hold on account of new id
-       release the hold of the old public id
-     */
-    return new HigherBidPlacedMessage(agentInfo.get(oldBiddingKey), newBidAmount, agentInfo.get(newBiddingKey));
-  }
-
   synchronized HoldAccountResult getHoldAccountResult(boolean isValid, int publicID)
   {
     //if the valid is true, do nothing
@@ -102,25 +92,34 @@ public class AuctionHouse extends Thread
   synchronized RequestMoneySentMessage requestMoney()
   {
     //request money to Central
+
     return new RequestMoneySentMessage();
   }
 
 
   // AGENTS
-  synchronized ItemNoLongerAvailableMessage invalidItem(boolean isInvalid)
+  synchronized HigherBidPlacedMessage higherBidPlaced(int oldBiddingKey, int newBidAmount, int newBiddingKey)
+  {
+    /* inform the old agent that there is a higher bid placed
+       call bid placed and send to central
+     */
+    return new HigherBidPlacedMessage(newBidAmount);
+  }
+
+  synchronized ItemNoLongerAvailableMessage itemSold(boolean isInvalid)
   {
     // if item is invalid
     // inform the agent
     return new ItemNoLongerAvailableMessage(isInvalid);
   }
 
-  synchronized BidReceivedMessage recievedBid()
+  synchronized BidReceivedMessage recievedBid(int publicID)
   {
     //inform the agent that the message is received
     return new BidReceivedMessage();
   }
 
-  synchronized InvalidBidMessage invalidBid()
+  synchronized InvalidBidMessage invalidBid(int publicID)
   {
     // After getting the result from Central,
     // if result is invalid, send this message to agent
@@ -129,6 +128,14 @@ public class AuctionHouse extends Thread
 
   synchronized SuccessfulBidMessage bidSucceeded()
   {
+    //have to have time for each bid
+    int time = 0;
+    if(time >= 30)
+    {
+      time = 0; //reset timer
+      //send the successful message to the current bidder
+      return new SuccessfulBidMessage();
+    }
     // AFTER 30' the highest bid remains is the winner
     // Inform the agent with given public ID (or bidding key)
     return new SuccessfulBidMessage();
@@ -147,5 +154,14 @@ public class AuctionHouse extends Thread
     }
   }
 
-
+  public List<Item> getHouseItemList()
+  {
+    return houseItems.getItemList();
+  }
 }
+
+/*central will take care of this, auction house only needs to send the message with the bidding key and the amount?
+  synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
+  {
+    return new PutHoldOnAccountMessage(agentInfo.get(biddingKey), bidAmount);
+  }*/

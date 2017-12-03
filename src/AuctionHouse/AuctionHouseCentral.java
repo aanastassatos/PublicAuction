@@ -16,11 +16,11 @@ public class AuctionHouseCentral extends Thread
   private int secretKey;
   private int publicID;
 
-  private ObjectInputStream ois;
-  private ObjectOutputStream oos;
+  private ObjectInputStream central_ois;
+  private ObjectOutputStream central_oos;
   private AuctionHouse auctionHouse;
-
-
+  private ObjectInputStream agent_ois;
+  private ObjectOutputStream agent_oos;
 
   public AuctionHouseCentral(String address, int port, String name) throws UnknownHostException, IOException
   {
@@ -29,10 +29,10 @@ public class AuctionHouseCentral extends Thread
       auctionHouse = new AuctionHouse(address,port,name,AuctionHouse.PORT);
       socket = new Socket(address, port);
 
-      oos = new ObjectOutputStream(socket.getOutputStream());
-      ois = new ObjectInputStream(socket.getInputStream());
-      oos.writeObject(new RegisterAuctionHouseMessage(name));
-      Object o = ois.readObject();
+      central_oos = new ObjectOutputStream(socket.getOutputStream());
+      central_ois = new ObjectInputStream(socket.getInputStream());
+      central_oos.writeObject(new RegisterAuctionHouseMessage(name));
+      Object o = central_ois.readObject();
     } catch (Exception e)
     {
       e.printStackTrace();
@@ -49,42 +49,31 @@ public class AuctionHouseCentral extends Thread
       Object o = null;
       try
       {
-        o = ois.readObject();
+        o = central_ois.readObject();
       } catch (Exception e)
       {
         e.printStackTrace();
         return;
       }
-
-      if(o instanceof PutHoldOnAccountMessage) handleMessage((PutHoldOnAccountMessage)o);
-      else if(o instanceof HigherBidPlacedMessage) handleMessage((HigherBidPlacedMessage)o);
-      else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
-      else if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
-      else if(o instanceof CloseConnectionMessage)
-      {
-        closeConnection();
-        return;
-      }
+      if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
       else throw new RuntimeException("Received unknown message");
     }
   }
 
-  private void handleMessage(final PutHoldOnAccountMessage message)
+  private void handleMessage(final HoldAccountResult message)
   {
+    // central sends message to auction house about the validity of the agent who placed the bid
+    // returns true if amount money is valid and returns the public id of the agent
     try
     {
-      oos.writeObject((auctionHouse.putHold(message.getBiddingKey(), message.getBidAmount())));
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }
-
-  private void handleMessage(final HigherBidPlacedMessage message)
-  {
-    try
-    {
-      oos.writeObject((auctionHouse.higherBidPlaced(message.getOldBiddingKey(),message.getnewBidAmount(),message.getNewBiddingKey())));
+      if(message.isValid() == true)
+      {
+        agent_oos.writeObject(auctionHouse.recievedBid(message.getPublicID()));
+      }
+      else
+      {
+        agent_oos.writeObject(auctionHouse.invalidBid(message.getPublicID()));
+      }
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -95,31 +84,13 @@ public class AuctionHouseCentral extends Thread
   {
     try
     {
-      oos.writeObject((auctionHouse.requestMoney()));
+      central_oos.writeObject((auctionHouse.requestMoney()));
     } catch (IOException e)
     {
       e.printStackTrace();
     }
   }
 
-  private void handleMessage(final HoldAccountResult message)
-  {
-    // central sends message to auction house about the validity of the agent who placed the bid
-    // returns true if amount money is valid and returns the public id of the agent
-
-  }
-
-  private void closeConnection()
-  {
-    try
-    {
-      ois.close();
-      socket.close();
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }
 
   int getSecretKey()
   {
@@ -132,3 +103,10 @@ public class AuctionHouseCentral extends Thread
   }
 
 }
+/*else if(o instanceof HigherBidPlacedMessage) handleMessage((HigherBidPlacedMessage)o);
+      else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
+      else if(o instanceof CloseConnectionMessage)
+      {
+        closeConnection();
+        return;
+      }*/

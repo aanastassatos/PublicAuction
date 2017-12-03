@@ -59,8 +59,12 @@ class HouseItems
       itemNPrice.put(item,item.getPrice());
       System.out.printf("%s %d%s %-30s %s %d\n", "Item",i,": ", item, "Price: ",item.getPrice());
     }
-
     return itemNPrice;
+  }
+
+  public List<Item> getItemList()
+  {
+    return itemL;
   }
 
 }
