@@ -13,16 +13,11 @@ import java.util.Random;
 public class AuctionHouseCentral extends Thread
 {
   private Socket socket;
-  private Socket agentSocket;
-
-  private int secretKey;
-  private int publicID;
 
   private ObjectInputStream central_ois;
   private ObjectOutputStream central_oos;
+
   private AuctionHouse auctionHouse;
-  private ObjectInputStream agent_ois;
-  private ObjectOutputStream agent_oos;
 
   public AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
   {
@@ -35,10 +30,6 @@ public class AuctionHouseCentral extends Thread
       central_ois = new ObjectInputStream(socket.getInputStream());
       central_oos.writeObject(new RegisterAuctionHouseMessage(name));
       Object o = central_ois.readObject();
-
-//      agentSocket = new Socket("localhost", AuctionHouse.PORT);
-//      agent_oos = new ObjectOutputStream(agentSocket.getOutputStream());
-//      agent_ois = new ObjectInputStream(agentSocket.getInputStream());
     } catch (Exception e)
     {
       e.printStackTrace();
@@ -48,8 +39,6 @@ public class AuctionHouseCentral extends Thread
   @Override
   public void run()
   {
-    //this is to listen from central to return the result
-    //how to send messages to central?
     while(true)
     {
       Object o = null;
@@ -62,8 +51,14 @@ public class AuctionHouseCentral extends Thread
         return;
       }
       if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
+      else if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage)o);
       else throw new RuntimeException("Received unknown message");
     }
+  }
+
+  private void handleMessage(final AuctionHouseInfoMessage message)
+  {
+     auctionHouse.storeInfo(message);
   }
 
   private void handleMessage(final BlockFundsResultMessage message)
@@ -97,16 +92,6 @@ public class AuctionHouseCentral extends Thread
       e.printStackTrace();
     }
   }*/
-
-  int getSecretKey()
-  {
-    return secretKey;
-  }
-
-  int getPublicID()
-  {
-    return publicID;
-  }
 
 }
 //else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);

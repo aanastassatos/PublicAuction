@@ -19,6 +19,10 @@ public class AuctionHouse extends Thread
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
+
+  private int secretKey;
+  private int publicID;
+
   private ServerSocket auctionHouseSocket;
 
   private AuctionHouseCentral central;
@@ -60,7 +64,7 @@ public class AuctionHouse extends Thread
       {
         Socket socket = this.auctionHouseSocket.accept();
         AuctionHouseClient client = new AuctionHouseClient(socket, this);
-        auctionHouseClients.put(central.getPublicID(),client);
+        auctionHouseClients.put(getPublicID(),client);
         //map the client to the list of clients, get their public ID
         client.start();
       } catch (Exception e)
@@ -139,12 +143,29 @@ public class AuctionHouse extends Thread
     {
       System.out.println("Server Ip: " + InetAddress.getLocalHost());
       System.out.println("Server host name: " + InetAddress.getLocalHost().getHostName());
-      auctionHouseItems(central.getPublicID());
+      auctionHouseItems(getPublicID());
     }
     catch (UnknownHostException e)
     {
       e.printStackTrace();
     }
+  }
+
+
+  int getSecretKey()
+  {
+    return secretKey;
+  }
+
+  int getPublicID()
+  {
+    return publicID;
+  }
+
+  public void storeInfo(AuctionHouseInfoMessage message)
+  {
+    publicID = message.getPublicID();
+    secretKey = message.getSecretKey();
   }
 }
 

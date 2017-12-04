@@ -12,7 +12,6 @@ class Item
 
   private final int maxVal = 5000;
   private final int minVal = 10;
-  private static int idInc = 1;
   private Random r = new Random();
 
   Item(String item)
@@ -34,8 +33,6 @@ class Item
   void setID(int itemID)
   {
     this.itemID = itemID;
-    //itemID = idInc;
-    //idInc *= 11;
   }
 
   int getID()
