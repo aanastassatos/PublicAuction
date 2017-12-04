@@ -5,20 +5,19 @@ import java.util.Random;
 class Item
 {
   private String item;
-  private long itemID;
+  private int itemID;
   private int itemPrice;
+  private int highestBidderKey;
+  private int highestBid = 0;
+
   private final int maxVal = 5000;
   private final int minVal = 10;
   private static int idInc = 1;
   private Random r = new Random();
 
-  private int minimumBid;
-  private int currentBid;
-
   Item(String item)
   {
     this.item = item;
-    setID();
     setPrice();
   }
 
@@ -32,13 +31,14 @@ class Item
     return itemPrice;
   }
 
-  private void setID()
+  void setID(int itemID)
   {
-    itemID = idInc;
-    idInc *= 11;
+    this.itemID = itemID;
+    //itemID = idInc;
+    //idInc *= 11;
   }
 
-  long getID()
+  int getID()
   {
     return itemID;
   }
@@ -48,11 +48,27 @@ class Item
     return item;
   }
 
-  int initBid()
+
+  int getHighestBidderKey()
   {
-    minimumBid = r.nextInt(itemPrice/10);
-    return minimumBid;
+    return highestBidderKey;
   }
+
+  void setHighestBidderKey(int highestBidderKey)
+  {
+    this.highestBidderKey = highestBidderKey;
+  }
+
+  int getHighestBid()
+  {
+    return highestBid;
+  }
+
+  void setHighestBid(int highestBid)
+  {
+    this.highestBid = highestBid;
+  }
+
   @Override
   public String toString()
   {

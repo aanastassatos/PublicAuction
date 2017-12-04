@@ -1,7 +1,6 @@
 package AuctionHouse;
 
 import AuctionCentral.AuctionCentral;
-import AuctionCentral.AuctionClient;
 import Messages.*;
 
 import java.io.IOException;
@@ -9,25 +8,24 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.Time;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 public class AuctionHouse extends Thread
 {
-  public final static int PORT = 50500;
+  public final static int PORT = 1113;
 
   public HouseItems houseItems;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
   private ServerSocket auctionHouseSocket;
-  private AuctionHouseCentral central;
-  //private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
 
-  //auction house only knows about the agents' bidding key and publicID to send to central
-  //private final HashMap<Integer, Integer> agentInfo = new HashMap<>();
+  private AuctionHouseCentral central;
+
+  //The clients have the auctionHouseID and the auction client
+  private final HashMap<Integer,AuctionHouseClient> auctionHouseClients = new HashMap<>();
+  private HashMap<Integer,Integer> itemsNCurrBids;
 
   //private Time timer;
 
@@ -46,10 +44,10 @@ public class AuctionHouse extends Thread
     }
   }
 
-  AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
+  AuctionHouse(String centralAddress, int centralPort, String name,int port) throws IOException
   {
-    auctionHouseSocket = new ServerSocket(port);
-    central = new AuctionHouseCentral(centralAddress, centralPort, name);
+    //auctionHouseSocket = new ServerSocket(port);
+    this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     printInfo();
   }
 
@@ -60,8 +58,9 @@ public class AuctionHouse extends Thread
     {
       try
       {
-        Socket socket = auctionHouseSocket.accept();
+        Socket socket = this.auctionHouseSocket.accept();
         AuctionHouseClient client = new AuctionHouseClient(socket, this);
+        auctionHouseClients.put(central.getPublicID(),client);
         //map the client to the list of clients, get their public ID
         client.start();
       } catch (Exception e)
@@ -71,29 +70,21 @@ public class AuctionHouse extends Thread
     }
   }
 
-  private void auctionHouseItems()
+  //Create random number of items in each auction house
+  //When initialize houseItems object, it will print the list of items
+  private void auctionHouseItems(int auctionHouseID)
   {
     Random rand = new Random();
     int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
-    houseItems = new HouseItems(randomNumItems);
-    //how to return the list of items
+    this.houseItems = new HouseItems(randomNumItems,auctionHouseID);
+    this.itemsNCurrBids = new HashMap<>(houseItems.getItemNCurrBid(auctionHouseID));
   }
 
   //CENTRAL
-  synchronized HoldAccountResult getHoldAccountResult(boolean isValid, int publicID)
-  {
-    //if the valid is true, do nothing
-    //otherwise, send invalidBidMessage to Agent
-    isValid = false;
-    publicID = 0;
-    return new HoldAccountResult(isValid,publicID);
-  }
-
-  synchronized RequestMoneySentMessage requestMoney()
+  synchronized RequestMoneySentMessage requestMoney(int auctionHouseID, int agentID, int amount)
   {
     //request money to Central
-
-    return new RequestMoneySentMessage();
+    return new RequestMoneySentMessage(auctionHouseID, agentID, amount);
   }
 
 
@@ -119,7 +110,7 @@ public class AuctionHouse extends Thread
     return new BidReceivedMessage();
   }
 
-  synchronized InvalidBidMessage invalidBid(int publicID)
+  synchronized InvalidBidMessage invalidBid(int biddingKey, int bidAmount, int auctionHousePublicID, int ItemID)
   {
     // After getting the result from Central,
     // if result is invalid, send this message to agent
@@ -134,29 +125,26 @@ public class AuctionHouse extends Thread
     {
       time = 0; //reset timer
       //send the successful message to the current bidder
+      //remove the item from the auctionhouse item list
       return new SuccessfulBidMessage();
     }
     // AFTER 30' the highest bid remains is the winner
     // Inform the agent with given public ID (or bidding key)
     return new SuccessfulBidMessage();
   }
+
   public void printInfo()
   {
     try
     {
       System.out.println("Server Ip: " + InetAddress.getLocalHost());
       System.out.println("Server host name: " + InetAddress.getLocalHost().getHostName());
-      auctionHouseItems();
+      auctionHouseItems(central.getPublicID());
     }
     catch (UnknownHostException e)
     {
       e.printStackTrace();
     }
-  }
-
-  public List<Item> getHouseItemList()
-  {
-    return houseItems.getItemList();
   }
 }
 
@@ -164,4 +152,15 @@ public class AuctionHouse extends Thread
   synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
   {
     return new PutHoldOnAccountMessage(agentInfo.get(biddingKey), bidAmount);
+  }*/
+ /* AgentInfoMessage getAgentInfo(final int publicID, final int auctionHouseID, final AuctionHouseClient agent)
+  {
+    auctionHousePublicID = auctionHouseID;
+    int biddingKey =  rand.nextInt(Integer.MAX_VALUE);
+    AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
+    agentKeys.put(publicID, biddingKey);
+    auctionHouseClients.put(agentKeys.get(publicID), agent);
+    System.out.println("Auction Agent with the ID "+publicID+" has connect to auctionHouse ID" +auctionHouseID+" with a bidding key: "
+            +biddingKey);
+    return agentInfo;
   }*/
