@@ -103,8 +103,8 @@ public class AuctionClient extends Thread
     try
     {
       Socket bankSocket = new Socket(AuctionCentral.BANK_ADDRESS, Bank.PORT);
-      bank_ois = new ObjectInputStream(bankSocket.getInputStream());
       bank_oos = new ObjectOutputStream(bankSocket.getOutputStream());
+      bank_ois = new ObjectInputStream(bankSocket.getInputStream());
       client_oos.writeObject(auctionCentral.registerAuctionHouse(msg.getName(), this));
     } catch (IOException e)
     {

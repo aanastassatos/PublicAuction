@@ -6,10 +6,7 @@ import Messages.*;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 public class AgentAuctionCentral extends Thread
 {
@@ -37,12 +34,9 @@ public class AgentAuctionCentral extends Thread
       AuctionHouseListMessage auctionHouses = ((AuctionHouseListMessage)ois.readObject());
 
       HashMap<Integer, String> houses = auctionHouses.getAuctionHouseList();
-      Collection<Integer> houseList = houses.keySet();
-      ArrayList<Integer> arrayList = new ArrayList<>(houseList);
-
-      oos.writeObject(new RequestConnectionToAuctionHouseMessage(arrayList.get(0)));
-      AuctionHouseConnectionInfoMessage info = ((AuctionHouseConnectionInfoMessage)ois.readObject());
-      auctionHouseSocket = info.getAuctionHouseSocket();
+      oos.writeObject(getAuctionHouses(houses));
+      //AuctionHouseConnectionInfoMessage info = ((AuctionHouseConnectionInfoMessage)ois.readObject());
+      //auctionHouseSocket = info.getAuctionHouseSocket();
       oos.writeObject(new CloseConnectionMessage());
 
     }
@@ -55,4 +49,21 @@ public class AgentAuctionCentral extends Thread
   Socket getAuctionHouseSocket() { return auctionHouseSocket; }
 
   int getBiddingKey() { return biddingKey; }
+
+  RequestConnectionToAuctionHouseMessage getAuctionHouses(HashMap<Integer, String> houses)
+  {
+    Collection<Integer> houseList = houses.keySet();
+    ArrayList<Integer> arrayList = new ArrayList<>(houseList);
+    if(arrayList.size() != 0)
+    {
+      System.out.println("Auction houses!");
+      //print all auction houses
+    }
+
+
+    System.out.print("Enter the auction house: ");
+    Scanner scanner = new Scanner(System.in);
+    int house = scanner.nextInt();
+    return new RequestConnectionToAuctionHouseMessage(arrayList.get(house));
+  }
 }

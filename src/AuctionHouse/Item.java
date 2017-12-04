@@ -2,7 +2,7 @@ package AuctionHouse;
 
 import java.util.Random;
 
-class Item
+public class Item
 {
   private String item;
   private int itemID;

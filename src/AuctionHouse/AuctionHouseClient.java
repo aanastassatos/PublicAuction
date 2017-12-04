@@ -72,6 +72,7 @@ public class AuctionHouseClient extends Thread
         e.printStackTrace();
         return;
       }
+
       //THIS ONLY HEAR MESSAGES SENT FROM THE AGENT. AND HANDLE THE MESSAGES ACCORDINGLY
       if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
       else throw new RuntimeException("Received unknown message");
