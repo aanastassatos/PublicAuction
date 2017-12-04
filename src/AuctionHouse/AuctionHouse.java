@@ -46,7 +46,7 @@ public class AuctionHouse extends Thread
   AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
     auctionHouseSocket = new ServerSocket(port);
-    central = new AuctionHouseCentral(centralAddress, centralPort, name);
+    central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     printInfo();
   }
 

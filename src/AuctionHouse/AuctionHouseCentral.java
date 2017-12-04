@@ -22,11 +22,11 @@ public class AuctionHouseCentral extends Thread
 
 
 
-  public AuctionHouseCentral(String address, int port, String name) throws UnknownHostException, IOException
+  public AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
   {
     try
     {
-      auctionHouse = new AuctionHouse(address,port,name,AuctionHouse.PORT);
+      this.auctionHouse = auctionHouse;
       socket = new Socket(address, port);
 
       oos = new ObjectOutputStream(socket.getOutputStream());
