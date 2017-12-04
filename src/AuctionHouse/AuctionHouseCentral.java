@@ -1,6 +1,7 @@
 package AuctionHouse;
 
 import Messages.*;
+//import sun.jvm.hotspot.opto.Block;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,12 +17,12 @@ public class AuctionHouseCentral extends Thread
   private int secretKey;
   private int publicID;
 
-  private ObjectInputStream ois;
-  private ObjectOutputStream oos;
+  private ObjectInputStream central_ois;
+  private ObjectOutputStream central_oos;
   private AuctionHouse auctionHouse;
-
-
-
+  private ObjectInputStream agent_ois;
+  private ObjectOutputStream agent_oos;
+  
   public AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
   {
     try
@@ -29,10 +30,14 @@ public class AuctionHouseCentral extends Thread
       this.auctionHouse = auctionHouse;
       socket = new Socket(address, port);
 
-      oos = new ObjectOutputStream(socket.getOutputStream());
-      ois = new ObjectInputStream(socket.getInputStream());
-      oos.writeObject(new RegisterAuctionHouseMessage(name));
-      Object o = ois.readObject();
+      central_oos = new ObjectOutputStream(socket.getOutputStream());
+      central_ois = new ObjectInputStream(socket.getInputStream());
+      central_oos.writeObject(new RegisterAuctionHouseMessage(name));
+      Object o = central_ois.readObject();
+
+//      agentSocket = new Socket("localhost", AuctionHouse.PORT);
+//      agent_oos = new ObjectOutputStream(agentSocket.getOutputStream());
+//      agent_ois = new ObjectInputStream(agentSocket.getInputStream());
     } catch (Exception e)
     {
       e.printStackTrace();
@@ -49,77 +54,54 @@ public class AuctionHouseCentral extends Thread
       Object o = null;
       try
       {
-        o = ois.readObject();
+        o = central_ois.readObject();
       } catch (Exception e)
       {
         e.printStackTrace();
         return;
       }
-
-      if(o instanceof PutHoldOnAccountMessage) handleMessage((PutHoldOnAccountMessage)o);
-      else if(o instanceof HigherBidPlacedMessage) handleMessage((HigherBidPlacedMessage)o);
-      else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
-      else if(o instanceof HoldAccountResult) handleMessage((HoldAccountResult)o);
-      else if(o instanceof CloseConnectionMessage)
-      {
-        closeConnection();
-        return;
-      }
+      if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
+      else if(o instanceof AuctionHouseInfoMessage) handleMessage((AgentInfoMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
   }
 
-  private void handleMessage(final PutHoldOnAccountMessage message)
+  private void handleMessage(final AuctionHouseInfoMessage message)
   {
-    try
-    {
-      oos.writeObject((auctionHouse.putHold(message.getBiddingKey(), message.getBidAmount())));
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
+    auctionHouse.storeInfo(message);
   }
-
-  private void handleMessage(final HigherBidPlacedMessage message)
-  {
-    try
-    {
-      oos.writeObject((auctionHouse.higherBidPlaced(message.getOldBiddingKey(),message.getnewBidAmount(),message.getNewBiddingKey())));
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }
-
-  private void handleMessage(final RequestMoneySentMessage message)
-  {
-    try
-    {
-      oos.writeObject((auctionHouse.requestMoney()));
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }
-
-  private void handleMessage(final HoldAccountResult message)
+  
+  private void handleMessage(final BlockFundsResultMessage message)
   {
     // central sends message to auction house about the validity of the agent who placed the bid
     // returns true if amount money is valid and returns the public id of the agent
+   /* try
+    {
+      if(message.getResult() == true)
+      {
 
+        agent_oos.writeObject(auctionHouse.recievedBid(()));
+      }
+      else
+      {
+        agent_oos.writeObject(auctionHouse.invalidBid(message.getResult)
+      }
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }*/
   }
 
-  private void closeConnection()
+  /*private void requestMoneySent(int agentI)
   {
     try
     {
-      ois.close();
-      socket.close();
+      central_oos.writeObject((auctionHouse.requestMoney(this.getPublicID(), .getAgentID(),())));
     } catch (IOException e)
     {
       e.printStackTrace();
     }
-  }
+  }*/
 
   int getSecretKey()
   {
@@ -132,3 +114,4 @@ public class AuctionHouseCentral extends Thread
   }
 
 }
+//else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
