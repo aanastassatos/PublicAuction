@@ -64,8 +64,6 @@ public class AuctionHouseClient extends Thread
       Object o = null;
       try
       {
-        PrintWriter pw = new PrintWriter(socket.getOutputStream(),true);
-        pw.println("Enter you Bidding Key: ");
         o = agent_ois.readObject();
       } catch (Exception e)
       {
@@ -73,23 +71,35 @@ public class AuctionHouseClient extends Thread
         return;
       }
       //THIS ONLY HEAR MESSAGES SENT FROM THE AGENT. AND HANDLE THE MESSAGES ACCORDINGLY
+      if(o instanceof AgentInfoMessage) handleMessage((AgentInfoMessage) o);
       if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
       else throw new RuntimeException("Received unknown message");
     }
   }
 
   //In case 2 people bids at the same time with higher value than the current highest bid
-  private boolean highestBid(int bid, int itemID, int auctionHouseID)
-  {
-    currentBid = houseItems.getCurrentHighestBid(auctionHouseID,itemID);
-    while(currentBid < bid)
-    {
-      if(highestBid.compareAndSet(currentBid,bid)) return true;
-      currentBid = highestBid.get();
-    }
-    return false;
-  }
+//  private boolean highestBid(int bid, int itemID, int auctionHouseID)
+//  {
+//    currentBid = houseItems.getCurrentHighestBid(auctionHouseID,itemID);
+//    while(currentBid < bid)
+//    {
+//      if(highestBid.compareAndSet(currentBid,bid)) return true;
+//      currentBid = highestBid.get();
+//    }
+//    return false;
+//  }
 
+  private void handleMessage(final AgentInfoMessage message)
+  {
+    try
+    {
+      agent_oos.writeObject(auctionHouse.registerAgent(message, this));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
   private void handleMessage(final BidPlacedMessage message)
   {
     //FIND A WAY TO KEEP TRACK OF WHO'S CURRENTLY HOLDING THE HIGHEST BID

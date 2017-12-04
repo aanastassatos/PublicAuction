@@ -13,11 +13,16 @@ import java.util.Random;
 
 public class AuctionHouse extends Thread
 {
-  public final static int PORT = 1113;
-
+  final static Random rand = new Random();
+  private final static int PORT = rand.nextInt((60000-50000)+1)+50000;
+  
   public HouseItems houseItems;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
+
+
+  private int secretKey;
+  private int publicID;
 
   private ServerSocket auctionHouseSocket;
 
@@ -25,7 +30,6 @@ public class AuctionHouse extends Thread
 
   //The clients have the auctionHouseID and the auction client
   private final HashMap<Integer,AuctionHouseClient> auctionHouseClients = new HashMap<>();
-  private HashMap<Integer,Integer> itemsNCurrBids;
 
   //private Time timer;
 
@@ -44,11 +48,14 @@ public class AuctionHouse extends Thread
     }
   }
 
+  private HouseItems items;
+  
   AuctionHouse(String centralAddress, int centralPort, String name,int port) throws IOException
   {
-
+    int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
     //auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
+    items = new HouseItems(randomNumItems);
     printInfo();
   }
 
@@ -61,7 +68,6 @@ public class AuctionHouse extends Thread
       {
         Socket socket = this.auctionHouseSocket.accept();
         AuctionHouseClient client = new AuctionHouseClient(socket, this);
-        auctionHouseClients.put(central.getPublicID(),client);
         //map the client to the list of clients, get their public ID
         client.start();
       } catch (Exception e)
@@ -69,16 +75,6 @@ public class AuctionHouse extends Thread
         e.printStackTrace();
       }
     }
-  }
-
-  //Create random number of items in each auction house
-  //When initialize houseItems object, it will print the list of items
-  private void auctionHouseItems(int auctionHouseID)
-  {
-    Random rand = new Random();
-    int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
-    this.houseItems = new HouseItems(randomNumItems,auctionHouseID);
-    this.itemsNCurrBids = new HashMap<>(houseItems.getItemNCurrBid(auctionHouseID));
   }
 
   //CENTRAL
@@ -133,6 +129,12 @@ public class AuctionHouse extends Thread
     // Inform the agent with given public ID (or bidding key)
     return new SuccessfulBidMessage();
   }
+  
+  synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
+  {
+    auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
+    return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
+  }
 
   public void printInfo()
   {
@@ -140,12 +142,28 @@ public class AuctionHouse extends Thread
     {
       System.out.println("Server Ip: " + InetAddress.getLocalHost());
       System.out.println("Server host name: " + InetAddress.getLocalHost().getHostName());
-      auctionHouseItems(central.getPublicID());
     }
     catch (UnknownHostException e)
     {
       e.printStackTrace();
     }
+  }
+
+
+  int getSecretKey()
+  {
+    return secretKey;
+  }
+
+  int getPublicID()
+  {
+    return publicID;
+  }
+
+  public void storeInfo(AuctionHouseInfoMessage message)
+  {
+    publicID = message.getPublicID();
+    secretKey = message.getSecretKey();
   }
 }
 

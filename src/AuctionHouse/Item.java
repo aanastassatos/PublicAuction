@@ -2,7 +2,7 @@ package AuctionHouse;
 
 import java.util.Random;
 
-class Item
+public class Item
 {
   private String item;
   private int itemID;
@@ -10,10 +10,9 @@ class Item
   private int highestBidderKey;
   private int highestBid = 0;
 
-  private final int maxVal = 5000;
-  private final int minVal = 10;
-  private static int idInc = 1;
-  private Random r = new Random();
+  private final int maxVal = 100;
+  private final int minVal = 1;
+  private static Random r = AuctionHouse.rand;
 
   Item(String item)
   {
@@ -26,7 +25,7 @@ class Item
     itemPrice = r.nextInt((maxVal - minVal) + 1) + minVal;
   }
 
-  int getPrice()
+  public int getPrice()
   {
     return itemPrice;
   }
@@ -34,40 +33,37 @@ class Item
   void setID(int itemID)
   {
     this.itemID = itemID;
-    //itemID = idInc;
-    //idInc *= 11;
   }
 
-  int getID()
+  public int getID()
   {
     return itemID;
   }
 
-  String getItem()
+  public String getItem()
   {
     return item;
   }
-
-
-  int getHighestBidderKey()
-  {
-    return highestBidderKey;
-  }
-
-  void setHighestBidderKey(int highestBidderKey)
-  {
-    this.highestBidderKey = highestBidderKey;
-  }
-
-  int getHighestBid()
-  {
-    return highestBid;
-  }
-
-  void setHighestBid(int highestBid)
-  {
-    this.highestBid = highestBid;
-  }
+  
+//  int getHighestBidderKey()
+//  {
+//    return highestBidderKey;
+//  }
+//
+//  void setHighestBidderKey(int highestBidderKey)
+//  {
+//    this.highestBidderKey = highestBidderKey;
+//  }
+//
+//  int getHighestBid()
+//  {
+//    return highestBid;
+//  }
+//
+//  void setHighestBid(int highestBid)
+//  {
+//    this.highestBid = highestBid;
+//  }
 
   @Override
   public String toString()

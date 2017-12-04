@@ -12,14 +12,11 @@ class HouseItems
   // Map of itemID and highestBid
   private final HashMap<Integer, Integer> itemNCurrHighestBid = new HashMap<>();
 
-  //Map of a auctionhouse id to of the map of itemID and its current highest bid
-  private final HashMap<Integer,HashMap<Integer,Integer>> auctionHouseItems = new HashMap<>();
-
-  HouseItems(int numItems,int auctionHouseID)
+  HouseItems(int numItems)
   {
     makeItems();
-    setItemNPrice(auctionHouseID,numItems);
-    printList(auctionHouseID);
+    setItemNPrice(numItems);
+//    printList();
   }
   private final int totalItems = ItemsList.values().length;
 
@@ -58,7 +55,7 @@ class HouseItems
     return list;
   }
 
-  private void setItemNPrice(int houseID, int numItems)
+  private void setItemNPrice(int numItems)
   {
     //INITIAL THE ITEMS AND INITIAL PRICES FOR EACH
     this.auctionHouseItemList = getNitems(numItems);
@@ -67,26 +64,19 @@ class HouseItems
       Item item = auctionHouseItemList.get(i);
       itemNCurrHighestBid.put(item.getID(),item.getPrice());
     }
-    auctionHouseItems.put(houseID,itemNCurrHighestBid);
-  }
-
-  HashMap<Integer,Integer> getItemNCurrBid(int houseID)
-  {
-    return auctionHouseItems.get(houseID);
   }
 
   //synchronized?
-  int getCurrentHighestBid(int houseID, int itemID)
+  int getCurrentHighestBid(int itemID)
   {
-    HashMap<Integer,Integer> getItemNCurrBid = getItemNCurrBid(houseID);
-    Iterator iter = getItemNCurrBid.entrySet().iterator();
+    Iterator iter = itemNCurrHighestBid.entrySet().iterator();
     while (iter.hasNext())
     {
       Map.Entry pair = (Map.Entry) iter.next();
       //equals correctly?
       if (pair.getKey().equals(itemID))
       {
-        int bidAmount = getItemNCurrBid.get(pair.getKey());
+        int bidAmount = itemNCurrHighestBid.get(pair.getKey());
         return bidAmount;
       }
     }
@@ -95,31 +85,37 @@ class HouseItems
 
   void removeItem(int houseID, int itemID)
   {
-    HashMap<Integer,Integer> getItemNCurrBid = getItemNCurrBid(houseID);
-    Iterator i = getItemNCurrBid.entrySet().iterator();
+    Iterator i = itemNCurrHighestBid.entrySet().iterator();
     while (i.hasNext())
     {
       Map.Entry pair = (Map.Entry) i.next();
       if (pair.getKey().equals(itemID))
       {
-        getItemNCurrBid.remove(pair.getKey());
+        itemNCurrHighestBid.remove(pair.getKey());
       }
     }
+  }
+  
+  List<Item> getAuctionHouseItemList()
+  {
+    return auctionHouseItemList;
   }
 
-  String printList(int auctionHouseID)
-  {
-    String str = "";
-    if(auctionHouseItemList.size() > 0)
-    {
-      for(int i = 0; i < itemL.size(); i++)
-      {
-        Item item = itemL.get(i);
-        str += "Auction House ID: " +auctionHouseID+ "\nItem ID: " + item.getID() + "Item Name: " +item.getItem() + "Highest Bidder: " +item.getHighestBidderKey()+
-                " Highest Bid: " +item.getHighestBid()+"\n";
-      }
-    }
-    else str+= "No more Items";
-    return str;
-  }
+//  String printList(int auctionHouseID)
+//  {
+//    String str = "";
+//    if(auctionHouseItemList.size() > 0)
+//    {
+//      for(int i = 0; i < itemL.size(); i++)
+//      {
+//        Item item = itemL.get(i);
+//        str += "Auction House ID: " +auctionHouseID+ "\nItem ID: " + item.getID() + "Item Name: " +item.getItem() + "Highest Bidder: " +item.getHighestBidderKey()+
+//                " Highest Bid: " +item.getHighestBid()+"\n";
+//      }
+//    }
+//    else str+= "No more Items";
+//    return str;
+//  }
+
+
 }
