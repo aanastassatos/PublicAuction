@@ -62,6 +62,12 @@ class HouseItems
     }
   }
 
+  boolean noMoreItemToSell()
+  {
+    if(theRestOfTheItemsList.size() <=0) return true;
+    else return false;
+  }
+
   void removeItem(int itemID)
   {
     for( Integer id : currentHouseItems.keySet())

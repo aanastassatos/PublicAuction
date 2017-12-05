@@ -81,7 +81,9 @@ public class AuctionHouse extends Thread
     }
   }
 
-  private void startTimer(int itemID, int bidAmount, int biddingKey)
+  //private void startTimer(int itemID, int bidAmount, int biddingKey)
+  //if(biddingTimeLeft == 0) bidSucceeded(itemID, bidAmount, biddingKey);
+  private void startTimer(Item item)
   {
     this.timer.scheduleAtFixedRate(new TimerTask()
     {
@@ -89,7 +91,7 @@ public class AuctionHouse extends Thread
       public void run()
       {
         tick();
-        if(biddingTimeLeft == 0) bidSucceeded(itemID, bidAmount, biddingKey);
+        if(biddingTimeLeft == 0) bidSucceeded(item.getID(), item.getHighestBid(), item.getHighestBidderKey());
       }
     }, 0, 1000);
   }
@@ -116,7 +118,11 @@ public class AuctionHouse extends Thread
 
     central.requestMoney(biddingKey, amount);
     items.removeItem(itemID);
-    items.updateItemList();
+
+    //If there are more things to sell, update the list, else close
+    if(!items.noMoreItemToSell()) items.updateItemList();
+    else central.closeConnection(publicID,secretKey);
+
     System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
     System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
                         "with bidding amount of: " +amount);
@@ -140,14 +146,19 @@ public class AuctionHouse extends Thread
     else if(item.getHighestBid() > amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
     else
     {
+
       BlockFundsResultMessage msg = central.sendBlockFundsMessage(new ModifyBlockedFundsMessage(biddingKey, amount, ModifyBlockedFundsMessage.TransactionType.Add, UUID.randomUUID()));
       if(msg != null)
       {
         if(msg.getResult())
         {
+          //set the highestBid to be the current bid and the bidding key to the highest bidder
+          item.setHighestBid(amount);
+          item.setHighestBidderKey(biddingKey);
           //if the new bid is placed by someone, reset the time
           biddingTimeLeft = BIDDING_TIME;
-          startTimer(itemID, amount, biddingKey);
+          //startTimer(itemID, amount, biddingKey);
+          startTimer(item);
           System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
                               "with the amount of: "+amount);
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
@@ -198,13 +209,14 @@ public class AuctionHouse extends Thread
   }
 }
 
+// WHAT IS THE POINT OF SECRET KEY??? ALSO PUBLIC ID
 // TIMER
 // SUCCESSFUL BID
 // MULTIPLE HOUSES
 // 3 ITEMS AT A TIME
 // UPDATE/REMOVE ITEMS
-// PRINT LIST OF ITEM FROM EACH AUCTION HOUSE
-
+// PRINT LIST OF ITEM with the ITEMID(hashmap) and CURRENT BID FROM EACH AUCTION HOUSE
+// IF ALL ITEMS ARE SOLD, CLOSE
 
 /*central will take care of this, auction house only needs to send the message with the bidding key and the amount?
   synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
