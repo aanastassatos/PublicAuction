@@ -41,11 +41,11 @@ public class AuctionHouse extends Thread
     {
       String centralAddress = "localhost";
       address = "localhost";
-       Random r = new Random();
-       char c = (char)(r.nextInt(26) + 'A');
-       String name = Character.toString(c)+Integer.toString(r.nextInt(1000)+1);
-       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
-       auctionHouse.start();
+      Random r = new Random();
+      char c = (char)(r.nextInt(26) + 'A');
+      String name = Character.toString(c)+Integer.toString(r.nextInt(1000)+1);
+      AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
+      auctionHouse.start();
 
     } catch (IOException e)
     {
