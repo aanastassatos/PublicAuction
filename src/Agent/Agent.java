@@ -22,7 +22,7 @@ public class Agent extends Thread
     AgentAuctionHouse auctionHouse = new AgentAuctionHouse(biddingKey, houseSocket, this);
   }
 
-  public static void main(String[] args) throws Exception
+  public static void main(String[] args) //throws Exception
   {
     Agent agent = new Agent();
   }
