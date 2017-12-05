@@ -65,7 +65,7 @@ public class Bank extends Thread
   @Override
   public void run()
   {
-    while(!Thread.currentThread().isInterrupted())
+    while(!isInterrupted())
     {
       try
       {

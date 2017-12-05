@@ -8,9 +8,9 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.util.LinkedList;
 
-class TransactionHistoryGUI extends Stage
+class TransactionHistoryGui extends Stage
 {
-  TransactionHistoryGUI(LinkedList<String> list)
+  TransactionHistoryGui(LinkedList<String> list)
   {
     final ListView<String> lv = new ListView<>(FXCollections.observableList(list));
     setScene(new Scene(lv));

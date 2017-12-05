@@ -1,6 +1,8 @@
 package Bank;
 
-import javafx.application.Platform;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -9,12 +11,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.awt.*;
 import java.util.LinkedList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 class BankGui extends Stage
 {
@@ -63,7 +63,6 @@ class BankGui extends Stage
 
   BankGui(final Bank bank)
   {
-
     setOnCloseRequest(e -> bank.shutdown());
     boxList = FXCollections.observableList(new LinkedList<>());
     boxList.add(placeHolder);
@@ -78,8 +77,10 @@ class BankGui extends Stage
 
     boxView.setOnMouseClicked(e -> openHistory(boxView));
 
-    final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-    service.scheduleAtFixedRate(this::refreshFunds, 0, 100, TimeUnit.MILLISECONDS);
+    final Timeline timeline = new Timeline();
+    timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1/60d), e -> refreshFunds()));
+    timeline.setCycleCount(Animation.INDEFINITE);
+    timeline.playFromStart();
   }
 
   void addAccount(final BankAccount account)
@@ -93,11 +94,11 @@ class BankGui extends Stage
 
   private void openHistory(final ListView<AccountNode> boxView)
   {
-    new TransactionHistoryGUI(boxView.getSelectionModel().getSelectedItem().getFund().getTransactionHistory());
+    new TransactionHistoryGui(boxView.getSelectionModel().getSelectedItem().getFund().getTransactionHistory());
   }
 
   private void refreshFunds()
   {
-    Platform.runLater(() -> boxList.forEach(b -> b.updateFund()));
+    boxList.forEach(b -> b.updateFund());
   }
 }
