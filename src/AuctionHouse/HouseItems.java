@@ -6,8 +6,8 @@ import java.util.stream.Stream;
 
 class HouseItems
 {
-  private HashMap<Integer, Item> auctionHouseItemList = new HashMap<>();
-
+  private HashMap<Integer, Item> theRestOfTheItemsList = new HashMap<>();
+  private HashMap<Integer,Item> currentHouseItems = new HashMap<>();
 
   HouseItems(int numItems)
   {
@@ -34,31 +34,65 @@ class HouseItems
     for (int i = 0; i < n; i++)
     {
       item = new Item(totalListItems.get(i));
-      auctionHouseItemList.put(item.getID(), item);
+      //Item number from 0 -> 2 go to currentHouseItems
+      while(i < 3)
+      {
+        item.setID(i);
+        currentHouseItems.put(item.getID(),item);
+      }
+      //The rest should go to auctionHouseItemList
+      while(i >= 3)
+      {
+        item.setID(i);
+        theRestOfTheItemsList.put(item.getID(), item);
+      }
     }
+  }
 
+  //HOW TO GET THE ID FROM THE ITEM LIST???
+  void updateItemList()
+  {
+    if(theRestOfTheItemsList.size() > 0)
+    {
+      Map.Entry<Integer,Item> entry = theRestOfTheItemsList.entrySet().iterator().next();
+      Integer itemID = entry.getKey();
+      Item itemName =entry.getValue();
+      currentHouseItems.put(itemID,itemName);
+      theRestOfTheItemsList.remove(itemID,itemName);
+    }
   }
 
   void removeItem(int itemID)
   {
-    System.out.println("Before removal");
-    for( Integer id : auctionHouseItemList.keySet())
+    for( Integer id : currentHouseItems.keySet())
     {
-      if(id == itemID) auctionHouseItemList.remove(id);
+      // == OR EQUALS??
+      if(id == itemID)
+      {
+        Item name = currentHouseItems.get(id);
+        currentHouseItems.remove(id,name);
+      }
     }
-    /*Iterator iter = auctionHouseItemList.entrySet().iterator();
+  }
+
+  HashMap<Integer,Item> getCurrentHouseItems()
+  {
+    return currentHouseItems;
+  }
+}
+
+
+/*Iterator iter = auctionHouseItemList.entrySet().iterator();
     while(iter.hasNext())
     {
       Map.Entry pair = (Map.Entry) iter.next();
       if(pair.getKey().equals(itemID)) auctionHouseItemList.remove(pair.getKey());
     }*/
-  }
 
-  HashMap<Integer, Item> getAuctionHouseItemList()
+  /*HashMap<Integer, Item> getAuctionHouseItemList()
   {
     return auctionHouseItemList;
-  }
-}
+  }*/
 
 //  String printList(int auctionHouseID)
 //  {

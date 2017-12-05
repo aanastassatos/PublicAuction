@@ -41,10 +41,14 @@ public class AuctionHouse extends Thread
     {
       String centralAddress = "localhost";
       address = "localhost";
-      
-      AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, "AA", PORT);
-      auctionHouse.start();
-
+      for(int i = 0; i < 10; i++)
+      {
+        Random r = new Random();
+        char c = (char)(r.nextInt(26) + 'A');
+        String name = Character.toString(c);
+        AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
+        auctionHouse.start();
+      }
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -107,20 +111,33 @@ public class AuctionHouse extends Thread
   synchronized SuccessfulBidMessage bidSucceeded(int itemID, int amount, int biddingKey)
   {
     //TRANSACTION ID???
+
+    //Should have another list for this?
+    // THE AUCTION HOUSE ONLY AUCTIONS AT MOST 3 ITEMS AT A TIME
+    // ONCE IT'S REMOVE THE ITEM THEN IT CAN ADD NEW ONES
+
     central.requestMoney(biddingKey, amount);
     items.removeItem(itemID);
+    items.updateItemList();
+    System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
+    System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
+                        "with bidding amount of: " +amount);
     return new SuccessfulBidMessage(itemID, amount, biddingKey);
   }
-  
+
+  //HAVE TO UPDATE THE LIST OF ITEMS AND SEND TO THE AGENT WHEN AN ITEM IS SOLD AND A NEW ONE IS PLACED
+  //HAVE TO PRINT OUT A NEW PRICE WHEN A HIGHER BID IS PLACED
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
-    return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
+    return new ItemListMessage(items.getCurrentHouseItems(), publicID);
+    //return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
   }
 
   synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
   {
-    Item item = items.getAuctionHouseItemList().get(itemID);
+    //Item item = items.getAuctionHouseItemList().get(itemID);
+    Item item = items.getCurrentHouseItems().get(itemID);
     if(item == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
     else if(item.getHighestBid() > amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
     else
@@ -130,9 +147,11 @@ public class AuctionHouse extends Thread
       {
         if(msg.getResult())
         {
-          //if the bid is placed by someone new, reset the time
+          //if the new bid is placed by someone, reset the time
           biddingTimeLeft = BIDDING_TIME;
           startTimer(itemID, amount, biddingKey);
+          System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
+                              "with the amount of: "+amount);
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }
         else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
