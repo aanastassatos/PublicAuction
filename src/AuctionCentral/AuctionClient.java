@@ -23,14 +23,15 @@ public class AuctionClient extends Thread
     this.socket = socket;
     try
     {
-      client_ois = new ObjectInputStream(socket.getInputStream());
+
       client_oos = new ObjectOutputStream(socket.getOutputStream());
+      client_ois = new ObjectInputStream(socket.getInputStream());
     } catch (IOException e)
     {
       e.printStackTrace();
     }
   }
-  
+
   @Override
   public void run()
   {

@@ -5,11 +5,10 @@ import java.util.UUID;
 
 public class ModifyBlockedFundsMessage implements Serializable
 {
-
   public enum TransactionType
   {
-    Add, Remove;
-  };
+    Add, Remove
+  }
 
   private final int amount;
   private final int accountNumber;

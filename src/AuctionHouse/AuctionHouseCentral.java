@@ -1,14 +1,12 @@
 package AuctionHouse;
 
 import Messages.*;
-//import sun.jvm.hotspot.opto.Block;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
 
 public class AuctionHouseCentral extends Thread
 {
@@ -19,7 +17,7 @@ public class AuctionHouseCentral extends Thread
 
   private AuctionHouse auctionHouse;
 
-  public AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
+  AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
   {
     try
     {
@@ -50,8 +48,10 @@ public class AuctionHouseCentral extends Thread
         e.printStackTrace();
         return;
       }
-      if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
-      else if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
+      
+//      if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
+      if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
+      else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
   }
@@ -73,17 +73,52 @@ public class AuctionHouseCentral extends Thread
     
     return null;
   }
-  
+
+  synchronized void requestMoney(int biddingKey, int amount)
+  {
+    try
+    {
+      WithdrawFundsMessage message = new WithdrawFundsMessage(biddingKey,amount);
+      central_oos.writeObject(message);
+    }catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
   private void handleMessage(final AuctionHouseInfoMessage message)
   {
     auctionHouse.storeInfo(message);
   }
   
-  private void handleMessage(final BlockFundsResultMessage message)
+  private void handleMessage(final RequestConnectionToAuctionHouseMessage message)
+  {
+    try
+    {
+      central_oos.writeObject(auctionHouse.getConnectionInfo());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+}
+
+  /*private void requestMoneySent(int agentI)
+  {
+    try
+    {
+      central_oos.writeObject((auctionHouse.requestMoney(this.getPublicID(), .getAgentID(),())));
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }*/
+//else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
+/*private void handleMessage(final BlockFundsResultMessage message)
   {
     // central sends message to auction house about the validity of the agent who placed the bid
     // returns true if amount money is valid and returns the public id of the agent
-   /* try
+    try
     {
       if(message.getResult() == true)
       {
@@ -97,19 +132,5 @@ public class AuctionHouseCentral extends Thread
     } catch (IOException e)
     {
       e.printStackTrace();
-    }*/
-  }
-
-  /*private void requestMoneySent(int agentI)
-  {
-    try
-    {
-      central_oos.writeObject((auctionHouse.requestMoney(this.getPublicID(), .getAgentID(),())));
-    } catch (IOException e)
-    {
-      e.printStackTrace();
     }
   }*/
-
-}
-//else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);

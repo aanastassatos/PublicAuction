@@ -27,7 +27,7 @@ public class Agent extends Thread
 
   }
 
-  public static void main(String[] args) throws Exception
+  public static void main(String[] args) //throws Exception
   {
     Agent agent = new Agent();
     agent.start();

@@ -26,8 +26,11 @@ public class AuctionCentral extends Thread
     System.out.print("Enter the bank address (use localhost if server is on same computer as this client): ");
     try{
       reader = new BufferedReader(new InputStreamReader(System.in));
-      String bank_address = reader.readLine();
+      String bank_address;
+      if(args.length > 0 && args[0].equals("test")) bank_address = "";
+      else bank_address = reader.readLine();
       new AuctionCentral(bank_address).start();
+      System.out.println("Connected to bank at " + (bank_address.equals("") ? "localhost" : bank_address));
     }
     catch(NumberFormatException e)
     {

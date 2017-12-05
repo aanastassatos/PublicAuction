@@ -44,8 +44,10 @@ class BankGui extends Stage
     }
   }
 
-  BankGui()
+  BankGui(final Bank bank)
   {
+
+    setOnCloseRequest(e -> bank.shutdown());
     boxList = FXCollections.observableList(new LinkedList<>());
 
     final ListView<AccountNode> boxView = new ListView<>(boxList);

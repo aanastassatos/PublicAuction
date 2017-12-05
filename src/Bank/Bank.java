@@ -52,7 +52,7 @@ public class Bank extends Thread
     {
       bankSocket = new ServerSocket(PORT);
       new JFXPanel(); // init jfx
-      Platform.runLater(() -> gui = new BankGui());
+      Platform.runLater(() -> gui = new BankGui(this));
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -137,6 +137,18 @@ public class Bank extends Thread
     keyMap.get(secretKey).getFund().removeBlocked(amount);
     System.out.println("Unblocked " + amount + " on account " + keyMap.get(secretKey).getAccountNumber()
             + " Leaving " + keyMap.get(secretKey).getFund().toString());
+  }
+
+  void shutdown()
+  {
+    interrupt();
+    try
+    {
+      bankSocket.close();
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
   }
 
   private void printInfo()
