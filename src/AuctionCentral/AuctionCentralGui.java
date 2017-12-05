@@ -21,6 +21,12 @@ public class AuctionCentralGui extends Application
     
   }
   
+  private class AuctionHouseNode
+  {
+    private String name;
+    private int publicID;
+  }
+  
   AuctionCentralGui()
   {
   }

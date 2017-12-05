@@ -1,6 +1,8 @@
 package Messages;
 
-public class BidResultMessage
+import java.io.Serializable;
+
+public class BidResultMessage implements Serializable
 {
   public enum BidResult
   {

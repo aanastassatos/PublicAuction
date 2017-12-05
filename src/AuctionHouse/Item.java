@@ -1,9 +1,10 @@
 package AuctionHouse;
 
+import java.io.Serializable;
 import java.util.Random;
 import java.util.UUID;
 
-public class Item
+public class Item implements Serializable
 {
   private String item;
   private int itemID;

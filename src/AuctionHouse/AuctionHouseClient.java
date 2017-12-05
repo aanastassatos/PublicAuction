@@ -60,7 +60,8 @@ public class AuctionHouseClient extends Thread
   {
     try
     {
-      agent_oos.writeObject(auctionHouse.registerAgent(message, this));
+      ItemListMessage msg = auctionHouse.registerAgent(message, this);
+      agent_oos.writeObject(msg);
     } catch (IOException e)
     {
       e.printStackTrace();

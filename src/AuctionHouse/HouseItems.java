@@ -35,13 +35,13 @@ class HouseItems
     {
       item = new Item(totalListItems.get(i));
       //Item number from 0 -> 2 go to currentHouseItems
-      while(i < 3)
+      if(i < 3)
       {
         item.setID(i);
         currentHouseItems.put(item.getID(),item);
       }
       //The rest should go to auctionHouseItemList
-      while(i >= 3)
+      else if(i >= 3)
       {
         item.setID(i);
         theRestOfTheItemsList.put(item.getID(), item);
