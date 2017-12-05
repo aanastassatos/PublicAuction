@@ -55,7 +55,10 @@ public class AuctionHouseClient extends Thread
         closeConnection();
         return;
       }
-      else throw new RuntimeException("Received unknown message");
+      else
+      {
+        throw new RuntimeException("Received unknown message");
+      }
     }
   }
 
