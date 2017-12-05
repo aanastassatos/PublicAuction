@@ -19,11 +19,6 @@ public class AuctionHouseClient extends Thread
   private ObjectInputStream agent_ois;
   private ObjectOutputStream agent_oos;
 
-  private ObjectInputStream central_ois;
-  private ObjectOutputStream central_oos;
-
-  //Map of agent bidding key and a map of itemID and the bid they placed
-
   AuctionHouseClient(final Socket socket, final AuctionHouse auctionHouse)
   {
     this.socket = socket;
@@ -36,9 +31,6 @@ public class AuctionHouseClient extends Thread
 
       //ASSIGN THE SOCKET TO CENTRAL HERE WHEN A CLIENT IS MADE
       centralSocket = new Socket("localhost", AuctionCentral.PORT);
-
-      central_oos = new ObjectOutputStream(centralSocket.getOutputStream());
-      central_ois = new ObjectInputStream(centralSocket.getInputStream());
     } catch (IOException e)
     {
       e.printStackTrace();

@@ -72,7 +72,19 @@ public class AuctionHouseCentral extends Thread
     
     return null;
   }
-  
+
+  synchronized void requestMoney(int biddingKey, int amount)
+  {
+    try
+    {
+      WithdrawFundsMessage message = new WithdrawFundsMessage(biddingKey,amount);
+      central_oos.writeObject(message);
+    }catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
   private void handleMessage(final AuctionHouseInfoMessage message)
   {
     auctionHouse.storeInfo(message);
