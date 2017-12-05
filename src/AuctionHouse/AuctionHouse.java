@@ -115,13 +115,14 @@ public class AuctionHouse extends Thread
     central.requestMoney(biddingKey, amount);
     items.removeItem(itemID);
     items.updateItemList();
-
+    System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
     System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
                         "with bidding amount of: " +amount);
     return new SuccessfulBidMessage(itemID, amount, biddingKey);
   }
 
   //HAVE TO UPDATE THE LIST OF ITEMS AND SEND TO THE AGENT WHEN AN ITEM IS SOLD AND A NEW ONE IS PLACED
+  //HAVE TO PRINT OUT A NEW PRICE WHEN A HIGHER BID IS PLACED
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
@@ -145,6 +146,8 @@ public class AuctionHouse extends Thread
           //if the bid is placed by someone new, reset the time
           biddingTimeLeft = BIDDING_TIME;
           startTimer(itemID, amount, biddingKey);
+          System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
+                              "with the amount of: "+amount);
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }
         else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
