@@ -9,7 +9,8 @@ import java.util.Scanner;
 public class Agent extends Thread
 {
   HashMap<Integer, Item> auctionHouseItems;
-  int itemToBidOn;
+  Integer itemToBidOn = null;
+  Integer amountToBid = null;
 
   public Agent()
   {
@@ -26,7 +27,6 @@ public class Agent extends Thread
     String address = auctionCentral.getAddress();
     System.out.println("Address = " + address + "port is: " + port);
     AgentAuctionHouse auctionHouse = new AgentAuctionHouse(biddingKey, address, port, this);
-
   }
 
   public static void main(String[] args) //throws Exception
@@ -44,10 +44,13 @@ public class Agent extends Thread
   {
     for(Item item : auctionHouseItems.values())
     {
-      System.out.println(item);
+      System.out.println("Item Name: " + item.getItem() + " Item ID: " + item.getID() + " Price: " + item.getPrice());
     }
   }
 
+  int getItemToBidOn() { return itemToBidOn; }
+
+  int getAmountBid() { return amountToBid; }
 
   @Override
   public void run()
@@ -61,6 +64,8 @@ public class Agent extends Thread
         System.out.print("Which item to bid on?: ");
         Scanner scanner = new Scanner(System.in);
         itemToBidOn = scanner.nextInt();
+        System.out.print("How much?: ");
+        amountToBid = scanner.nextInt();
       }
     }
   }

@@ -41,13 +41,14 @@ public class AuctionHouseClient extends Thread
     while (true)
     {
       Object o = null;
+
       try
       {
         o = agent_ois.readObject();
       } catch (Exception e)
       {
-        e.printStackTrace();
-        return;
+//        e.printStackTrace();
+//        return;
       }
 
       if(o instanceof AgentInfoMessage) handleMessage((AgentInfoMessage) o);
