@@ -52,7 +52,25 @@ public class AuctionHouseClient extends Thread
 
       if(o instanceof AgentInfoMessage) handleMessage((AgentInfoMessage) o);
       else if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
+      else if(o instanceof CloseConnectionMessage)
+      {
+        closeConnection();
+        return;
+      }
       else throw new RuntimeException("Received unknown message");
+    }
+  }
+
+  private void closeConnection()
+  {
+    try
+    {
+      agent_oos.writeObject(new CloseConnectionMessage());
+      agent_ois.close();
+      socket.close();
+    } catch (IOException e)
+    {
+      e.printStackTrace();
     }
   }
 
@@ -67,7 +85,7 @@ public class AuctionHouseClient extends Thread
       e.printStackTrace();
     }
   }
-  
+
   private void handleMessage(final BidPlacedMessage message)
   {
     try
