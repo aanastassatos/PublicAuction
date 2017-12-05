@@ -104,7 +104,7 @@ public class AuctionHouse extends Thread
   {
     return new AuctionHouseConnectionInfoMessage(address, PORT);
   }
-
+  
   // AGENTS
   synchronized SuccessfulBidMessage bidSucceeded(int itemID, int amount, int biddingKey)
   {
@@ -171,6 +171,26 @@ public class AuctionHouse extends Thread
     }
   }
 
+  int getSecretKey()
+  {
+    return secretKey;
+  }
+
+  int getPublicID()
+  {
+    return publicID;
+  }
+  
+  String getAddress()
+  {
+    return address;
+  }
+  
+  int getPort()
+  {
+    return PORT;
+  }
+  
   void storeInfo(AuctionHouseInfoMessage message)
   {
     publicID = message.getPublicID();

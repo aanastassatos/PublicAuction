@@ -1,13 +1,11 @@
-package Messages;
+package AuctionCentral;
 
-import java.io.Serializable;
-
-public class AuctionHouseConnectionInfoMessage implements Serializable
+public class AuctionHouseConnectionInfo
 {
   private final String address;
   private final int port;
   
-  public AuctionHouseConnectionInfoMessage(final String address, final int port)
+  AuctionHouseConnectionInfo(final String address, final int port)
   {
     this.address = address;
     this.port = port;

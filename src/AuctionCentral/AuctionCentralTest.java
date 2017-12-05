@@ -23,8 +23,8 @@ public class AuctionCentralTest extends Thread
       e.printStackTrace();
     }
     
-//    new Thread(() -> registerTestAgent("Bob", 5000)).start();
-    new Thread(() -> testAuctionHouse()).start();
+    new Thread(() -> registerTestAgent("Bob", 5000)).start();
+   // new Thread(() -> testAuctionHouse()).start();
   }
   
   
@@ -111,7 +111,7 @@ public class AuctionCentralTest extends Thread
       Socket auctionsocket =  new Socket(HOSTNAME, AuctionCentral.PORT);
       auctionhouseoos = new ObjectOutputStream(auctionsocket.getOutputStream());
       auctionhouseois = new ObjectInputStream(auctionsocket.getInputStream());
-      auctionhouseoos.writeObject(new RegisterAuctionHouseMessage("AuctionHouseBob"));
+      auctionhouseoos.writeObject(new RegisterAuctionHouseMessage("AuctionHouseBob", "localhost", 55557));
       o = auctionhouseois.readObject();
       int publicID = ((AuctionHouseInfoMessage) o).getPublicID();
       int secretKey = ((AuctionHouseInfoMessage) o).getSecretKey();

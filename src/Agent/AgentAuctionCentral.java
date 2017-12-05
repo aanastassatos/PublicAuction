@@ -70,6 +70,6 @@ public class AgentAuctionCentral extends Thread
     System.out.print("Enter the auction house: ");
     Scanner scanner = new Scanner(System.in);
     int house = scanner.nextInt();
-    return new RequestConnectionToAuctionHouseMessage(arrayList.get(house));
+    return new RequestConnectionToAuctionHouseMessage(arrayList.get(house), biddingKey);
   }
 }
