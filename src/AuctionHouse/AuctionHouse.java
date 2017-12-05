@@ -107,20 +107,32 @@ public class AuctionHouse extends Thread
   synchronized SuccessfulBidMessage bidSucceeded(int itemID, int amount, int biddingKey)
   {
     //TRANSACTION ID???
+
+    //Should have another list for this?
+    // THE AUCTION HOUSE ONLY AUCTIONS AT MOST 3 ITEMS AT A TIME
+    // ONCE IT'S REMOVE THE ITEM THEN IT CAN ADD NEW ONES
+
     central.requestMoney(biddingKey, amount);
     items.removeItem(itemID);
+    items.updateItemList();
+
+    System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
+                        "with bidding amount of: " +amount);
     return new SuccessfulBidMessage(itemID, amount, biddingKey);
   }
-  
+
+  //HAVE TO UPDATE THE LIST OF ITEMS AND SEND TO THE AGENT WHEN AN ITEM IS SOLD AND A NEW ONE IS PLACED
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
-    return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
+    return new ItemListMessage(items.getCurrentHouseItems(), publicID);
+    //return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
   }
 
   synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
   {
-    Item item = items.getAuctionHouseItemList().get(itemID);
+    //Item item = items.getAuctionHouseItemList().get(itemID);
+    Item item = items.getCurrentHouseItems().get(itemID);
     if(item == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
     else if(item.getHighestBid() > amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
     else

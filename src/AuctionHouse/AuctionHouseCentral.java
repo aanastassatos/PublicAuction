@@ -85,6 +85,11 @@ public class AuctionHouseCentral extends Thread
     }
   }
 
+  /*private void handleMessage(final BlockFundsResultMessage message)
+  {
+
+  }*/
+
   private void handleMessage(final AuctionHouseInfoMessage message)
   {
     auctionHouse.storeInfo(message);
@@ -101,34 +106,3 @@ public class AuctionHouseCentral extends Thread
     }
   }
 }
-  /*private void requestMoneySent(int agentI)
-  {
-    try
-    {
-      central_oos.writeObject((auctionHouse.requestMoney(this.getPublicID(), .getAgentID(),())));
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }*/
-//else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
-/*private void handleMessage(final BlockFundsResultMessage message)
-  {
-    // central sends message to auction house about the validity of the agent who placed the bid
-    // returns true if amount money is valid and returns the public id of the agent
-    try
-    {
-      if(message.getResult() == true)
-      {
-
-        agent_oos.writeObject(auctionHouse.recievedBid(()));
-      }
-      else
-      {
-        agent_oos.writeObject(auctionHouse.invalidBid(message.getResult)
-      }
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }*/
