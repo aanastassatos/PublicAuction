@@ -51,7 +51,7 @@ public class AuctionHouseClient extends Thread
       }
 
       if(o instanceof AgentInfoMessage) handleMessage((AgentInfoMessage) o);
-      if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
+      else if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
       else throw new RuntimeException("Received unknown message");
     }
   }
