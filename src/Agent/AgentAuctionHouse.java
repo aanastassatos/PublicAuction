@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class AgentAuctionHouse extends Thread
 {
   final Agent agent;
+  HashMap<Integer, Item> items;
 
   AgentAuctionHouse(int biddingKey, String address, int port, Agent agent)
   {
@@ -24,23 +25,38 @@ public class AgentAuctionHouse extends Thread
 
     try
     {
-      System.out.println("Here be monsters");
       final Socket houseSocket = new Socket(address, port);
       ObjectOutputStream oos = new ObjectOutputStream(houseSocket.getOutputStream());
       ObjectInputStream ois = new ObjectInputStream(houseSocket.getInputStream());
-      System.out.println("Or here?");
       oos.writeObject(new AgentInfoMessage(biddingKey));
       ItemListMessage itemsMessage = ((ItemListMessage) ois.readObject());
       HashMap<Integer, Item> items = itemsMessage.getItemList();
       System.out.println("Size is = : " + items.values().size());
       agent.setItems(items);
 
+      if((Integer)agent.getItemToBidOn() != null)
+      {
+        oos.writeObject(new BidPlacedMessage(biddingKey, agent.getItemToBidOn(), agent.getAmountBid()));
+      }
 
-      oos.writeObject(new CloseConnectionMessage());
+      Object bidResultMessage = ois.readObject();
+      if(bidResultMessage instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage) bidResultMessage);
+      else if(bidResultMessage instanceof BidResultMessage) handleMessage((BidResultMessage)bidResultMessage);
     }
+
     catch(Exception e)
     {
       e.getStackTrace();
     }
+  }
+
+  void handleMessage(SuccessfulBidMessage message)
+  {
+
+  }
+
+  void handleMessage(BidResultMessage message)
+  {
+
   }
 }
