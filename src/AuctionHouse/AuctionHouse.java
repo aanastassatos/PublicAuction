@@ -10,11 +10,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 
 public class AuctionHouse extends Thread
 {
   final static Random rand = new Random();
   private final static int PORT = rand.nextInt((60000-50000)+1)+50000;
+  private static String address;
   
   public HouseItems houseItems;
   private final int maxNumOfItems = 10;
@@ -38,7 +40,8 @@ public class AuctionHouse extends Thread
     try
     {
       String centralAddress = "localhost";
-
+      address = "localhost";
+      
       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, "AA", PORT);
       //auctionHouse.start();
 
@@ -84,35 +87,38 @@ public class AuctionHouse extends Thread
     return new RequestMoneySentMessage(auctionHouseID, agentID, amount);
   }
 
-
+  AuctionHouseConnectionInfoMessage getConnectionInfo()
+  {
+    return new AuctionHouseConnectionInfoMessage(address, PORT);
+  }
   // AGENTS
-  synchronized HigherBidPlacedMessage higherBidPlaced(int oldBiddingKey, int newBidAmount, int newBiddingKey)
-  {
-    /* inform the old agent that there is a higher bid placed
-       call bid placed and send to central
-     */
-    return new HigherBidPlacedMessage(newBidAmount);
-  }
-
-  synchronized ItemNoLongerAvailableMessage itemSold(boolean isInvalid)
-  {
-    // if item is invalid
-    // inform the agent
-    return new ItemNoLongerAvailableMessage(isInvalid);
-  }
-
-  synchronized BidReceivedMessage recievedBid(int publicID)
-  {
-    //inform the agent that the message is received
-    return new BidReceivedMessage();
-  }
-
-  synchronized InvalidBidMessage invalidBid(int biddingKey, int bidAmount, int auctionHousePublicID, int ItemID)
-  {
-    // After getting the result from Central,
-    // if result is invalid, send this message to agent
-    return new InvalidBidMessage();
-  }
+//  synchronized HigherBidPlacedMessage higherBidPlaced(int oldBiddingKey, int newBidAmount, int newBiddingKey)
+//  {
+//    /* inform the old agent that there is a higher bid placed
+//       call bid placed and send to central
+//     */
+//    return new HigherBidPlacedMessage(newBidAmount);
+//  }
+//
+//  synchronized ItemNoLongerAvailableMessage itemSold(boolean isInvalid)
+//  {
+//    // if item is invalid
+//    // inform the agent
+//    return new ItemNoLongerAvailableMessage(isInvalid);
+//  }
+//
+//  synchronized BidReceivedMessage recievedBid(int publicID)
+//  {
+//    //inform the agent that the message is received
+//    return new BidReceivedMessage();
+//  }
+//
+//  synchronized InvalidBidMessage invalidBid(int biddingKey, int bidAmount, int auctionHousePublicID, int ItemID)
+//  {
+//    // After getting the result from Central,
+//    // if result is invalid, send this message to agent
+//    return new InvalidBidMessage();
+//  }
 
   synchronized SuccessfulBidMessage bidSucceeded()
   {
@@ -138,8 +144,20 @@ public class AuctionHouse extends Thread
 
   synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
   {
-    if(items.getAuctionHouseItemList().get(itemID) == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
-    else if()
+    Item item = items.getAuctionHouseItemList().get(itemID);
+    if(item == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
+    else if(item.getHighestBid() > amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
+    else
+    {
+      BlockFundsResultMessage msg = central.sendBlockFundsMessage(new ModifyBlockedFundsMessage(biddingKey, amount, ModifyBlockedFundsMessage.TransactionType.Add, UUID.randomUUID()));
+      if(msg != null)
+      {
+        if(msg.getResult()) return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
+        else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
+      }
+    }
+    
+    return null;
   }
   
   public void printInfo()

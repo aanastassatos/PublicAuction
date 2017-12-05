@@ -1,6 +1,7 @@
 package AuctionCentral;
 
 import Messages.*;
+import com.sun.org.apache.regexp.internal.RE;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -114,9 +115,10 @@ public class AuctionCentral extends Thread
     return new AuctionHouseListMessage(auctionHouseNames);
   }
   
-  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final int auctionHouseID)
+  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg, final int auctionHouseID)
   {
-    return new AuctionHouseConnectionInfoMessage(auctionHouseClients.get(auctionHouseKeys.get(auctionHouseID)).getSocket());
+    AuctionHouseConnectionInfoMessage message = auctionHouseClients.get(auctionHouseKeys.get(auctionHouseID)).requestConnection(msg);
+    return message;
   }
   
   ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)

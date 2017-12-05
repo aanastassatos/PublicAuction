@@ -52,10 +52,29 @@ public class AuctionHouseCentral extends Thread
       }
       if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
       else if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
+      else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
   }
 
+  synchronized BlockFundsResultMessage sendBlockFundsMessage(final ModifyBlockedFundsMessage message)
+  {
+    try
+    {
+      central_oos.writeObject(message);
+      Object o = central_ois.readObject();
+      return (BlockFundsResultMessage) o;
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e)
+    {
+      e.printStackTrace();
+    }
+    
+    return null;
+  }
+  
   private void handleMessage(final AuctionHouseInfoMessage message)
   {
     auctionHouse.storeInfo(message);
@@ -80,6 +99,17 @@ public class AuctionHouseCentral extends Thread
     {
       e.printStackTrace();
     }*/
+  }
+  
+  private void handleMessage(final RequestConnectionToAuctionHouseMessage message)
+  {
+    try
+    {
+      central_oos.writeObject(auctionHouse.getConnectionInfo());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
   }
 
   /*private void requestMoneySent(int agentI)

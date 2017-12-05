@@ -1,14 +1,16 @@
 package AuctionHouse;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class Item
 {
   private String item;
   private int itemID;
   private int itemPrice;
-  private int highestBidderKey;
-  private int highestBid = 0;
+  private int highestBidderKey = 0;
+  private int highestBid;
+  private UUID highestBidTransactionID;
 
   private final int maxVal = 100;
   private final int minVal = 1;
@@ -23,6 +25,7 @@ public class Item
   private void setPrice()
   {
     itemPrice = r.nextInt((maxVal - minVal) + 1) + minVal;
+    highestBid = itemPrice;
   }
 
   public int getPrice()
@@ -45,25 +48,25 @@ public class Item
     return item;
   }
   
-//  int getHighestBidderKey()
-//  {
-//    return highestBidderKey;
-//  }
-//
-//  void setHighestBidderKey(int highestBidderKey)
-//  {
-//    this.highestBidderKey = highestBidderKey;
-//  }
-//
-//  int getHighestBid()
-//  {
-//    return highestBid;
-//  }
-//
-//  void setHighestBid(int highestBid)
-//  {
-//    this.highestBid = highestBid;
-//  }
+  int getHighestBidderKey()
+  {
+    return highestBidderKey;
+  }
+
+  void setHighestBidderKey(int highestBidderKey)
+  {
+    this.highestBidderKey = highestBidderKey;
+  }
+
+  int getHighestBid()
+  {
+    return highestBid;
+  }
+
+  void setHighestBid(int highestBid)
+  {
+    this.highestBid = highestBid;
+  }
 
   @Override
   public String toString()
