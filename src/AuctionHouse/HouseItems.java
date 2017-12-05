@@ -7,18 +7,15 @@ import java.util.stream.Stream;
 class HouseItems
 {
   private List<Item> itemL = new ArrayList();
-  private List<Item> auctionHouseItemList = new ArrayList<>();
-  private List<String> totalListItems;
   // Map of itemID and highestBid
+  private HashMap<Integer, Item> auctionHouseItemList = new HashMap<>();
   private final HashMap<Integer, Integer> itemNCurrHighestBid = new HashMap<>();
 
   HouseItems(int numItems)
   {
-    makeItems();
-    setItemNPrice(numItems);
+    makeItems(numItems);
 //    printList();
   }
-  private final int totalItems = ItemsList.values().length;
 
   enum ItemsList
   {
@@ -30,41 +27,31 @@ class HouseItems
     BOATING_CRUISE
   }
 
-  private void makeItems()
+  private void makeItems(int n)
   {
-    totalListItems = Stream.of(ItemsList.values())
+    List<String> totalListItems = Stream.of(ItemsList.values())
             .map(ItemsList::name)
             .collect(Collectors.toList());
-    for(int i = 0; i< totalItems;i++)
+    Collections.shuffle(totalListItems);
+    Item item;
+    for(int i = 0; i < n; i++)
     {
-      Item j = new Item(totalListItems.get(i));
-      itemL.add(j);
+      item = new Item(totalListItems.get(i));
+      auctionHouseItemList.put(item.getID(), item);
     }
+    
   }
 
-  private List<Item> getNitems(int n)
-  {
-    makeItems();
-    List<Item> copy = new ArrayList<>(itemL);
-    Collections.shuffle(copy);
-    List<Item> list =  copy.subList(0, n);
-    for(int i = 0; i <list.size(); i++)
-    {
-      list.get(i).setID(i);
-    }
-    return list;
-  }
-
-  private void setItemNPrice(int numItems)
-  {
-    //INITIAL THE ITEMS AND INITIAL PRICES FOR EACH
-    this.auctionHouseItemList = getNitems(numItems);
-    for(int i = 0; i < auctionHouseItemList.size();i ++)
-    {
-      Item item = auctionHouseItemList.get(i);
-      itemNCurrHighestBid.put(item.getID(),item.getPrice());
-    }
-  }
+//  private void setItemNPrice(int numItems)
+//  {
+//    //INITIAL THE ITEMS AND INITIAL PRICES FOR EACH
+//    auctionHouseItemList = getNitems(numItems);
+//    for(int i = 0; i < auctionHouseItemList.size();i ++)
+//    {
+//      Item item = auctionHouseItemList.get(i);
+//      itemNCurrHighestBid.put(item.getID(),item.getPrice());
+//    }
+//  }
 
   //synchronized?
   int getCurrentHighestBid(int itemID)
@@ -96,7 +83,7 @@ class HouseItems
     }
   }
   
-  List<Item> getAuctionHouseItemList()
+  HashMap<Integer, Item> getAuctionHouseItemList()
   {
     return auctionHouseItemList;
   }

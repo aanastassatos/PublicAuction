@@ -103,49 +103,52 @@ public class AuctionHouseClient extends Thread
   
   private void handleMessage(final BidPlacedMessage message)
   {
-    //FIND A WAY TO KEEP TRACK OF WHO'S CURRENTLY HOLDING THE HIGHEST BID
-
-    //if the item is sold, send no longer available message to the agent
-    //change this save the ID
-
-    HashMap<Integer,Integer> itemNBid = new HashMap<>();
-    itemNBid.put(message.getItemID(),message.getBidAmount());
-    agentBiddingItem.put(message.getBiddingKey(),itemNBid);
-
-    if(!itemList.contains(message.getItemID()))
+    try
     {
-      try
-      {
-        agent_oos.writeObject(auctionHouse.itemSold(false));
-      } catch (IOException e)
-      {
-        e.printStackTrace();
-      }
-    }
-    else
+      agent_oos.writeObject(auctionHouse.placeBid(message.getItemID(), message.getBiddingKey(), message.getBidAmount()));
+    } catch (IOException e)
     {
-      if (highestBid(message.getBidAmount(),message.getItemID(),message.getAuctionHouseID()))
-      {
-        //agent_oos.writeObject(auctionHouse.higherBidPlaced(message.getBidAmount(),newBiddingKey,));
-        currentBid = message.getBidAmount();
-        try
-        {
-          //MAKE A HASHMAP OF PUBLIC ID AND SECRET KEY bc the hold requires the secret key
-          central_oos.writeObject(new ModifyBlockedFundsMessage(message.getBiddingKey(),message.getBidAmount(), ModifyBlockedFundsMessage.TransactionType.Add, UUID.randomUUID()));
-        } catch (IOException e)
-        {
-          e.printStackTrace();
-        }
-      } else
-        try
-        {
-          //check
-          agent_oos.writeObject(auctionHouse.invalidBid(message.getBiddingKey(),message.getBidAmount(),message.getAuctionHouseID(),message.getItemID()));
-        } catch (IOException e)
-        {
-          e.printStackTrace();
-        }
+      e.printStackTrace();
     }
+  
+    //    HashMap<Integer,Integer> itemNBid = new HashMap<>();
+//    itemNBid.put(message.getItemID(),message.getBidAmount());
+//    agentBiddingItem.put(message.getBiddingKey(),itemNBid);
+//
+//    if(!itemList.contains(message.getItemID()))
+//    {
+//      try
+//      {
+//        agent_oos.writeObject(auctionHouse.itemSold(false));
+//      } catch (IOException e)
+//      {
+//        e.printStackTrace();
+//      }
+//    }
+//    else
+//    {
+//      if (highestBid(message.getBidAmount(),message.getItemID(),message.getAuctionHouseID()))
+//      {
+//        //agent_oos.writeObject(auctionHouse.higherBidPlaced(message.getBidAmount(),newBiddingKey,));
+//        currentBid = message.getBidAmount();
+//        try
+//        {
+//          //MAKE A HASHMAP OF PUBLIC ID AND SECRET KEY bc the hold requires the secret key
+//          central_oos.writeObject(new ModifyBlockedFundsMessage(message.getBiddingKey(),message.getBidAmount(), ModifyBlockedFundsMessage.TransactionType.Add, UUID.randomUUID()));
+//        } catch (IOException e)
+//        {
+//          e.printStackTrace();
+//        }
+//      } else
+//        try
+//        {
+//          //check
+//          agent_oos.writeObject(auctionHouse.invalidBid(message.getBiddingKey(),message.getBidAmount(),message.getAuctionHouseID(),message.getItemID()));
+//        } catch (IOException e)
+//        {
+//          e.printStackTrace();
+//        }
+//    }
   }
 
   int getCurrentHighestBid(int auctionHouseID, int itemID)

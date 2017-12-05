@@ -53,7 +53,7 @@ public class AuctionHouse extends Thread
   AuctionHouse(String centralAddress, int centralPort, String name,int port) throws IOException
   {
     int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
-    //auctionHouseSocket = new ServerSocket(port);
+    auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     items = new HouseItems(randomNumItems);
     printInfo();
@@ -66,7 +66,7 @@ public class AuctionHouse extends Thread
     {
       try
       {
-        Socket socket = this.auctionHouseSocket.accept();
+        Socket socket = auctionHouseSocket.accept();
         AuctionHouseClient client = new AuctionHouseClient(socket, this);
         //map the client to the list of clients, get their public ID
         client.start();
@@ -136,6 +136,12 @@ public class AuctionHouse extends Thread
     return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
   }
 
+  synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
+  {
+    if(items.getAuctionHouseItemList().get(itemID) == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
+    else if()
+  }
+  
   public void printInfo()
   {
     try
