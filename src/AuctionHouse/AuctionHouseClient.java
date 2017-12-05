@@ -61,6 +61,17 @@ public class AuctionHouseClient extends Thread
     }
   }
 
+  void sendMessage(Object m)
+  {
+    try
+    {
+      agent_oos.writeObject(m);
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
   private void closeConnection()
   {
     try

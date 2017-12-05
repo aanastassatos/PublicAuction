@@ -121,12 +121,29 @@ public class AuctionHouse extends Thread
 
     //If there are more things to sell, update the list, else close
     if(!items.noMoreItemToSell()) items.updateItemList();
-    else central.closeConnection();
+    else
+    {
+      sendMessageToClients(new NoItemLeftMessage());
+      central.closeConnection();
+    }
 
     System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
     System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
                         "with bidding amount of: " +amount);
     return new SuccessfulBidMessage(itemID, amount, biddingKey);
+  }
+
+  public synchronized void sendMessageToClients(Object m)
+  {
+    List<Map.Entry> deadClients = new ArrayList<>();
+    Iterator iter = auctionHouseClients.entrySet().iterator();
+    while (iter.hasNext())
+    {
+      Map.Entry pair = (Map.Entry) iter.next();
+      auctionHouseClients.get(pair.getKey()).sendMessage(m);
+    }
+    for(Map.Entry c: deadClients)
+      auctionHouseClients.remove(c);
   }
 
   //HAVE TO UPDATE THE LIST OF ITEMS AND SEND TO THE AGENT WHEN AN ITEM IS SOLD AND A NEW ONE IS PLACED
@@ -161,6 +178,7 @@ public class AuctionHouse extends Thread
           startTimer(item);
           System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
                               "with the amount of: "+amount);
+          sendMessageToClients(new HigherBidPlacedMessage(itemID, amount));
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }
         else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
