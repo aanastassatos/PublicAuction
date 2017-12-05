@@ -79,7 +79,7 @@ public class AuctionHouse extends Thread
     }
   }
 
-  private void startTimer()
+  private void startTimer(int itemID, int bidAmount, int biddingKey)
   {
     this.timer.scheduleAtFixedRate(new TimerTask()
     {
@@ -87,7 +87,7 @@ public class AuctionHouse extends Thread
       public void run()
       {
         tick();
-        if(biddingTimeLeft == 0) bidSucceeded();
+        if(biddingTimeLeft == 0) bidSucceeded(itemID, bidAmount, biddingKey);
       }
     }, 0, 1000);
   }
@@ -98,24 +98,18 @@ public class AuctionHouse extends Thread
   }
 
   //CENTRAL
-  synchronized RequestMoneySentMessage requestMoney(int auctionHouseID, int agentID, int amount)
-  {
-    //request money to Central
-    return new RequestMoneySentMessage(auctionHouseID, agentID, amount);
-  }
-
   AuctionHouseConnectionInfoMessage getConnectionInfo()
   {
     return new AuctionHouseConnectionInfoMessage(address, PORT);
   }
 
   // AGENTS
-  synchronized SuccessfulBidMessage bidSucceeded()
+  synchronized SuccessfulBidMessage bidSucceeded(int itemID, int amount, int biddingKey)
   {
-    //if the bid is over, reset the time
-    biddingTimeLeft = BIDDING_TIME;
-
-    return new SuccessfulBidMessage();
+    //TRANSACTION ID???
+    central.requestMoney(biddingKey, amount);
+    items.removeItem(itemID);
+    return new SuccessfulBidMessage(itemID, amount, biddingKey);
   }
   
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
@@ -136,7 +130,9 @@ public class AuctionHouse extends Thread
       {
         if(msg.getResult())
         {
-          startTimer();
+          //if the bid is placed by someone new, reset the time
+          biddingTimeLeft = BIDDING_TIME;
+          startTimer(itemID, amount, biddingKey);
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }
         else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
@@ -156,16 +152,6 @@ public class AuctionHouse extends Thread
     {
       e.printStackTrace();
     }
-  }
-
-  int getSecretKey()
-  {
-    return secretKey;
-  }
-
-  int getPublicID()
-  {
-    return publicID;
   }
 
   void storeInfo(AuctionHouseInfoMessage message)
