@@ -12,7 +12,7 @@ public class AuctionHouseClient extends Thread
 {
   private final AuctionHouse auctionHouse;
   private final Socket socket;
-  private  Socket centralSocket;
+  //private  Socket centralSocket;
 
   private HouseItems houseItems;
 
@@ -30,7 +30,7 @@ public class AuctionHouseClient extends Thread
       agent_ois = new ObjectInputStream(socket.getInputStream());
 
       //ASSIGN THE SOCKET TO CENTRAL HERE WHEN A CLIENT IS MADE
-      centralSocket = new Socket("localhost", AuctionCentral.PORT);
+    //  centralSocket = new Socket("localhost", AuctionCentral.PORT);
     } catch (IOException e)
     {
       e.printStackTrace();

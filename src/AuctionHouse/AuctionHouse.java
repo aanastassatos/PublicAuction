@@ -41,10 +41,14 @@ public class AuctionHouse extends Thread
     {
       String centralAddress = "localhost";
       address = "localhost";
-      
-      AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, "AA", PORT);
-      auctionHouse.start();
-
+      for(int i = 0; i < 10; i++)
+      {
+        Random r = new Random();
+        char c = (char)(r.nextInt(26) + 'A');
+        String name = Character.toString(c);
+        AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
+        auctionHouse.start();
+      }
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -143,7 +147,7 @@ public class AuctionHouse extends Thread
       {
         if(msg.getResult())
         {
-          //if the bid is placed by someone new, reset the time
+          //if the new bid is placed by someone, reset the time
           biddingTimeLeft = BIDDING_TIME;
           startTimer(itemID, amount, biddingKey);
           System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
