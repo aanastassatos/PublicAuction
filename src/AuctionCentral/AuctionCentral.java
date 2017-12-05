@@ -43,10 +43,12 @@ public class AuctionCentral extends Thread
   }
   
   private ServerSocket auctionCentralSocket;
+  private AuctionCentralGui gui;
   
   public AuctionCentral(final String bank_address) throws IOException
   {
     BANK_ADDRESS = bank_address;
+    gui = new AuctionCentralGui();
     auctionCentralSocket = new ServerSocket(PORT);
     printInfo();
   }
@@ -55,6 +57,7 @@ public class AuctionCentral extends Thread
   private final HashMap<Integer, Integer> auctionHouseKeys = new HashMap<>();
   private final HashMap<Integer, AuctionHouseConnectionInfo> auctionHouseConnections = new HashMap<>();
   private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
+  private final HashMap<Integer, String> agentNames = new HashMap<>();
   private final HashMap<Integer, Integer> agentBankKeys = new HashMap<>();
   private final HashMap<Integer, AuctionClient> agentClients = new HashMap<>();
   
@@ -83,8 +86,8 @@ public class AuctionCentral extends Thread
     AuctionHouseInfoMessage auctionHouseInfo = new AuctionHouseInfoMessage(publicID, secretKey);
     AuctionHouseConnectionInfo connectionInfo = new AuctionHouseConnectionInfo(address, port);
     auctionHouseNames.put(publicID, name);
-    auctionHouseKeys.put(publicID, auctionHouseInfo.getSecretKey());
-    auctionHouseClients.put(auctionHouseKeys.get(publicID), auctionHouse);
+    auctionHouseKeys.put(publicID, secretKey);
+    auctionHouseClients.put(secretKey, auctionHouse);
     auctionHouseConnections.put(secretKey, connectionInfo);
     System.out.println("Auction house "+name+" has registered under the public publicID "+publicID);
     return auctionHouseInfo;
@@ -100,6 +103,7 @@ public class AuctionCentral extends Thread
       auctionHouseNames.remove(publicID);
       auctionHouseKeys.remove(publicID);
       auctionHouseClients.remove(secretKey);
+      auctionHouseConnections.remove(secretKey);
       System.out.println("Auction house " + auctionHouse + " has deregistered from the public publicID " + publicID);
       result = true;
     }
@@ -110,6 +114,7 @@ public class AuctionCentral extends Thread
   {
     int biddingKey = name.hashCode();
     AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
+    agentNames.put(biddingKey,name);
     agentBankKeys.put(biddingKey, bankKey);
     agentClients.put(biddingKey, agent);
     System.out.println("Agent "+name+" registered under the bidding key "+biddingKey+" and the bank key "+bankKey);
@@ -136,6 +141,8 @@ public class AuctionCentral extends Thread
   {
     return new WithdrawFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount());
   }
+  
+  
   
   public void printInfo()
   {
