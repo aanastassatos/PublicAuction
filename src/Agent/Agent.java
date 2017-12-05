@@ -2,9 +2,8 @@ package Agent;
 
 import AuctionHouse.Item;
 
-import java.net.Socket;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
 public class Agent extends Thread
@@ -20,10 +19,13 @@ public class Agent extends Thread
     int secretKey = bankAccount.getSecretKey();
 
     AgentAuctionCentral auctionCentral = new AgentAuctionCentral(hostname, name, secretKey, this);
-    int biddingKey = auctionCentral.getBiddingKey();
+    int house = auctionCentral.getHouse();
 
-    Socket houseSocket = auctionCentral.getAuctionHouseSocket();
-    AgentAuctionHouse auctionHouse = new AgentAuctionHouse(biddingKey, houseSocket, this);
+    int biddingKey = auctionCentral.getBiddingKey();
+    int port = auctionCentral.getPort();
+    String address = auctionCentral.getAddress();
+    System.out.println("Address = " + address + "port is: " + port);
+    AgentAuctionHouse auctionHouse = new AgentAuctionHouse(biddingKey, address, port, this);
 
   }
 
