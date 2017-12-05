@@ -6,8 +6,8 @@ import Messages.*;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AgentAuctionHouse
 {
@@ -20,13 +20,13 @@ public class AgentAuctionHouse
     {
       ObjectOutputStream oos = new ObjectOutputStream(auctionHouseSocket.getOutputStream());
       ObjectInputStream ois = new ObjectInputStream((auctionHouseSocket.getInputStream()));
-
+      System.out.println("Here be monsters");
       oos.writeObject(new AgentInfoMessage(biddingKey));
-      AuctionHouseItemsListMessage itemsMessage = ((AuctionHouseItemsListMessage)ois.readObject());
-      ArrayList<Item> items = itemsMessage.getItems();
+      ItemListMessage itemsMessage = ((ItemListMessage) ois.readObject());
+      HashMap<Integer, Item> items = itemsMessage.getItemList();
+      System.out.println("Size is = : " + items.values().size());
       agent.setItems(items);
 
-      //oos.writeObject(new PlaceBidOnItemMessage());
 
       oos.writeObject(new CloseConnectionMessage());
     }

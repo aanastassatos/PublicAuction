@@ -43,7 +43,7 @@ public class AuctionHouse extends Thread
       address = "localhost";
       
       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, "AA", PORT);
-      //auctionHouse.start();
+      auctionHouse.start();
 
     } catch (IOException e)
     {

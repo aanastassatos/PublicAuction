@@ -12,9 +12,11 @@ public class AgentAuctionCentral extends Thread
 {
   private int biddingKey;
   private Socket auctionHouseSocket;
+  final Agent agent;
 
-  AgentAuctionCentral(String hostname, String name, int key)
+  AgentAuctionCentral(String hostname, String name, int key, Agent agent)
   {
+    this.agent = agent;
     new Thread(() -> connectToAuctionCentral(hostname, name, key)).start();
   }
 
@@ -35,8 +37,9 @@ public class AgentAuctionCentral extends Thread
 
       HashMap<Integer, String> houses = auctionHouses.getAuctionHouseList();
       oos.writeObject(getAuctionHouses(houses));
-      //AuctionHouseConnectionInfoMessage info = ((AuctionHouseConnectionInfoMessage)ois.readObject());
-      //auctionHouseSocket = info.getAuctionHouseSocket();
+      AuctionHouseConnectionInfoMessage info = ((AuctionHouseConnectionInfoMessage)ois.readObject());
+      auctionHouseSocket = new Socket(info.getAddress(), info.getPort());
+      System.out.println("or here?");
       oos.writeObject(new CloseConnectionMessage());
 
     }
@@ -57,7 +60,10 @@ public class AgentAuctionCentral extends Thread
     if(arrayList.size() != 0)
     {
       System.out.println("Auction houses!");
-      //print all auction houses
+      for(int housesList: arrayList)
+      {
+        System.out.println(housesList);
+      }
     }
 
 

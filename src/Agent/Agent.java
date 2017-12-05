@@ -3,11 +3,14 @@ package Agent;
 import AuctionHouse.Item;
 
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
 
 public class Agent extends Thread
 {
-  ArrayList<Item> auctionHouseItems;
+  HashMap<Integer, Item> auctionHouseItems;
+  int itemToBidOn;
 
   public Agent()
   {
@@ -16,25 +19,28 @@ public class Agent extends Thread
     String name = bankAccount.getAgentName();
     int secretKey = bankAccount.getSecretKey();
 
-    AgentAuctionCentral auctionCentral = new AgentAuctionCentral(hostname, name, secretKey);
+    AgentAuctionCentral auctionCentral = new AgentAuctionCentral(hostname, name, secretKey, this);
     int biddingKey = auctionCentral.getBiddingKey();
+
     Socket houseSocket = auctionCentral.getAuctionHouseSocket();
     AgentAuctionHouse auctionHouse = new AgentAuctionHouse(biddingKey, houseSocket, this);
+
   }
 
   public static void main(String[] args) throws Exception
   {
     Agent agent = new Agent();
+    agent.start();
   }
 
-  void setItems(ArrayList<Item> items)
+  void setItems(HashMap<Integer, Item> items)
   {
     this.auctionHouseItems = items;
   }
 
   void printItems()
   {
-    for(Item item : auctionHouseItems)
+    for(Item item : auctionHouseItems.values())
     {
       System.out.println(item);
     }
@@ -46,10 +52,13 @@ public class Agent extends Thread
   {
     while(true)
     {
-      if(auctionHouseItems.size() != 0)
+      if(auctionHouseItems != null)
       {
+        System.out.println("Size = " + auctionHouseItems.size());
         printItems();
-
+        System.out.print("Which item to bid on?: ");
+        Scanner scanner = new Scanner(System.in);
+        itemToBidOn = scanner.nextInt();
       }
     }
   }
