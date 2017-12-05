@@ -12,15 +12,13 @@ import java.util.*;
 
 public class AuctionHouse extends Thread
 {
-  final int BIDDING_TIME = 30;
+  private final int BIDDING_TIME = 30;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
   final static Random rand = new Random();
   private final static int PORT = rand.nextInt((60000-50000)+1)+50000;
   private static String address;
-  
-  public HouseItems houseItems;
 
   private int secretKey;
   private int publicID;
@@ -34,6 +32,8 @@ public class AuctionHouse extends Thread
 
   private Timer timer = null;
   private int biddingTimeLeft = BIDDING_TIME;
+
+  HouseItems houseItems;
 
   public static void main(String[] args)
   {
@@ -71,7 +71,6 @@ public class AuctionHouse extends Thread
       {
         Socket socket = auctionHouseSocket.accept();
         AuctionHouseClient client = new AuctionHouseClient(socket, this);
-        //map the client to the list of clients, get their public ID
         client.start();
       } catch (Exception e)
       {
@@ -80,7 +79,7 @@ public class AuctionHouse extends Thread
     }
   }
 
-  void startTimer()
+  private void startTimer()
   {
     this.timer.scheduleAtFixedRate(new TimerTask()
     {
@@ -93,7 +92,7 @@ public class AuctionHouse extends Thread
     }, 0, 1000);
   }
 
-  void tick()
+  private void tick()
   {
     this.biddingTimeLeft--;
   }
@@ -113,7 +112,9 @@ public class AuctionHouse extends Thread
   // AGENTS
   synchronized SuccessfulBidMessage bidSucceeded()
   {
+    //if the bid is over, reset the time
     biddingTimeLeft = BIDDING_TIME;
+
     return new SuccessfulBidMessage();
   }
   
@@ -141,11 +142,10 @@ public class AuctionHouse extends Thread
         else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
       }
     }
-    
     return null;
   }
   
-  public void printInfo()
+  private void printInfo()
   {
     try
     {
@@ -168,7 +168,7 @@ public class AuctionHouse extends Thread
     return publicID;
   }
 
-  public void storeInfo(AuctionHouseInfoMessage message)
+  void storeInfo(AuctionHouseInfoMessage message)
   {
     publicID = message.getPublicID();
     secretKey = message.getSecretKey();

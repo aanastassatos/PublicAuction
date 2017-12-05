@@ -17,7 +17,7 @@ public class AuctionHouseCentral extends Thread
 
   private AuctionHouse auctionHouse;
 
-  public AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
+  AuctionHouseCentral(String address, int port, String name, AuctionHouse auctionHouse) throws UnknownHostException, IOException
   {
     try
     {
@@ -48,8 +48,8 @@ public class AuctionHouseCentral extends Thread
         e.printStackTrace();
         return;
       }
-      if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
-      else if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
+      //if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
+      if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
       else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
@@ -77,28 +77,7 @@ public class AuctionHouseCentral extends Thread
   {
     auctionHouse.storeInfo(message);
   }
-  
-  private void handleMessage(final BlockFundsResultMessage message)
-  {
-    // central sends message to auction house about the validity of the agent who placed the bid
-    // returns true if amount money is valid and returns the public id of the agent
-   /* try
-    {
-      if(message.getResult() == true)
-      {
 
-        agent_oos.writeObject(auctionHouse.recievedBid(()));
-      }
-      else
-      {
-        agent_oos.writeObject(auctionHouse.invalidBid(message.getResult)
-      }
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }*/
-  }
-  
   private void handleMessage(final RequestConnectionToAuctionHouseMessage message)
   {
     try
@@ -121,3 +100,23 @@ public class AuctionHouseCentral extends Thread
     }
   }*/
 //else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
+/*private void handleMessage(final BlockFundsResultMessage message)
+  {
+    // central sends message to auction house about the validity of the agent who placed the bid
+    // returns true if amount money is valid and returns the public id of the agent
+    try
+    {
+      if(message.getResult() == true)
+      {
+
+        agent_oos.writeObject(auctionHouse.recievedBid(()));
+      }
+      else
+      {
+        agent_oos.writeObject(auctionHouse.invalidBid(message.getResult)
+      }
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }*/
