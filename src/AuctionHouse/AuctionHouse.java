@@ -86,11 +86,7 @@ public class AuctionHouse extends Thread
     //request money to Central
     return new RequestMoneySentMessage(auctionHouseID, agentID, amount);
   }
-
-  AuctionHouseConnectionInfoMessage getConnectionInfo()
-  {
-    return new AuctionHouseConnectionInfoMessage(address, PORT);
-  }
+  
   // AGENTS
 //  synchronized HigherBidPlacedMessage higherBidPlaced(int oldBiddingKey, int newBidAmount, int newBiddingKey)
 //  {
@@ -182,6 +178,16 @@ public class AuctionHouse extends Thread
   int getPublicID()
   {
     return publicID;
+  }
+  
+  String getAddress()
+  {
+    return address;
+  }
+  
+  int getPort()
+  {
+    return PORT;
   }
 
   public void storeInfo(AuctionHouseInfoMessage message)

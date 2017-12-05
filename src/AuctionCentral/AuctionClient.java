@@ -64,24 +64,6 @@ public class AuctionClient extends Thread
     }
   }
   
-  synchronized AuctionHouseConnectionInfoMessage requestConnection(RequestConnectionToAuctionHouseMessage msg)
-  {
-    try
-    {
-      client_oos.writeObject(msg);
-      Object o = client_ois.readObject();
-      return (AuctionHouseConnectionInfoMessage) o;
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e)
-    {
-      e.printStackTrace();
-    }
-    
-    return null;
-  }
-  
   private void closeConnection()
   {
     try
@@ -118,7 +100,7 @@ public class AuctionClient extends Thread
       Socket bankSocket = new Socket(AuctionCentral.BANK_ADDRESS, Bank.PORT);
       bank_oos = new ObjectOutputStream(bankSocket.getOutputStream());
       bank_ois = new ObjectInputStream(bankSocket.getInputStream());
-      client_oos.writeObject(auctionCentral.registerAuctionHouse(msg.getName(), this));
+      client_oos.writeObject(auctionCentral.registerAuctionHouse(msg.getName(), this, msg.getAddress(), msg.getPort()));
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -151,7 +133,7 @@ public class AuctionClient extends Thread
   {
     try
     {
-      client_oos.writeObject(auctionCentral.connectClientToAuctionHouse(msg, msg.getAuctionHouseID()));
+      client_oos.writeObject(auctionCentral.connectClientToAuctionHouse(msg));
     } catch (IOException e)
     {
       e.printStackTrace();

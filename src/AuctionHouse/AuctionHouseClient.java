@@ -48,8 +48,8 @@ public class AuctionHouseClient extends Thread
 
       //ASSIGN THE SOCKET TO CENTRAL HERE WHEN A CLIENT IS MADE
       centralSocket = new Socket("localhost", AuctionCentral.PORT);
-      central_ois = new ObjectInputStream(centralSocket.getInputStream());
       central_oos = new ObjectOutputStream(centralSocket.getOutputStream());
+      central_ois = new ObjectInputStream(centralSocket.getInputStream());
     } catch (IOException e)
     {
       e.printStackTrace();

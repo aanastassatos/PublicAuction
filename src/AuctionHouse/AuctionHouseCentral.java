@@ -28,7 +28,7 @@ public class AuctionHouseCentral extends Thread
 
       central_oos = new ObjectOutputStream(socket.getOutputStream());
       central_ois = new ObjectInputStream(socket.getInputStream());
-      central_oos.writeObject(new RegisterAuctionHouseMessage(name));
+      central_oos.writeObject(new RegisterAuctionHouseMessage(name, auctionHouse.getAddress(), auctionHouse.getPort()));
       Object o = central_ois.readObject();
     } catch (Exception e)
     {
@@ -52,7 +52,6 @@ public class AuctionHouseCentral extends Thread
       }
       if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
       else if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
-      else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
   }
@@ -99,17 +98,6 @@ public class AuctionHouseCentral extends Thread
     {
       e.printStackTrace();
     }*/
-  }
-  
-  private void handleMessage(final RequestConnectionToAuctionHouseMessage message)
-  {
-    try
-    {
-      central_oos.writeObject(auctionHouse.getConnectionInfo());
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
   }
 
   /*private void requestMoneySent(int agentI)

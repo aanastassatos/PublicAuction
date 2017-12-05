@@ -50,6 +50,7 @@ public class AuctionCentral extends Thread
   
   private final HashMap<Integer, String> auctionHouseNames = new HashMap<>();
   private final HashMap<Integer, Integer> auctionHouseKeys = new HashMap<>();
+  private final HashMap<Integer, AuctionHouseConnectionInfo> auctionHouseConnections = new HashMap<>();
   private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
   private final HashMap<Integer, Integer> agentBankKeys = new HashMap<>();
   private final HashMap<Integer, AuctionClient> agentClients = new HashMap<>();
@@ -72,14 +73,16 @@ public class AuctionCentral extends Thread
     }
   }
   
-  AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse)
+  AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse, final String address, final int port)
   {
     int publicID = name.hashCode();
     int secretKey = rand.nextInt(Integer.MAX_VALUE);
     AuctionHouseInfoMessage auctionHouseInfo = new AuctionHouseInfoMessage(publicID, secretKey);
+    AuctionHouseConnectionInfo connectionInfo = new AuctionHouseConnectionInfo(address, port);
     auctionHouseNames.put(publicID, name);
     auctionHouseKeys.put(publicID, auctionHouseInfo.getSecretKey());
     auctionHouseClients.put(auctionHouseKeys.get(publicID), auctionHouse);
+    auctionHouseConnections.put(secretKey, connectionInfo);
     System.out.println("Auction house "+name+" has registered under the public publicID "+publicID);
     return auctionHouseInfo;
   }
@@ -115,10 +118,10 @@ public class AuctionCentral extends Thread
     return new AuctionHouseListMessage(auctionHouseNames);
   }
   
-  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg, final int auctionHouseID)
+  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg)
   {
-    AuctionHouseConnectionInfoMessage message = auctionHouseClients.get(auctionHouseKeys.get(auctionHouseID)).requestConnection(msg);
-    return message;
+    AuctionHouseConnectionInfo connectionInfo = auctionHouseConnections.get(auctionHouseKeys.get(msg.getAuctionHouseID()));
+    return new AuctionHouseConnectionInfoMessage(connectionInfo.getAddress(), connectionInfo.getPort());
   }
   
   ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
