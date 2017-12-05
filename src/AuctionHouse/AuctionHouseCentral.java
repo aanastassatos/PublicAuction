@@ -1,14 +1,12 @@
 package AuctionHouse;
 
 import Messages.*;
-//import sun.jvm.hotspot.opto.Block;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
 
 public class AuctionHouseCentral extends Thread
 {
@@ -111,7 +109,7 @@ public class AuctionHouseCentral extends Thread
       e.printStackTrace();
     }
   }
-
+}
   /*private void requestMoneySent(int agentI)
   {
     try
@@ -122,6 +120,4 @@ public class AuctionHouseCentral extends Thread
       e.printStackTrace();
     }
   }*/
-
-}
 //else if(o instanceof RequestMoneySentMessage) handleMessage((RequestMoneySentMessage)o);
