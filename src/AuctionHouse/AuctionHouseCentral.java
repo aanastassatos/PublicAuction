@@ -57,11 +57,11 @@ public class AuctionHouseCentral extends Thread
   }
 
   //ASK THE CENTRAL TO CLOSE THE CONNECTION BECAUSE THERE IS NO MORE ITEMS TO SELL
-  synchronized void closeConnection(int publicID, int secretKey)
+  synchronized void closeConnection()
   {
     try
     {
-      central_oos.writeObject(new CloseConnectionMessage(publicID, secretKey));
+      central_oos.writeObject(new CloseConnectionMessage());
     }catch(IOException e)
     {
       e.printStackTrace();

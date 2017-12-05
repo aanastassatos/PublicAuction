@@ -121,7 +121,7 @@ public class AuctionHouse extends Thread
 
     //If there are more things to sell, update the list, else close
     if(!items.noMoreItemToSell()) items.updateItemList();
-    else central.closeConnection(publicID,secretKey);
+    else central.closeConnection();
 
     System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
     System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
