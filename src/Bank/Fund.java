@@ -19,6 +19,7 @@ class Fund
   Fund(final int initialBalance)
   {
     total = initialBalance;
+    transactionHistory.add("Created new account with an initial balance of " + initialBalance);
   }
 
   synchronized LinkedList<String> getTransactionHistory()

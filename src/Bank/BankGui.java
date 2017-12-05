@@ -1,7 +1,6 @@
 package Bank;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -10,14 +9,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 class BankGui extends Stage
 {
   private final ObservableList<AccountNode> boxList;
+  final private PlaceHolderNode placeHolder = new PlaceHolderNode();
 
   private class AccountNode extends BorderPane
   {
@@ -28,7 +30,10 @@ class BankGui extends Stage
     {
       this.account = account;
       this.fund = fund;
+    }
 
+    void init()
+    {
       setLeft(new Text(account.toString()));
       setRight(new Text(fund.toString()));
     }
@@ -44,12 +49,24 @@ class BankGui extends Stage
     }
   }
 
+  private class PlaceHolderNode extends AccountNode
+  {
+    private PlaceHolderNode()
+    {
+      super(null, null);
+      setLeft(new Text("No accounts active."));
+    }
+
+    @Override
+    void updateFund(){}
+  }
+
   BankGui(final Bank bank)
   {
 
     setOnCloseRequest(e -> bank.shutdown());
     boxList = FXCollections.observableList(new LinkedList<>());
-
+    boxList.add(placeHolder);
     final ListView<AccountNode> boxView = new ListView<>(boxList);
 
     setScene(new Scene(new StackPane(boxView)));
@@ -61,16 +78,16 @@ class BankGui extends Stage
 
     boxView.setOnMouseClicked(e -> openHistory(boxView));
 
-    final Timeline timeline = new Timeline();
-    timeline.setCycleCount(Timeline.INDEFINITE);
-    timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1/60d), event -> refreshFunds()));
-    timeline.playFromStart();
+    final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+    service.scheduleAtFixedRate(this::refreshFunds, 0, 100, TimeUnit.MILLISECONDS);
   }
 
   void addAccount(final BankAccount account)
   {
+    if(boxList.contains(placeHolder)) boxList.remove(placeHolder);
     final Fund f = account.getFund();
     final AccountNode box = new AccountNode(account, f);
+    box.init();
     boxList.add(box);
   }
 
@@ -81,6 +98,6 @@ class BankGui extends Stage
 
   private void refreshFunds()
   {
-    boxList.forEach(b -> b.updateFund());
+    Platform.runLater(() -> boxList.forEach(b -> b.updateFund()));
   }
 }
