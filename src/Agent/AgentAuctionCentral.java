@@ -11,8 +11,10 @@ import java.util.*;
 public class AgentAuctionCentral extends Thread
 {
   private int biddingKey;
-  private Socket auctionHouseSocket;
   final Agent agent;
+  private String address;
+  private static volatile Integer port;
+  private static volatile Integer house;
 
   AgentAuctionCentral(String hostname, String name, int key, Agent agent)
   {
@@ -38,8 +40,8 @@ public class AgentAuctionCentral extends Thread
       HashMap<Integer, String> houses = auctionHouses.getAuctionHouseList();
       oos.writeObject(getAuctionHouses(houses));
       AuctionHouseConnectionInfoMessage info = ((AuctionHouseConnectionInfoMessage)ois.readObject());
-      auctionHouseSocket = new Socket(info.getAddress(), info.getPort());
-      System.out.println("or here?");
+      this.address = info.getAddress();
+      this.port = info.getPort();
       oos.writeObject(new CloseConnectionMessage());
 
     }
@@ -49,9 +51,25 @@ public class AgentAuctionCentral extends Thread
     }
   }
 
-  Socket getAuctionHouseSocket() { return auctionHouseSocket; }
+  String getAddress() { return address; }
+
+  int getPort() {
+    while(port == null)
+    {
+
+    }
+    return port;
+  }
 
   int getBiddingKey() { return biddingKey; }
+
+  int getHouse() {
+    while(house == null)
+    {
+
+    }
+    return house;
+  }
 
   RequestConnectionToAuctionHouseMessage getAuctionHouses(HashMap<Integer, String> houses)
   {
@@ -69,7 +87,7 @@ public class AgentAuctionCentral extends Thread
 
     System.out.print("Enter the auction house: ");
     Scanner scanner = new Scanner(System.in);
-    int house = scanner.nextInt();
+    house = scanner.nextInt();
     return new RequestConnectionToAuctionHouseMessage(arrayList.get(house), biddingKey);
   }
 }

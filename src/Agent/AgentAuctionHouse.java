@@ -7,20 +7,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.List;
 
-public class AgentAuctionHouse
+public class AgentAuctionHouse extends Thread
 {
   final Agent agent;
 
-  AgentAuctionHouse(int biddingKey, Socket auctionHouseSocket, Agent agent)
+  AgentAuctionHouse(int biddingKey, String address, int port, Agent agent)
   {
     this.agent = agent;
+    new Thread(() -> connectToHouse(biddingKey, address, port)).start();
+  }
+
+  public void connectToHouse(int biddingKey, String address, int port)
+  {
+    System.out.println("address: " + address + "port: " + port);
+
     try
     {
-      ObjectOutputStream oos = new ObjectOutputStream(auctionHouseSocket.getOutputStream());
-      ObjectInputStream ois = new ObjectInputStream((auctionHouseSocket.getInputStream()));
       System.out.println("Here be monsters");
+      final Socket houseSocket = new Socket(address, port);
+      ObjectOutputStream oos = new ObjectOutputStream(houseSocket.getOutputStream());
+      ObjectInputStream ois = new ObjectInputStream(houseSocket.getInputStream());
+      System.out.println("Or here?");
       oos.writeObject(new AgentInfoMessage(biddingKey));
       ItemListMessage itemsMessage = ((ItemListMessage) ois.readObject());
       HashMap<Integer, Item> items = itemsMessage.getItemList();
