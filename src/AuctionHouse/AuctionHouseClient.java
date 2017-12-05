@@ -14,8 +14,6 @@ public class AuctionHouseClient extends Thread
   private final Socket socket;
   //private  Socket centralSocket;
 
-  private HouseItems houseItems;
-
   private ObjectInputStream agent_ois;
   private ObjectOutputStream agent_oos;
 
@@ -23,7 +21,6 @@ public class AuctionHouseClient extends Thread
   {
     this.socket = socket;
     this.auctionHouse = auctionHouse;
-    this.houseItems = auctionHouse.houseItems;
     try
     {
       agent_oos = new ObjectOutputStream(socket.getOutputStream());
