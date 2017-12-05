@@ -1,18 +1,23 @@
 package Messages;
 
-import java.net.Socket;
-
 public class AuctionHouseConnectionInfoMessage
 {
-  private final Socket auctionHouseSocket;
+  private final String address;
+  private final int port;
   
-  public AuctionHouseConnectionInfoMessage(final Socket auctionHouseSocket)
+  public AuctionHouseConnectionInfoMessage(final String address, final int port)
   {
-    this.auctionHouseSocket = auctionHouseSocket;
+    this.address = address;
+    this.port = port;
   }
   
-  public Socket getAuctionHouseSocket()
+  public String getAddress()
   {
-    return auctionHouseSocket;
+    return address;
+  }
+  
+  public int getPort()
+  {
+    return port;
   }
 }
