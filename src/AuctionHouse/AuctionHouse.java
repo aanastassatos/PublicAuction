@@ -41,14 +41,12 @@ public class AuctionHouse extends Thread
     {
       String centralAddress = "localhost";
       address = "localhost";
-      for(int i = 0; i < 10; i++)
-      {
-        Random r = new Random();
-        char c = (char)(r.nextInt(26) + 'A');
-        String name = Character.toString(c);
-        AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
-        auctionHouse.start();
-      }
+       Random r = new Random();
+       char c = (char)(r.nextInt(26) + 'A');
+       String name = Character.toString(c)+Integer.toString(r.nextInt(1000)+1);
+       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
+       auctionHouse.start();
+
     } catch (IOException e)
     {
       e.printStackTrace();
@@ -179,6 +177,14 @@ public class AuctionHouse extends Thread
     secretKey = message.getSecretKey();
   }
 }
+
+// TIMER
+// SUCCESSFUL BID
+// MULTIPLE HOUSES
+// 3 ITEMS AT A TIME
+// UPDATE/REMOVE ITEMS
+// PRINT LIST OF ITEM FROM EACH AUCTION HOUSE
+
 
 /*central will take care of this, auction house only needs to send the message with the bidding key and the amount?
   synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
