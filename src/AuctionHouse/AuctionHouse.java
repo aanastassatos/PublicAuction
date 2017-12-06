@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionHouse extends Thread
 {
@@ -81,18 +82,30 @@ public class AuctionHouse extends Thread
   {
     while(true)
     {
-      HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
-      Iterator iter = itemList.entrySet().iterator();
-      while (iter.hasNext())
-      {
-        Map.Entry pair = (Map.Entry) iter.next();
-        Item current = itemList.get(pair.getKey());
-        if (current.isTimeUp())
-        {
-          
-          bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
-        }
-      }
+      ConcurrentHashMap<Integer, Item> itemList = new ConcurrentHashMap<Integer, Item>(items.getCurrentHouseItems());
+      Queue<Integer> itemsToRemove = new LinkedList<>();
+      synchronized (this){
+      items.getCurrentHouseItems().keySet().stream()
+              .map(itemList::get)
+              .filter(Objects::nonNull)
+              .filter(i -> i.isTimeUp())
+              .forEach(current ->
+              {
+                bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
+                itemsToRemove.add(current.getID());
+              });
+      itemsToRemove.forEach(items::removeItem);}
+
+//      while (iter.hasNext())
+//      {
+//        Map.Entry pair = (Map.Entry) iter.next();
+//        Item current = itemList.get(pair.getKey());
+//        if (current.isTimeUp())
+//        {
+//
+//          bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
+//        }
+//      }
     }
   }
 
@@ -106,7 +119,6 @@ public class AuctionHouse extends Thread
   void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
     central.requestMoney(biddingKey, amount);
-    items.removeItem(itemID);
 
     //If there are more things to sell, update the list, else close
     if(!items.noMoreItemToSell()) items.updateItemList();
