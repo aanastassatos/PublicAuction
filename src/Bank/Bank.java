@@ -108,6 +108,7 @@ public class Bank extends Thread
    */
   synchronized void withdrawFunds(final int secretKey, final int amount)
   {
+    keyMap.get(secretKey).getFund().removeBlocked(amount);
     keyMap.get(secretKey).getFund().withdraw(amount);
     System.out.println("Withdrew " + amount + " from account " + keyMap.get(secretKey).getAccountNumber()
             + " leaving " + keyMap.get(secretKey).getFund().toString());
