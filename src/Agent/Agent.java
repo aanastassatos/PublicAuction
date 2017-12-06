@@ -38,6 +38,7 @@ public class Agent extends Thread
   void setItems(HashMap<Integer, Item> items)
   {
     this.auctionHouseItems = items;
+    printItems();
   }
 
   void printItems()
@@ -48,7 +49,7 @@ public class Agent extends Thread
     }
   }
 
-  int getItemToBidOn() { return itemToBidOn; }
+  Integer getItemToBidOn() { return itemToBidOn; }
 
   int getAmountBid() { return amountToBid; }
 
@@ -59,8 +60,6 @@ public class Agent extends Thread
     {
       if(auctionHouseItems != null)
       {
-        System.out.println("Size = " + auctionHouseItems.size());
-        printItems();
         System.out.print("Which item to bid on?: ");
         Scanner scanner = new Scanner(System.in);
         itemToBidOn = scanner.nextInt();
