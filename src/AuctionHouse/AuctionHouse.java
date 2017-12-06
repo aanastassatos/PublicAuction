@@ -210,7 +210,7 @@ public class AuctionHouse extends Thread
 // UPDATE/REMOVE ITEMS
 // PRINT LIST OF ITEM with the ITEMID(hashmap) and CURRENT BID FROM EACH AUCTION HOUSE
 // IF ALL ITEMS ARE SOLD, CLOSE
-
+// GUI
 /*central will take care of this, auction house only needs to send the message with the bidding key and the amount?
   synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
   {

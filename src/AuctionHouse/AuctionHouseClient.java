@@ -1,6 +1,5 @@
 package AuctionHouse;
 
-import AuctionCentral.AuctionCentral;
 import Messages.*;
 
 import java.io.IOException;
@@ -12,7 +11,6 @@ public class AuctionHouseClient extends Thread
 {
   private final AuctionHouse auctionHouse;
   private final Socket socket;
-  //private  Socket centralSocket;
 
   private ObjectInputStream agent_ois;
   private ObjectOutputStream agent_oos;
@@ -44,8 +42,8 @@ public class AuctionHouseClient extends Thread
         o = agent_ois.readObject();
       } catch (Exception e)
       {
-//        e.printStackTrace();
-//        return;
+         e.printStackTrace();
+         return;
       }
 
       if(o instanceof AgentInfoMessage) handleMessage((AgentInfoMessage) o);
@@ -109,30 +107,8 @@ public class AuctionHouseClient extends Thread
     }
   }
 }
-  /*
-  private void handleMessage(final SuccessfulBidMessage message)
-  {
-    try
-    {
-      agent_oos.writeObject(auctionHouse.bidSucceeded());
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-  }*/
 
 
-//In case 2 people bids at the same time with higher value than the current highest bid
-//  private boolean highestBid(int bid, int itemID, int auctionHouseID)
-//  {
-//    currentBid = houseItems.getCurrentHighestBid(auctionHouseID,itemID);
-//    while(currentBid < bid)
-//    {
-//      if(highestBid.compareAndSet(currentBid,bid)) return true;
-//      currentBid = highestBid.get();
-//    }
-//    return false;
-//  }
 
 
 //    HashMap<Integer,Integer> itemNBid = new HashMap<>();

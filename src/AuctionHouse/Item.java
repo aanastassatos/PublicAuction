@@ -26,6 +26,7 @@ public class Item implements Serializable
 
   Item(String item)
   {
+    timer = new Timer();
     this.item = item;
     setPrice();
   }
