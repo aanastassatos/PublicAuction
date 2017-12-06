@@ -38,10 +38,10 @@ public class AgentAuctionHouse extends Thread
       {
         oos.writeObject(new BidPlacedMessage(biddingKey, agent.getItemToBidOn(), agent.getAmountBid()));
       }
-
-      Object readMessage = ois.readObject();
+      
       while(true)
       {
+        Object readMessage = ois.readObject();
         if (readMessage instanceof ItemListMessage)
         {
           ItemListMessage listMessage = (ItemListMessage) readMessage;
@@ -49,12 +49,14 @@ public class AgentAuctionHouse extends Thread
           agent.setItems(items);
         } else if (readMessage instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage) readMessage);
         else if (readMessage instanceof BidResultMessage) handleMessage((BidResultMessage) readMessage);
-        readMessage = ois.readObject();
-        if(readMessage instanceof NoItemLeftMessage)
+        else if(readMessage instanceof SuccessfulBidMessage) System.out.println("poop");
+        else if(readMessage instanceof NoItemLeftMessage)
         {
           oos.writeObject(new CloseConnectionMessage());
           break;
         }
+        
+        
       }
     }
 

@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class Agent extends Thread
 {
   HashMap<Integer, Item> auctionHouseItems;
-  Integer itemToBidOn = null;
-  Integer amountToBid = null;
+  Integer itemToBidOn = 0;
+  Integer amountToBid = 100;
 
   public Agent()
   {

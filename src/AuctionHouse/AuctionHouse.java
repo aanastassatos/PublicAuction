@@ -56,6 +56,7 @@ public class AuctionHouse extends Thread
     auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     items = new HouseItems(randomNumItems);
+    new Thread(() -> checkItem()).start();
     printInfo();
   }
 
@@ -73,19 +74,25 @@ public class AuctionHouse extends Thread
       {
         e.printStackTrace();
       }
-      checkItem();
     }
   }
 
-  private synchronized void checkItem()
+  private void checkItem()
   {
-    HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
-    Iterator iter = itemList.entrySet().iterator();
-    while (iter.hasNext())
+    while(true)
     {
-      Map.Entry pair = (Map.Entry) iter.next();
-      Item current = itemList.get(pair.getKey());
-      if(current.isTimeUp()) bidSucceeded(current.getItem(),current.getID(), current.getHighestBid(), current.getHighestBidderKey());
+      HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
+      Iterator iter = itemList.entrySet().iterator();
+      while (iter.hasNext())
+      {
+        Map.Entry pair = (Map.Entry) iter.next();
+        Item current = itemList.get(pair.getKey());
+        if (current.isTimeUp())
+        {
+          
+          bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
+        }
+      }
     }
   }
 
@@ -96,7 +103,7 @@ public class AuctionHouse extends Thread
   }
   
   // AGENTS
-  synchronized void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
+  void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
     central.requestMoney(biddingKey, amount);
     items.removeItem(itemID);

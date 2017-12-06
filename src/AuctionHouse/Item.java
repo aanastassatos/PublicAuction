@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class Item implements Serializable
 {
-  private final int BIDDING_TIME = 30;
+  private final int BIDDING_TIME = 5;
   private final int maxVal = 100;
   private final int minVal = 1;
 
@@ -21,7 +21,7 @@ public class Item implements Serializable
 
   private static Random r = AuctionHouse.rand;
 
-  private Timer timer;
+  transient private Timer timer;
   private int biddingTimeLeft = BIDDING_TIME;
 
   Item(String item)
@@ -62,7 +62,11 @@ public class Item implements Serializable
 
   private void tick()
   {
-    this.biddingTimeLeft--;
+    if(biddingTimeLeft > 0)
+    {
+      this.biddingTimeLeft--;
+      System.out.println(biddingTimeLeft);
+    }
   }
 
   void setID(int itemID)
