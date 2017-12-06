@@ -2,10 +2,16 @@ package AuctionHouse;
 
 import java.io.Serializable;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class Item implements Serializable
 {
+  private final int BIDDING_TIME = 30;
+  private final int maxVal = 100;
+  private final int minVal = 1;
+
   private String item;
   private int itemID;
   private int itemPrice;
@@ -13,9 +19,10 @@ public class Item implements Serializable
   private int highestBid;
   private UUID highestBidTransactionID;
 
-  private final int maxVal = 100;
-  private final int minVal = 1;
   private static Random r = AuctionHouse.rand;
+
+  private Timer timer;
+  private int biddingTimeLeft = BIDDING_TIME;
 
   Item(String item)
   {
@@ -32,6 +39,29 @@ public class Item implements Serializable
   public int getPrice()
   {
     return itemPrice;
+  }
+
+  void startTimer()
+  {
+    this.timer.scheduleAtFixedRate(new TimerTask()
+    {
+      @Override
+      public void run()
+      {
+        tick();
+      }
+    }, 0, 1000);
+  }
+
+  boolean isTimeUp()
+  {
+    if(biddingTimeLeft == 0) return true;
+    return false;
+  }
+
+  private void tick()
+  {
+    this.biddingTimeLeft--;
   }
 
   void setID(int itemID)
@@ -56,6 +86,7 @@ public class Item implements Serializable
 
   void setHighestBidderKey(int highestBidderKey)
   {
+    startTimer();
     this.highestBidderKey = highestBidderKey;
   }
 

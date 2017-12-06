@@ -12,7 +12,6 @@ import java.util.*;
 
 public class AuctionHouse extends Thread
 {
-  private final int BIDDING_TIME = 30;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
@@ -30,10 +29,6 @@ public class AuctionHouse extends Thread
   //The clients have the auctionHouseID and the auction client
   private final HashMap<Integer,AuctionHouseClient> auctionHouseClients = new HashMap<>();
 
-  private Timer timer = null;
-  private int biddingTimeLeft = BIDDING_TIME;
-
-  HouseItems houseItems;
 
   public static void main(String[] args)
   {
@@ -78,27 +73,20 @@ public class AuctionHouse extends Thread
       {
         e.printStackTrace();
       }
+      checkItem();
     }
   }
 
-  //private void startTimer(int itemID, int bidAmount, int biddingKey)
-  //if(biddingTimeLeft == 0) bidSucceeded(itemID, bidAmount, biddingKey);
-  private void startTimer(Item item)
+  private synchronized void checkItem()
   {
-    this.timer.scheduleAtFixedRate(new TimerTask()
+    HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
+    Iterator iter = itemList.entrySet().iterator();
+    while (iter.hasNext())
     {
-      @Override
-      public void run()
-      {
-        tick();
-        if(biddingTimeLeft == 0) bidSucceeded(item.getID(), item.getHighestBid(), item.getHighestBidderKey());
-      }
-    }, 0, 1000);
-  }
-
-  private void tick()
-  {
-    this.biddingTimeLeft--;
+      Map.Entry pair = (Map.Entry) iter.next();
+      Item current = itemList.get(pair.getKey());
+      if(current.isTimeUp()) bidSucceeded(current.getItem(),current.getID(), current.getHighestBid(), current.getHighestBidderKey());
+    }
   }
 
   //CENTRAL
@@ -108,14 +96,8 @@ public class AuctionHouse extends Thread
   }
   
   // AGENTS
-  synchronized SuccessfulBidMessage bidSucceeded(int itemID, int amount, int biddingKey)
+  synchronized void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
-    //TRANSACTION ID???
-
-    //Should have another list for this?
-    // THE AUCTION HOUSE ONLY AUCTIONS AT MOST 3 ITEMS AT A TIME
-    // ONCE IT'S REMOVE THE ITEM THEN IT CAN ADD NEW ONES
-
     central.requestMoney(biddingKey, amount);
     items.removeItem(itemID);
 
@@ -126,11 +108,11 @@ public class AuctionHouse extends Thread
       sendMessageToClients(new NoItemLeftMessage());
       central.closeConnection();
     }
-
+    sendMessageToClients(new ItemSoldMessage(itemID, itemName, amount));
     System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
     System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
                         "with bidding amount of: " +amount);
-    return new SuccessfulBidMessage(itemID, amount, biddingKey);
+    auctionHouseClients.get(biddingKey).sendMessage(new SuccessfulBidMessage(itemID, amount, biddingKey));
   }
 
   public synchronized void sendMessageToClients(Object m)
@@ -146,18 +128,14 @@ public class AuctionHouse extends Thread
       auctionHouseClients.remove(c);
   }
 
-  //HAVE TO UPDATE THE LIST OF ITEMS AND SEND TO THE AGENT WHEN AN ITEM IS SOLD AND A NEW ONE IS PLACED
-  //HAVE TO PRINT OUT A NEW PRICE WHEN A HIGHER BID IS PLACED
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
     return new ItemListMessage(items.getCurrentHouseItems(), publicID);
-    //return new ItemListMessage(items.getAuctionHouseItemList(), publicID);
   }
 
   synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
   {
-    //Item item = items.getAuctionHouseItemList().get(itemID);
     Item item = items.getCurrentHouseItems().get(itemID);
     if(item == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
     else if(item.getHighestBid() > amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
@@ -172,10 +150,7 @@ public class AuctionHouse extends Thread
           //set the highestBid to be the current bid and the bidding key to the highest bidder
           item.setHighestBid(amount);
           item.setHighestBidderKey(biddingKey);
-          //if the new bid is placed by someone, reset the time
-          biddingTimeLeft = BIDDING_TIME;
-          //startTimer(itemID, amount, biddingKey);
-          startTimer(item);
+
           System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
                               "with the amount of: "+amount);
           sendMessageToClients(new HigherBidPlacedMessage(itemID, amount));
