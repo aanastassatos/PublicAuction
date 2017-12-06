@@ -70,15 +70,6 @@ class HouseItems
 
   synchronized void removeItem(int itemID)
   {
-//    for( Integer id : currentHouseItems.keySet())
-//    {
-//      // == OR EQUALS??
-//      if(id == itemID)
-//      {
-//        Item name = currentHouseItems.get(id);
-//        currentHouseItems.remove(id,name);
-//      }
-//    }
     currentHouseItems.remove(itemID);
   }
 

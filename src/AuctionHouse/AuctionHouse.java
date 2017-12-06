@@ -2,6 +2,7 @@ package AuctionHouse;
 
 import AuctionCentral.AuctionCentral;
 import Messages.*;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -12,11 +13,12 @@ import java.util.*;
 
 public class AuctionHouse extends Thread
 {
+  private AuctionHouseGui auctionHouseGui;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
   final static Random rand = new Random();
-  private final static int PORT = rand.nextInt((60000-50000)+1)+50000;
+  private final static int PORT = rand.nextInt((60000 - 50000) + 1) + 50000;
   private static String address;
 
   private int secretKey;
@@ -27,7 +29,7 @@ public class AuctionHouse extends Thread
   private AuctionHouseCentral central;
 
   //The clients have the auctionHouseID and the auction client
-  private final HashMap<Integer,AuctionHouseClient> auctionHouseClients = new HashMap<>();
+  private final HashMap<Integer, AuctionHouseClient> auctionHouseClients = new HashMap<>();
 
 
   public static void main(String[] args)
@@ -37,8 +39,8 @@ public class AuctionHouse extends Thread
       String centralAddress = "localhost";
       address = "localhost";
       Random r = new Random();
-      char c = (char)(r.nextInt(26) + 'A');
-      String name = Character.toString(c)+Integer.toString(r.nextInt(1000)+1);
+      char c = (char) (r.nextInt(26) + 'A');
+      String name = Character.toString(c) + Integer.toString(r.nextInt(1000) + 1);
       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
       auctionHouse.start();
 
@@ -49,14 +51,15 @@ public class AuctionHouse extends Thread
   }
 
   private HouseItems items;
-  
-  AuctionHouse(String centralAddress, int centralPort, String name,int port) throws IOException
+
+  AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
     int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
     auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     items = new HouseItems(randomNumItems);
     new Thread(() -> checkItem()).start();
+    Platform.runLater(() -> auctionHouseGui = new AuctionHouseGui(this));
     printInfo();
   }
 
@@ -79,7 +82,7 @@ public class AuctionHouse extends Thread
 
   private void checkItem()
   {
-    while(true)
+    while (true)
     {
       HashMap<Integer, Item> itemList = new HashMap<Integer, Item>(items.getCurrentHouseItems());
       Queue<Item> itemsToRemove = new LinkedList<Item>();
@@ -89,9 +92,10 @@ public class AuctionHouse extends Thread
               .filter(i -> i.isTimeUp())
               .forEach(itemsToRemove::add);
 
+      itemsToRemove.forEach(it -> items.removeItem(it.getID()));
       itemsToRemove.forEach(current ->
               bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey()));
-      itemsToRemove.forEach(it -> items.removeItem(it.getID()));
+
 
 //      while (iter.hasNext())
 //      {
@@ -99,12 +103,24 @@ public class AuctionHouse extends Thread
 //        Item current = itemList.get(pair.getKey());
 //        if (current.isTimeUp())
 //        {
-//
 //          bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
 //        }
 //      }
     }
   }
+
+  //WHY IS THIS WORKING
+ /* void printItemList()
+  {
+    HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
+    Iterator iter = auctionHouseClients.entrySet().iterator();
+    while (iter.hasNext())
+    {
+      Map.Entry pair = (Map.Entry) iter.next();
+      Item current = itemList.get(pair.getKey());
+      Platform.runLater(() -> auctionHouseGui.addItem(current));
+    }
+  }*/
 
   //CENTRAL
   AuctionHouseConnectionInfoMessage getConnectionInfo()
@@ -118,7 +134,12 @@ public class AuctionHouse extends Thread
     central.requestMoney(biddingKey, amount);
 
     //If there are more things to sell, update the list, else close
-    if(!items.noMoreItemToSell()) items.updateItemList();
+    if(!items.noMoreItemToSell())
+    {
+      items.updateItemList();
+      System.out.println("New list is: " + items.getCurrentHouseItems());
+    }
+
     else
     {
       sendMessageToClients(new NoItemLeftMessage());
@@ -126,8 +147,8 @@ public class AuctionHouse extends Thread
     }
     sendMessageToClients(new ItemSoldMessage(itemID, itemName, amount));
     System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
-    System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
-                        "with bidding amount of: " +amount);
+    System.out.println("Congratulations! Bidding key number: " +biddingKey+ " has won "+itemName+
+                        " with bidding amount of: " +amount);
     auctionHouseClients.get(biddingKey).sendMessage(new SuccessfulBidMessage(itemID, amount, biddingKey));
   }
 
@@ -147,6 +168,7 @@ public class AuctionHouse extends Thread
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
+    //printItemList();
     return new ItemListMessage(items.getCurrentHouseItems(), publicID);
   }
 
@@ -190,16 +212,6 @@ public class AuctionHouse extends Thread
       e.printStackTrace();
     }
   }
-
-  int getSecretKey()
-  {
-    return secretKey;
-  }
-
-  int getPublicID()
-  {
-    return publicID;
-  }
   
   String getAddress()
   {
@@ -217,29 +229,3 @@ public class AuctionHouse extends Thread
     secretKey = message.getSecretKey();
   }
 }
-
-// WHAT IS THE POINT OF SECRET KEY??? ALSO PUBLIC ID
-// TIMER
-// SUCCESSFUL BID
-// MULTIPLE HOUSES
-// 3 ITEMS AT A TIME
-// UPDATE/REMOVE ITEMS
-// PRINT LIST OF ITEM with the ITEMID(hashmap) and CURRENT BID FROM EACH AUCTION HOUSE
-// IF ALL ITEMS ARE SOLD, CLOSE
-// GUI
-/*central will take care of this, auction house only needs to send the message with the bidding key and the amount?
-  synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
-  {
-    return new PutHoldOnAccountMessage(agentInfo.get(biddingKey), bidAmount);
-  }*/
- /* AgentInfoMessage getAgentInfo(final int publicID, final int auctionHouseID, final AuctionHouseClient agent)
-  {
-    auctionHousePublicID = auctionHouseID;
-    int biddingKey =  rand.nextInt(Integer.MAX_VALUE);
-    AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
-    agentKeys.put(publicID, biddingKey);
-    auctionHouseClients.put(agentKeys.get(publicID), agent);
-    System.out.println("Auction Agent with the ID "+publicID+" has connect to auctionHouse ID" +auctionHouseID+" with a bidding key: "
-            +biddingKey);
-    return agentInfo;
-  }*/
