@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionHouse extends Thread
 {
@@ -82,19 +81,17 @@ public class AuctionHouse extends Thread
   {
     while(true)
     {
-      ConcurrentHashMap<Integer, Item> itemList = new ConcurrentHashMap<Integer, Item>(items.getCurrentHouseItems());
-      Queue<Integer> itemsToRemove = new LinkedList<>();
-      synchronized (this){
+      HashMap<Integer, Item> itemList = new HashMap<Integer, Item>(items.getCurrentHouseItems());
+      Queue<Item> itemsToRemove = new LinkedList<Item>();
       items.getCurrentHouseItems().keySet().stream()
               .map(itemList::get)
               .filter(Objects::nonNull)
               .filter(i -> i.isTimeUp())
-              .forEach(current ->
-              {
-                bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
-                itemsToRemove.add(current.getID());
-              });
-      itemsToRemove.forEach(items::removeItem);}
+              .forEach(itemsToRemove::add);
+
+      itemsToRemove.forEach(current ->
+              bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey()));
+      itemsToRemove.forEach(it -> items.removeItem(it.getID()));
 
 //      while (iter.hasNext())
 //      {
