@@ -68,7 +68,7 @@ class HouseItems
     else return false;
   }
 
-  void removeItem(int itemID)
+  synchronized void removeItem(int itemID)
   {
 //    for( Integer id : currentHouseItems.keySet())
 //    {
