@@ -30,18 +30,32 @@ public class AgentAuctionHouse extends Thread
       ObjectInputStream ois = new ObjectInputStream(houseSocket.getInputStream());
       oos.writeObject(new AgentInfoMessage(biddingKey));
       ItemListMessage itemsMessage = ((ItemListMessage) ois.readObject());
-      HashMap<Integer, Item> items = itemsMessage.getItemList();
-      System.out.println("Size is = : " + items.values().size());
+      items = itemsMessage.getItemList();
+      //System.out.println("Size is = : " + items.values().size());
       agent.setItems(items);
 
-      if((Integer)agent.getItemToBidOn() != null)
+      if(agent.getItemToBidOn() != null)
       {
         oos.writeObject(new BidPlacedMessage(biddingKey, agent.getItemToBidOn(), agent.getAmountBid()));
       }
 
-      Object bidResultMessage = ois.readObject();
-      if(bidResultMessage instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage) bidResultMessage);
-      else if(bidResultMessage instanceof BidResultMessage) handleMessage((BidResultMessage)bidResultMessage);
+      Object readMessage = ois.readObject();
+      while(true)
+      {
+        if (readMessage instanceof ItemListMessage)
+        {
+          ItemListMessage listMessage = (ItemListMessage) readMessage;
+          items = listMessage.getItemList();
+          agent.setItems(items);
+        } else if (readMessage instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage) readMessage);
+        else if (readMessage instanceof BidResultMessage) handleMessage((BidResultMessage) readMessage);
+        readMessage = ois.readObject();
+        if(readMessage instanceof NoItemLeftMessage)
+        {
+          oos.writeObject(new CloseConnectionMessage());
+          break;
+        }
+      }
     }
 
     catch(Exception e)
