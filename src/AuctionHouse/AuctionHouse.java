@@ -129,7 +129,7 @@ public class AuctionHouse extends Thread
   }
   
   // AGENTS
-  void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
+  synchronized void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
     central.requestMoney(biddingKey, amount);
 

@@ -1,3 +1,7 @@
+/**
+ * I may delete this
+ */
+
 package AuctionCentral;
 
 import javafx.application.Application;

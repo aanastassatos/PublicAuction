@@ -1,3 +1,9 @@
+/**
+ * Created by Alex Anastassatos
+ *
+ * Serves as a proxy between AuctionCentral and whatever client is currently connected.
+ */
+
 package AuctionCentral;
 
 import Bank.Bank;
@@ -10,13 +16,18 @@ import java.net.Socket;
 
 public class AuctionClient extends Thread
 {
-  private final AuctionCentral auctionCentral;
-  private ObjectInputStream client_ois;
-  private ObjectOutputStream client_oos;
-  private ObjectInputStream bank_ois = null;
-  private ObjectOutputStream bank_oos = null;
-  private final Socket socket;
+  private final AuctionCentral auctionCentral;  //A reference to AuctionCentral in order to use the methods within it
+  private ObjectInputStream client_ois;   //Object input stream to the client.
+  private ObjectOutputStream client_oos;  //Object output stream to the client.
+  private ObjectInputStream bank_ois = null;  //Object input stream to the bank (only used if client is an auction house)
+  private ObjectOutputStream bank_oos = null; //Object output stream to the bank (only used if client is an auction house)
+  private final Socket socket;  //Socket made by client to connect to AuctionCentral
   
+  /**
+   * Instantiates AuctionClient with a socket and a reference to AuctionCentral
+   * @param socket
+   * @param auctionCentral
+   */
   AuctionClient(final Socket socket, final AuctionCentral auctionCentral)
   {
     this.auctionCentral = auctionCentral;
@@ -31,7 +42,10 @@ public class AuctionClient extends Thread
       e.printStackTrace();
     }
   }
-
+  
+  /**
+   * Loops continuously, reading messages that come through the Object Input Stream, and handling messages.
+   */
   @Override
   public void run()
   {
@@ -65,6 +79,9 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Closes the connection to a client, and (if client is an auction house) to the bank
+   */
   private void closeConnection()
   {
     try
@@ -83,6 +100,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the RegisterAgentMessage
+   * @param msg
+   */
   private void handleMessage(final RegisterAgentMessage msg)
   {
     try
@@ -94,6 +115,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the RegisterAuctionHouseMessage
+   * @param msg
+   */
   private void handleMessage(final RegisterAuctionHouseMessage msg)
   {
     try
@@ -108,6 +133,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the DeregisterAuctionHouseMessage
+   * @param msg
+   */
   private void handleMessage(final DeregisterAuctionHouseMessage msg)
   {
     try
@@ -119,6 +148,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the RequestAuctionHouseListMessage
+   * @param msg
+   */
   private void handleMessage(final RequestAuctionHouseListMessage msg)
   {
     try
@@ -130,6 +163,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the RequestConnectionToAuctionHouseMessage
+   * @param msg
+   */
   private void handleMessage(final RequestConnectionToAuctionHouseMessage msg)
   {
     try
@@ -141,6 +178,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the ModifyBlockedFundsMessage
+   * @param msg
+   */
   private void handleMessage(final ModifyBlockedFundsMessage msg)
   {
     try
@@ -156,6 +197,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the BlockFundsResultMessage
+   * @param msg
+   */
   private void handleMessage(final BlockFundsResultMessage msg)
   {
     try
@@ -167,6 +212,10 @@ public class AuctionClient extends Thread
     }
   }
   
+  /**
+   * Handles the WithdrawFundsMessage
+   * @param msg
+   */
   private void handleMessage(final WithdrawFundsMessage msg)
   {
     try
