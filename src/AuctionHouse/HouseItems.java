@@ -50,7 +50,7 @@ class HouseItems
   }
 
   //HOW TO GET THE ID FROM THE ITEM LIST???
-  void updateItemList()
+  synchronized void updateItemList()
   {
     if(theRestOfTheItemsList.size() > 0)
     {

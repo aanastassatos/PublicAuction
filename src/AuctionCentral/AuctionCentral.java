@@ -1,7 +1,13 @@
+/**
+ * Created by Alex Anastassatos
+ *
+ * Creates the Auction Central and handles accepting clients, storing information,
+ * and directing messages.
+ */
+
 package AuctionCentral;
 
 import Messages.*;
-import com.sun.org.apache.regexp.internal.RE;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,13 +20,16 @@ import java.util.*;
 
 public class AuctionCentral extends Thread
 {
-  public static final boolean DEBUG = true;
-  public static Random rand = new Random();
-  public static final int PORT = 55556;
-  public static BufferedReader reader;
-  static String BANK_ADDRESS;
+  public static final int PORT = 55556; //Static port number for AuctionCentral
+
+  static Random rand = new Random();
+  static String BANK_ADDRESS;  //Stores the bank's address for later use
   
-  //This creates an AuctionCentral and instantiates it with a port.
+  private static BufferedReader reader;
+  
+  /**
+   * This creates an AuctionCentral and instantiates it with the address needed to connect to the bank.
+   */
   public static void main(String[] args)
   {
     System.out.print("Enter the bank address (use localhost if server is on same computer as this client): ");
@@ -42,9 +51,14 @@ public class AuctionCentral extends Thread
     }
   }
   
-  private ServerSocket auctionCentralSocket;
+  private ServerSocket auctionCentralSocket;  //Server port for AuctionCentral
   private AuctionCentralGui gui;
   
+  /**
+   * Instantiates AuctionCentral, stores the bank address for use in auction client and makes the server socket.
+   * @param bank_address
+   * @throws IOException
+   */
   public AuctionCentral(final String bank_address) throws IOException
   {
     BANK_ADDRESS = bank_address;
@@ -53,14 +67,17 @@ public class AuctionCentral extends Thread
     printInfo();
   }
   
-  private final HashMap<Integer, String> auctionHouseNames = new HashMap<>();
-  private final HashMap<Integer, Integer> auctionHouseKeys = new HashMap<>();
-  private final HashMap<Integer, AuctionHouseConnectionInfo> auctionHouseConnections = new HashMap<>();
-  private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();
-  private final HashMap<Integer, String> agentNames = new HashMap<>();
-  private final HashMap<Integer, Integer> agentBankKeys = new HashMap<>();
-  private final HashMap<Integer, AuctionClient> agentClients = new HashMap<>();
+  private final HashMap<Integer, String> auctionHouseNames = new HashMap<>(); //Stores the auction house names with the public ID of the auction house
+  private final HashMap<Integer, Integer> auctionHouseKeys = new HashMap<>(); //Stores the secret keys of the auction houses with the public ID
+  private final HashMap<Integer, AuctionHouseConnectionInfo> auctionHouseConnections = new HashMap<>(); //Stores the connection info of the auction houses with the secret key.
+  private final HashMap<Integer, AuctionClient> auctionHouseClients = new HashMap<>();  //Stores the clients of the auction house with the secret keys
+  private final HashMap<Integer, String> agentNames = new HashMap<>();  //Stores the agent's names with the bidding key
+  private final HashMap<Integer, Integer> agentBankKeys = new HashMap<>();  //Stores the Bank keys  with the bidding key
+  private final HashMap<Integer, AuctionClient> agentClients = new HashMap<>(); //Stores the clients with the bidding key
   
+  /**
+   * Continuously loops, accepting client sockets and putting them in an AuctionClient
+   */
   @Override
   public void run()
   {
@@ -79,6 +96,15 @@ public class AuctionCentral extends Thread
     }
   }
   
+  /**
+   * Stores the name, auctionClient, address, and port number of auction houses for later use and returns an info message to be
+   * sent to the auction house that just registered.
+   * @param name
+   * @param auctionHouse
+   * @param address
+   * @param port
+   * @return
+   */
   AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse, final String address, final int port)
   {
     int publicID = name.hashCode();
@@ -93,6 +119,13 @@ public class AuctionCentral extends Thread
     return auctionHouseInfo;
   }
   
+  /**
+   * Removes all information regarding to the auction house, and returns a result message to be sent to the
+   * auction house.
+   * @param publicID
+   * @param secretKey
+   * @return
+   */
   DeregisterAuctionHouseResultMessage deRegisterAuctionHouse(final int publicID, final int secretKey)
   {
     boolean result = false;
@@ -110,9 +143,17 @@ public class AuctionCentral extends Thread
     return new DeregisterAuctionHouseResultMessage(result);
   }
   
+  /**
+   * Stores the name, bankKey, and AuctionClient of the agent for later use and returns a message
+   * containing the info to be sent to the agent.
+   * @param name
+   * @param bankKey
+   * @param agent
+   * @return
+   */
   AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
   {
-    int biddingKey = name.hashCode();
+    int biddingKey = name.hashCode()*rand.nextInt();
     AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
     agentNames.put(biddingKey,name);
     agentBankKeys.put(biddingKey, bankKey);
@@ -121,30 +162,52 @@ public class AuctionCentral extends Thread
     return agentInfo;
   }
   
+  /**
+   * Returns a message containing a hashmap of auction house publicIDs and names.
+   * @return
+   */
   AuctionHouseListMessage getAuctionHouseList()
   {
     return new AuctionHouseListMessage(auctionHouseNames);
   }
   
+  /**
+   * Returns a message with the info required to connect to a requested auction house.
+   * @param msg
+   * @return
+   */
   AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg)
   {
     AuctionHouseConnectionInfo connectionInfo = auctionHouseConnections.get(auctionHouseKeys.get(msg.getAuctionHouseID()));
     return new AuctionHouseConnectionInfoMessage(connectionInfo.getAddress(), connectionInfo.getPort());
   }
   
+  /**
+   * Changes the bidding key in the received "ModifyBlockedFundsMessage" and replaces it with its corresponding
+   * bank key. Returns the changed message.
+   * @param msg
+   * @return
+   */
   ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
   {
     return new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount(), msg.getType(), msg.getTransactionId());
   }
   
+  /**
+   * Changes the bidding key in the received "WithdrawFundsMessage" and replaces it with its corresponding
+   * bank key. Returns the changed message.
+   * @param msg
+   * @return
+   */
   WithdrawFundsMessage withdrawFunds(final WithdrawFundsMessage msg)
   {
     return new WithdrawFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount());
   }
   
-  
-  
-  public void printInfo()
+  /**
+   * Prints the information of the computer that AuctionCentral is running on.
+   */
+  private void printInfo()
   {
     try
     {
