@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class Item implements Serializable
 {
-  private final int BIDDING_TIME = 5;
+  private final int BIDDING_TIME = 3;
   private final int maxVal = 100;
   private final int minVal = 1;
 
@@ -65,7 +65,7 @@ public class Item implements Serializable
     if(biddingTimeLeft > 0)
     {
       this.biddingTimeLeft--;
-      System.out.println(biddingTimeLeft);
+      System.out.println("time left is: " + biddingTimeLeft);
     }
   }
 

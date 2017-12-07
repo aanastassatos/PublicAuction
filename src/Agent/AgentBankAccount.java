@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class AgentBankAccount extends Thread
 {
+  private Agent agent;
   private static int accountNumber;
   private String hostname;
   private String name;
@@ -29,7 +30,7 @@ public class AgentBankAccount extends Thread
 
   String getAgentName() { return name; }
 
-  private static void connectToBank(final String hostname, final String name, final int initialBalance)
+  static void connectToBank(final String hostname, final String name, final int initialBalance)
   {
     try
     {
@@ -65,15 +66,17 @@ public class AgentBankAccount extends Thread
     return scanner.nextInt();
   }
 
-  AgentBankAccount()
+  AgentBankAccount(Agent agent)
   {
-    final Scanner in = new Scanner(System.in);
-    System.out.print("Enter bank host name: ");
-    this.hostname = in.nextLine();
-    this.name = setName(in);
+    this.agent = agent;
+//    final Scanner in = new Scanner(System.in);
+//    System.out.print("Enter bank host name: ");
+//
+//    this.hostname = in.nextLine();
+//    this.name = setName(in);
+//
+//    final int balance = setAmount(in);
 
-    final int balance = setAmount(in);
-
-    new Thread(() -> connectToBank(hostname, name, balance)).start();
+    //new Thread(() -> connectToBank(hostname, name, balance)).start();
   }
 }

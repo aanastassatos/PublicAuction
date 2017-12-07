@@ -1,3 +1,7 @@
+/**
+ * A test of Auction Central for debugging
+ */
+
 package AuctionCentral;
 
 import Bank.Bank;

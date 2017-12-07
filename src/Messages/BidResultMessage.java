@@ -6,7 +6,7 @@ public class BidResultMessage implements Serializable
 {
   public enum BidResult
   {
-    NOT_IN_STOCK, BID_IS_TOO_LOW, SUCCESS, INSUFICIENT_FUNDS
+    NOT_IN_STOCK, BID_IS_TOO_LOW, SUCCESS, INSUFFICIENT_FUNDS
   }
   
   private BidResult result;

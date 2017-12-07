@@ -2,6 +2,7 @@ package AuctionHouse;
 
 import AuctionCentral.AuctionCentral;
 import Messages.*;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -12,11 +13,12 @@ import java.util.*;
 
 public class AuctionHouse extends Thread
 {
+  private AuctionHouseGui auctionHouseGui;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
   final static Random rand = new Random();
-  private final static int PORT = rand.nextInt((60000-50000)+1)+50000;
+  private final static int PORT = rand.nextInt((60000 - 50000) + 1) + 50000;
   private static String address;
 
   private int secretKey;
@@ -27,7 +29,7 @@ public class AuctionHouse extends Thread
   private AuctionHouseCentral central;
 
   //The clients have the auctionHouseID and the auction client
-  private final HashMap<Integer,AuctionHouseClient> auctionHouseClients = new HashMap<>();
+  private final HashMap<Integer, AuctionHouseClient> auctionHouseClients = new HashMap<>();
 
 
   public static void main(String[] args)
@@ -37,8 +39,8 @@ public class AuctionHouse extends Thread
       String centralAddress = "localhost";
       address = "localhost";
       Random r = new Random();
-      char c = (char)(r.nextInt(26) + 'A');
-      String name = Character.toString(c)+Integer.toString(r.nextInt(1000)+1);
+      char c = (char) (r.nextInt(26) + 'A');
+      String name = Character.toString(c) + Integer.toString(r.nextInt(1000) + 1);
       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
       auctionHouse.start();
 
@@ -49,14 +51,15 @@ public class AuctionHouse extends Thread
   }
 
   private HouseItems items;
-  
-  AuctionHouse(String centralAddress, int centralPort, String name,int port) throws IOException
+
+  AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
     int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
     auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     items = new HouseItems(randomNumItems);
     new Thread(() -> checkItem()).start();
+    Platform.runLater(() -> auctionHouseGui = new AuctionHouseGui(this));
     printInfo();
   }
 
@@ -77,9 +80,18 @@ public class AuctionHouse extends Thread
     }
   }
 
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - This loops through the current house item list and check if there is
+  //      any item that time is up.
+  // - If there is an time up item then remove the item from the list
+  //     and inform the winner by calling bidSucceeded method
+  // ***********************************************************************
   private void checkItem()
   {
-    while(true)
+    while (true)
     {
       HashMap<Integer, Item> itemList = new HashMap<Integer, Item>(items.getCurrentHouseItems());
       Queue<Item> itemsToRemove = new LinkedList<Item>();
@@ -89,48 +101,86 @@ public class AuctionHouse extends Thread
               .filter(i -> i.isTimeUp())
               .forEach(itemsToRemove::add);
 
+      itemsToRemove.forEach(it -> items.removeItem(it.getID()));
       itemsToRemove.forEach(current ->
               bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey()));
-      itemsToRemove.forEach(it -> items.removeItem(it.getID()));
-
-//      while (iter.hasNext())
-//      {
-//        Map.Entry pair = (Map.Entry) iter.next();
-//        Item current = itemList.get(pair.getKey());
-//        if (current.isTimeUp())
-//        {
-//
-//          bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
-//        }
-//      }
     }
   }
 
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - What does this do???
+  // ***********************************************************************
+  /*void printItemList()
+  {
+    HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
+    Iterator iter = auctionHouseClients.entrySet().iterator();
+    while (iter.hasNext())
+    {
+      Map.Entry pair = (Map.Entry) iter.next();
+      Item current = itemList.get(pair.getKey());
+      Platform.runLater(() -> auctionHouseGui.addItem(current));
+    }
+  }*/
+
   //CENTRAL
+  //***************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - This send the auction house info with the address and PORT when called
+  // **************************************************************************
   AuctionHouseConnectionInfoMessage getConnectionInfo()
   {
     return new AuctionHouseConnectionInfoMessage(address, PORT);
   }
   
   // AGENTS
+  //************************************************************************
+  //Each parameter's type and name: String itemName, int itemID, int amount, int biddingKey
+  //Method's return value : void
+  //Description of what the method does.
+  // - When the time for an item is up, this method will request the money
+  //     equals to the cost of the item from Auction Central
+  // - There are 2 lists that holds an auction house items, 1 that only have 3 items
+  //     that being auctioned and the other list holds the rest of the items
+  //   + Checks if the rest of item list is empty, if is not empty, then update currentList
+  //   + Check if there is no items left in both lists, send message to all clients and close
+  //   + If there are only items left in currentList, do nothing
+  // - Send a message to all clients to inform that the item has been sold with the amount.
+  // - Send a message to the agent that won the bid
+  // ***********************************************************************
   void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
     central.requestMoney(biddingKey, amount);
 
     //If there are more things to sell, update the list, else close
-    if(!items.noMoreItemToSell()) items.updateItemList();
-    else
+    if(!items.noMoreNewItem())
+    {
+      items.updateItemList();
+      System.out.println("New list is: " + items.getCurrentHouseItems());
+    }
+
+    else if(!items.allItemsAreSold())
     {
       sendMessageToClients(new NoItemLeftMessage());
       central.closeConnection();
     }
     sendMessageToClients(new ItemSoldMessage(itemID, itemName, amount));
     System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
-    System.out.println("Congratulations! Bidding key number: " +biddingKey+ "has won "+items.getCurrentHouseItems().get(itemID)+
-                        "with bidding amount of: " +amount);
+    System.out.println("Congratulations! Bidding key number: " +biddingKey+ " has won "+itemName+
+                        " with bidding amount of: " +amount);
     auctionHouseClients.get(biddingKey).sendMessage(new SuccessfulBidMessage(itemID, amount, biddingKey));
   }
 
+  //************************************************************************
+  //Each parameter's type and name: Object m
+  //Method's return value : void
+  //Description of what the method does.
+  // - A place holder to send message to clients
+  // ***********************************************************************
   public synchronized void sendMessageToClients(Object m)
   {
     List<Map.Entry> deadClients = new ArrayList<>();
@@ -144,12 +194,34 @@ public class AuctionHouse extends Thread
       auctionHouseClients.remove(c);
   }
 
+  //************************************************************************************************
+  //Each parameter's type and name: AgentInfoMessage message, AuctionHouseClient auctionHouseClien
+  //Method's return value : void
+  //Description of what the method does.
+  // - add the agent to the agent map with the bidding key
+  // - send the item list message to the agent with list of items being auctioned
+  // ***********************************************************************************************
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
+    //printItemList();
     return new ItemListMessage(items.getCurrentHouseItems(), publicID);
   }
 
+  //************************************************************************
+  //Each parameter's type and name: int itemID, int biddingKey, int amount
+  //Method's return value : BidResultMessage
+  //Description of what the method does.
+  // - This handle the bid that was placed by the agent.
+  //     if the item isnt in the list anymore, send message inform that item is not in stock
+  //     if the bid placed is lower than current highest bid, send message bid too low
+  //     else send message to central to block a fund in the agent account
+  //         wait for the result, if the blocked fund went through:
+  //            reset highest bid and bidderKey,
+  //            send message to clients with updated bid amount
+  //            send message to agent to inform the bid is successfully placed
+  //         if blocked fund failed, send message insufficient funds
+  // ***********************************************************************
   synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
   {
     Item item = items.getCurrentHouseItems().get(itemID);
@@ -172,12 +244,18 @@ public class AuctionHouse extends Thread
           sendMessageToClients(new HigherBidPlacedMessage(itemID, amount));
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }
-        else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
+        else return new BidResultMessage(BidResultMessage.BidResult.INSUFFICIENT_FUNDS);
       }
     }
     return null;
   }
-  
+
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // -Print the server ip and host name
+  // ***********************************************************************
   private void printInfo()
   {
     try
@@ -190,16 +268,6 @@ public class AuctionHouse extends Thread
       e.printStackTrace();
     }
   }
-
-  int getSecretKey()
-  {
-    return secretKey;
-  }
-
-  int getPublicID()
-  {
-    return publicID;
-  }
   
   String getAddress()
   {
@@ -210,36 +278,16 @@ public class AuctionHouse extends Thread
   {
     return PORT;
   }
-  
+
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - Store the info of the auction house got from central when register
+  // ***********************************************************************
   void storeInfo(AuctionHouseInfoMessage message)
   {
     publicID = message.getPublicID();
     secretKey = message.getSecretKey();
   }
 }
-
-// WHAT IS THE POINT OF SECRET KEY??? ALSO PUBLIC ID
-// TIMER
-// SUCCESSFUL BID
-// MULTIPLE HOUSES
-// 3 ITEMS AT A TIME
-// UPDATE/REMOVE ITEMS
-// PRINT LIST OF ITEM with the ITEMID(hashmap) and CURRENT BID FROM EACH AUCTION HOUSE
-// IF ALL ITEMS ARE SOLD, CLOSE
-// GUI
-/*central will take care of this, auction house only needs to send the message with the bidding key and the amount?
-  synchronized PutHoldOnAccountMessage putHold(int biddingKey, int bidAmount)
-  {
-    return new PutHoldOnAccountMessage(agentInfo.get(biddingKey), bidAmount);
-  }*/
- /* AgentInfoMessage getAgentInfo(final int publicID, final int auctionHouseID, final AuctionHouseClient agent)
-  {
-    auctionHousePublicID = auctionHouseID;
-    int biddingKey =  rand.nextInt(Integer.MAX_VALUE);
-    AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
-    agentKeys.put(publicID, biddingKey);
-    auctionHouseClients.put(agentKeys.get(publicID), agent);
-    System.out.println("Auction Agent with the ID "+publicID+" has connect to auctionHouse ID" +auctionHouseID+" with a bidding key: "
-            +biddingKey);
-    return agentInfo;
-  }*/

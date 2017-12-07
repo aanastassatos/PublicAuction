@@ -1,27 +1,38 @@
 package Agent;
 
 import AuctionHouse.Item;
-
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class Agent extends Thread
 {
   HashMap<Integer, Item> auctionHouseItems;
-  Integer itemToBidOn = 0;
-  Integer amountToBid = 100;
+  Integer itemToBidOn = 1;
+  Integer amountToBid = 111;
+  int secretKey;
+
+  AgentGUI agentGui;
 
   public Agent()
   {
-    AgentBankAccount bankAccount = new AgentBankAccount();
-    String hostname = bankAccount.getHostName();
-    String name = bankAccount.getAgentName();
-    int secretKey = bankAccount.getSecretKey();
+    new JFXPanel();
+    Platform.runLater(() -> agentGui = new AgentGUI(this));
+  }
 
+  public void activateBank(String hostname, String name, int deposit)
+  {
+    AgentBankAccount bankAccount = new AgentBankAccount(this);
+    new Thread(() -> bankAccount.connectToBank(hostname, name, deposit)).start();
+    secretKey = bankAccount.getSecretKey();
     AgentAuctionCentral auctionCentral = new AgentAuctionCentral(hostname, name, secretKey, this);
-    int house = auctionCentral.getHouse();
+    HashMap<Integer, String> map = auctionCentral.getHouses();
+    agentGui.showAuctionHouses(auctionCentral);
+  }
 
+  public void activateHouse(AgentAuctionCentral auctionCentral)
+  {
     int biddingKey = auctionCentral.getBiddingKey();
     int port = auctionCentral.getPort();
     String address = auctionCentral.getAddress();
@@ -56,16 +67,25 @@ public class Agent extends Thread
   @Override
   public void run()
   {
+    while(agentGui == null)
+    {
+
+    }
     while(true)
     {
-      if(auctionHouseItems != null)
+      if(agentGui.isFinished())
       {
-        System.out.print("Which item to bid on?: ");
-        Scanner scanner = new Scanner(System.in);
-        itemToBidOn = scanner.nextInt();
-        System.out.print("How much?: ");
-        amountToBid = scanner.nextInt();
+        activateBank(agentGui.getHostname(), agentGui.getName(), agentGui.getDepositAmount());
+        agentGui.setFinished(false);
       }
+//      if(auctionHouseItems != null)
+//      {
+//        System.out.print("Which item to bid on?: ");
+//        Scanner scanner = new Scanner(System.in);
+//        itemToBidOn = scanner.nextInt();
+//        System.out.print("How much?: ");
+//        amountToBid = scanner.nextInt();
+//      }
     }
   }
 }
