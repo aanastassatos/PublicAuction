@@ -105,7 +105,7 @@ public class AuctionCentral extends Thread
    * @param port
    * @return
    */
-  AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse, final String address, final int port)
+  synchronized AuctionHouseInfoMessage registerAuctionHouse(final String name, final AuctionClient auctionHouse, final String address, final int port)
   {
     int publicID = name.hashCode();
     int secretKey = rand.nextInt(Integer.MAX_VALUE);
@@ -126,7 +126,7 @@ public class AuctionCentral extends Thread
    * @param secretKey
    * @return
    */
-  DeregisterAuctionHouseResultMessage deRegisterAuctionHouse(final int publicID, final int secretKey)
+  synchronized DeregisterAuctionHouseResultMessage deRegisterAuctionHouse(final int publicID, final int secretKey)
   {
     boolean result = false;
     
@@ -151,7 +151,7 @@ public class AuctionCentral extends Thread
    * @param agent
    * @return
    */
-  AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
+  synchronized AgentInfoMessage registerAgent(final String name, final int bankKey, final AuctionClient agent)
   {
     int biddingKey = name.hashCode()*rand.nextInt();
     AgentInfoMessage agentInfo = new AgentInfoMessage(biddingKey);
@@ -166,7 +166,7 @@ public class AuctionCentral extends Thread
    * Returns a message containing a hashmap of auction house publicIDs and names.
    * @return
    */
-  AuctionHouseListMessage getAuctionHouseList()
+  synchronized AuctionHouseListMessage getAuctionHouseList()
   {
     return new AuctionHouseListMessage(auctionHouseNames);
   }
@@ -176,7 +176,7 @@ public class AuctionCentral extends Thread
    * @param msg
    * @return
    */
-  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg)
+  synchronized AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg)
   {
     AuctionHouseConnectionInfo connectionInfo = auctionHouseConnections.get(auctionHouseKeys.get(msg.getAuctionHouseID()));
     return new AuctionHouseConnectionInfoMessage(connectionInfo.getAddress(), connectionInfo.getPort());
@@ -188,7 +188,7 @@ public class AuctionCentral extends Thread
    * @param msg
    * @return
    */
-  ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
+  synchronized ModifyBlockedFundsMessage modifyBlockedFunds(final ModifyBlockedFundsMessage msg)
   {
     return new ModifyBlockedFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount(), msg.getType(), msg.getTransactionId());
   }
@@ -199,7 +199,7 @@ public class AuctionCentral extends Thread
    * @param msg
    * @return
    */
-  WithdrawFundsMessage withdrawFunds(final WithdrawFundsMessage msg)
+  synchronized WithdrawFundsMessage withdrawFunds(final WithdrawFundsMessage msg)
   {
     return new WithdrawFundsMessage(agentBankKeys.get(msg.getAccountNumber()), msg.getAmount());
   }
