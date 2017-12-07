@@ -62,7 +62,7 @@ public class AgentAuctionHouse extends Thread
 
     catch(Exception e)
     {
-      e.getStackTrace();
+      e.printStackTrace();
     }
   }
 
