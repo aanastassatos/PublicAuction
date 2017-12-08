@@ -10,7 +10,7 @@ public class ItemSoldMessage implements Serializable
 
   public ItemSoldMessage(int itemID, String itemName, int amount)
   {
-    this.amount = amount;
+    this.itemName = itemName;
     this.itemID = itemID;
     this.amount = amount;
   }
