@@ -171,6 +171,11 @@ public class AuctionCentral extends Thread
     return new AuctionHouseListMessage(auctionHouseNames);
   }
   
+  /**
+   * Returns a message containing the info connect to the auction house.
+   * @param publicID
+   * @return
+   */
   AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(int publicID)
   {
     AuctionHouseConnectionInfo info = auctionHouseConnections.get(auctionHouseKeys.get(publicID));
