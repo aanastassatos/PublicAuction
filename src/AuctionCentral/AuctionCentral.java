@@ -172,17 +172,6 @@ public class AuctionCentral extends Thread
   }
   
   /**
-   * Returns a message with the info required to connect to a requested auction house.
-   * @param msg
-   * @return
-   */
-  synchronized AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg)
-  {
-    AuctionHouseConnectionInfo connectionInfo = auctionHouseConnections.get(auctionHouseKeys.get(msg.getAuctionHouseID()));
-    return new AuctionHouseConnectionInfoMessage(connectionInfo.getAddress(), connectionInfo.getPort());
-  }
-  
-  /**
    * Changes the bidding key in the received "ModifyBlockedFundsMessage" and replaces it with its corresponding
    * bank key. Returns the changed message.
    * @param msg
@@ -212,7 +201,7 @@ public class AuctionCentral extends Thread
     String infoString = null;
     try
     {
-      infoString = "Server Ip: " + InetAddress.getLocalHost() +"\n"+ "Server host name: " + InetAddress.getLocalHost().getHostName();
+      infoString = "Auction Central Ip: " + InetAddress.getLocalHost() +"\n"+ "Auction Central host name: " + InetAddress.getLocalHost().getHostName();
     }
     catch (UnknownHostException e)
     {
