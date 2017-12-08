@@ -1,5 +1,11 @@
 package Agent;
-
+/**
+ * Agent Package:
+ * Agent class: Runs agent thread for a perspective auction house
+ * agent.  Creates a bank account, connects to auction central to
+ * display available houses, and connects to a house to begin an
+ * auction
+ */
 import AuctionHouse.Item;
 import Bank.Bank;
 import Messages.*;
@@ -18,7 +24,13 @@ public class Agent extends Thread
   private int bankKey = 0;
   private int biddingKey;
   private boolean bidding = false;
-  
+
+  /**
+   * main method prompts user for bank hostname, auction central hostname,
+   * their name, and their initial deposit .
+   * Launches a new agent object with the provided information
+   * @param args
+   */
   public static void main(String [] args)
   {
     System.out.print("Enter the bank address (use localhost if server is on same computer as this client): ");
@@ -45,7 +57,16 @@ public class Agent extends Thread
   
   private AuctionCentralConnection auctionCentral;
   private AgentAuctionHouse auctionHouse;
-  
+
+  /**
+   * Constructor builds a new Agent
+   * @param name: users name
+   * @param auction_central: hostname of auction central
+   * @param bank_address: hostname of bank
+   * @param initDeposit: agents deposit amount
+   *                   creates agents bank account with specified
+   *                   money, and creates a new auction central thread
+   */
   public Agent(String name, String auction_central, String bank_address, int initDeposit)
   {
     this.name = name;
@@ -59,7 +80,12 @@ public class Agent extends Thread
       System.out.println("Something went wrong");
     }
   }
-  
+
+  /**
+   * selectAuctionHouse method attempts to connect agent with desired auction house
+   * @param auctionHouses: hashmap of all available auction houses
+   * @return a new message to request connection to the specified auction house
+   */
   RequestConnectionToAuctionHouseMessage selectAuctionHouse(HashMap<Integer, String> auctionHouses)
   {
     System.out.println("List Received!");
@@ -95,7 +121,12 @@ public class Agent extends Thread
     System.out.println("Connecting to "+nameList.get(selection-1)+"...");
     return new RequestConnectionToAuctionHouseMessage(IDList.get(selection-1), biddingKey);
   }
-  
+
+  /**
+   * bidOnItems method returns a bidPlacedMessage
+   * @param items: hashmap of current items at selected auction house
+   * @return: message to place a bid on an item
+   */
   synchronized BidPlacedMessage bidOnItems(HashMap<Integer, Item> items)
   {
     List<Item> itemList = new ArrayList<>(items.values());
@@ -137,7 +168,12 @@ public class Agent extends Thread
     new Thread(() -> selectOption()).start();
     return new BidPlacedMessage(biddingKey, itemCodes.get(selection-1), bidAmount);
   }
-  
+
+  /**
+   * connectToAuctionHouse method starts a new auction house thread based on the selected house
+   * @param address: address of house to be connected to
+   * @param port: port of house to be connected to
+   */
   void connectToAuctionHouse(String address, int port)
   {
     System.out.print("Connecting to Auction House...");
@@ -155,24 +191,40 @@ public class Agent extends Thread
     
     new Thread(() -> selectOption()).start();
   }
-  
+
+  /**
+   * requestAuctionHouseList method asks the current auction central
+   * for a list of available auction houses
+   */
   void requestAuctionHouseList()
   {
     System.out.println("Requesting list of Auction Houses...");
     auctionCentral.sendMessage(new RequestAuctionHouseListMessage());
   }
-  
+
+  /**
+   * storeBiddingInfo method stores the agents current bidding key
+   * @param biddingKey: the bidding key to be stored
+   */
   void storeBiddingInfo(int biddingKey)
   {
     System.out.println("Your bidding key is "+biddingKey+".");
     this.biddingKey = biddingKey;
   }
-  
+
+  /**
+   * requests an item list from the connected auction house
+   */
   void requestItemList()
   {
     auctionHouse.sendMessage(new RequestItemListMessage());
   }
-  
+
+  /**
+   * handleBidResult prints the result of a bid made
+   * @param result: type BidResult enum from BidResultMessage class
+   *              Lets the agent know the status of their bid
+   */
   void handleBidResult(BidResultMessage.BidResult result)
   {
     String resultString;
@@ -198,7 +250,12 @@ public class Agent extends Thread
     
     System.out.println(resultString);
   }
-  
+
+  /**
+   * When an agent enters an auction house, selectOption method
+   * prompts them as to whether theyd like to leave the auction house
+   * or bid on an item
+   */
   private void selectOption()
   {
     System.out.print("What do you want to do?\n" +
@@ -233,7 +290,13 @@ public class Agent extends Thread
         break;
     }
   }
-  
+
+  /**
+   * Takes the agents hostname and initial deposit to create a linked bank
+   * account
+   * @param bankAddress: hostname of bank
+   * @param initDeposit: int deposit of agents funds
+   */
   private void makeBankAccount(String bankAddress, int initDeposit)
   {
     System.out.println("Connecting to bank...");
@@ -265,107 +328,4 @@ public class Agent extends Thread
       e.printStackTrace();
     }
   }
-  
-//  int secretKey;
-//  AgentAuctionHouse agentAuctionHouse;
-//
-//  AgentGUI agentGui;
-//
-//  public Agent()
-//  {
-//    new JFXPanel();
-//    Platform.runLater(() -> agentGui = new AgentGUI(this));
-//  }
-//
-//  String successMessage(BidResultMessage.BidResult bidResult)
-//  {
-//    switch(bidResult)
-//    {
-//      case BID_IS_TOO_LOW:
-//        return "Bid is too low!";
-//      case SUCCESS:
-//        return "Bid Placed!";
-//      case INSUFFICIENT_FUNDS:
-//        return "Insufficient Funds in Your Account :(";
-//      case NOT_IN_STOCK:
-//        return "Item Not In Stock";
-//      default:
-//        return "Here Be Monsters";
-//    }
-//  }
-//
-//  public void activateBank(String hostname, String name, int deposit)
-//  {
-//    AgentBankAccount bankAccount = new AgentBankAccount(this);
-//    new Thread(() -> bankAccount.connectToBank(hostname, name, deposit)).start();
-//    secretKey = bankAccount.getSecretKey();
-//    AgentAuctionCentral auctionCentral = new AgentAuctionCentral(hostname, name, secretKey, this);
-//    HashMap<Integer, String> map = auctionCentral.getHouses();
-//    agentGui.showAuctionHouses(auctionCentral);
-//  }
-//
-//  public void activateHouse(AgentAuctionCentral auctionCentral)
-//  {
-//    int biddingKey = auctionCentral.getBiddingKey();
-//    int port = auctionCentral.getPort();
-//    String address = auctionCentral.getAddress();
-//    System.out.println("Address = " + address + "port is: " + port);
-//
-//    agentAuctionHouse = new AgentAuctionHouse(biddingKey, address, port, this);
-//    agentGui.openAuctionHouse();
-//  }
-//
-//  AgentAuctionHouse getAgentAuctionHouse()
-//  {
-//    return agentAuctionHouse;
-//  }
-//
-//  public static void main(String[] args) //throws Exception
-//  {
-//    Agent agent = new Agent();
-//    agent.start();
-//  }
-//
-////  void setItems(HashMap<Integer, Item> items)
-////  {
-////    this.auctionHouseItems = items;
-////    //printItems();
-////  }
-////
-////  void printItems()
-////  {
-////    for(Item item : auctionHouseItems.values())
-////    {
-////      System.out.println("Item Name: " + item.getItem() + " Item ID: " + item.getID() + " Price: " + item.getPrice());
-////    }
-////  }
-////
-////  Integer getItemToBidOn() { return itemToBidOn; }
-////
-////  int getAmountBid() { return amountToBid; }
-//
-//  @Override
-//  public void run()
-//  {
-//    while(agentGui == null)
-//    {
-//
-//    }
-//    while(true)
-//    {
-//      if(agentGui.isFinished())
-//      {
-//        activateBank(agentGui.getHostname(), agentGui.getName(), agentGui.getDepositAmount());
-//        agentGui.setFinished(false);
-//      }
-////      if(auctionHouseItems != null)
-////      {
-////        System.out.print("Which item to bid on?: ");
-////        Scanner scanner = new Scanner(System.in);
-////        itemToBidOn = scanner.nextInt();
-////        System.out.print("How much?: ");
-////        amountToBid = scanner.nextInt();
-////      }
-//    }
-//  }
 }
