@@ -2,6 +2,7 @@ package Agent;
 
 import AuctionHouse.Item;
 import Messages.*;
+import javafx.application.Platform;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,50 +13,42 @@ public class AgentAuctionHouse extends Thread
 {
   final Agent agent;
   HashMap<Integer, Item> items;
+  private int biddingKey;
+  private ObjectOutputStream oos;
+  private ObjectInputStream ois;
+
+  private Integer itemToBid;
+  private Integer amountToBid;
+
+  private String success;
 
   AgentAuctionHouse(int biddingKey, String address, int port, Agent agent)
   {
     this.agent = agent;
-    new Thread(() -> connectToHouse(biddingKey, address, port)).start();
+    this.biddingKey = biddingKey;
+    new Thread(() -> connectToHouse(address, port)).start();
   }
 
-  public void connectToHouse(int biddingKey, String address, int port)
+  void setItemToBid(Item item)
   {
-    System.out.println("address: " + address + "port: " + port);
+    this.itemToBid = item.getID();
+  }
 
+  void setAmountToBid(int bidAmount)
+  {
+    this.amountToBid = bidAmount;
+  }
+
+  public void connectToHouse(String address, int port)
+  {
     try
     {
       final Socket houseSocket = new Socket(address, port);
-      ObjectOutputStream oos = new ObjectOutputStream(houseSocket.getOutputStream());
-      ObjectInputStream ois = new ObjectInputStream(houseSocket.getInputStream());
+      oos = new ObjectOutputStream(houseSocket.getOutputStream());
+      ois = new ObjectInputStream(houseSocket.getInputStream());
       oos.writeObject(new AgentInfoMessage(biddingKey));
       ItemListMessage itemsMessage = ((ItemListMessage) ois.readObject());
       items = itemsMessage.getItemList();
-      //System.out.println("Size is = : " + items.values().size());
-      agent.setItems(items);
-
-      if(agent.getItemToBidOn() != null)
-      {
-        oos.writeObject(new BidPlacedMessage(biddingKey, agent.getItemToBidOn(), agent.getAmountBid()));
-      }
-      
-      while(true)
-      {
-        Object readMessage = ois.readObject();
-        if (readMessage instanceof ItemListMessage)
-        {
-          ItemListMessage listMessage = (ItemListMessage) readMessage;
-          items = listMessage.getItemList();
-          agent.setItems(items);
-        } else if (readMessage instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage) readMessage);
-        else if (readMessage instanceof BidResultMessage) handleMessage((BidResultMessage) readMessage);
-        else if(readMessage instanceof SuccessfulBidMessage) System.out.println("poop");
-        else if(readMessage instanceof NoItemLeftMessage)
-        {
-          oos.writeObject(new CloseConnectionMessage());
-          break;
-        }
-      }
     }
 
     catch(Exception e)
@@ -64,26 +57,78 @@ public class AgentAuctionHouse extends Thread
     }
   }
 
+  String getSuccess() {
+    return success;
+  }
+
+  void startAuction()
+  {
+    try
+    {
+      while (true)
+      {
+        if (itemToBid != null)
+        {
+          oos.writeObject(new BidPlacedMessage(biddingKey, itemToBid, amountToBid));
+          itemToBid = null;
+        }
+        Object readMessage = ois.readObject();
+        if (readMessage instanceof ItemListMessage)
+        {
+          ItemListMessage listMessage = (ItemListMessage) readMessage;
+          items = listMessage.getItemList();
+          //agent.setItems(items);
+        } else if (readMessage instanceof SuccessfulBidMessage) handleMessage((SuccessfulBidMessage) readMessage);
+        else if (readMessage instanceof BidResultMessage) handleMessage((BidResultMessage) readMessage);
+        else if (readMessage instanceof NoItemLeftMessage)
+        {
+          oos.writeObject(new CloseConnectionMessage());
+          break;
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  HashMap<Integer, Item> getItems()
+  {
+    while(items == null)
+    {
+
+    }
+    return items;
+  }
+
   private void handleMessage(SuccessfulBidMessage message)
   {
-    System.out.println("YOUVE WON! Item" + message.getItemID());
+    success = "You Won!";
   }
 
   private void handleMessage(BidResultMessage message)
   {
+    String result;
     BidResultMessage.BidResult bidResult = message.getResult();
     switch(bidResult)
     {
       case BID_IS_TOO_LOW:
+        result = "Bid is too low!";
         break;
       case SUCCESS:
+        result = "Bid Placed!";
         break;
       case INSUFICIENT_FUNDS:
+        result = "Insufficient Funds in Your Account :(";
         break;
       case NOT_IN_STOCK:
+        result = "Item Not In Stock";
         break;
       default:
+        result = "Here Be Monsters";
         break;
     }
+    Platform.runLater(() -> new AgentSuccessGUI(result));
   }
 }

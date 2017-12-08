@@ -37,7 +37,7 @@ public class Item implements Serializable
     highestBid = itemPrice;
   }
 
-  public int getPrice()
+  public Integer getPrice()
   {
     return itemPrice;
   }
