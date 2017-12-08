@@ -20,7 +20,6 @@ public class BidPlacedMessage implements Serializable
     return bidAmount;
   }
 
-  //fix this, need to get the ITEM from the AuctionHouseItemList
   public int getItemID()
   {
     return itemID;
