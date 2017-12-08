@@ -1,6 +1,7 @@
 package Agent;
 
 import AuctionHouse.AuctionHouse;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -93,7 +94,8 @@ public class AgentGUI extends Stage
 
   void openAuctionHouse()
   {
-    new AgentHouseGUI(agent.getAgentAuctionHouse(), agent);
+    System.out.println("Here be monsters:");
+    Platform.runLater(() -> new AgentHouseGUI(agent.getAgentAuctionHouse(), agent));
   }
 
   AgentGUI(Agent agent)
