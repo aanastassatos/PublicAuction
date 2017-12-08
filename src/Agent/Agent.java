@@ -20,23 +20,6 @@ public class Agent extends Thread
     Platform.runLater(() -> agentGui = new AgentGUI(this));
   }
 
-  String successMessage(BidResultMessage.BidResult bidResult)
-  {
-    switch(bidResult)
-    {
-      case BID_IS_TOO_LOW:
-        return "Bid is too low!";
-      case SUCCESS:
-        return "Bid Placed!";
-      case INSUFFICIENT_FUNDS:
-        return "Insufficient Funds in Your Account :(";
-      case NOT_IN_STOCK:
-        return "Item Not In Stock";
-      default:
-        return "Here Be Monsters";
-    }
-  }
-
   public void activateBank(String hostname, String name, int deposit)
   {
     AgentBankAccount bankAccount = new AgentBankAccount(this);

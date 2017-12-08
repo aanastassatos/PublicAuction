@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -15,6 +16,8 @@ import java.util.HashMap;
 public class AgentHouseGUI extends Stage
 {
   private Agent agent;
+  Item itemToBid;
+  Integer amount;
 
   AgentHouseGUI(AgentAuctionHouse agentAuctionHouse, Agent agent)
   {
@@ -41,14 +44,34 @@ public class AgentHouseGUI extends Stage
 
     placeBid.setOnAction(e -> {
       int itemNum = Integer.parseInt(item.getText()) - 1;
-      agentAuctionHouse.setItemToBid(itemsArrayList.get(itemNum));
-      agentAuctionHouse.setAmountToBid(Integer.parseInt(bidText.getText()));
-      agentAuctionHouse.startAuction();
+      itemToBid = itemsArrayList.get(itemNum);
+      amount = Integer.parseInt(bidText.getText());
+//      agentAuctionHouse.setItemToBid(itemsArrayList.get(itemNum));
+//      agentAuctionHouse.setAmountToBid(Integer.parseInt(bidText.getText()));
       //new AgentSuccessGUI("Success!");
     });
 
+    setWidth(400);
     VBox vBox = new VBox(itemText, itemNumber, item, bidAmount, bidText, placeBid);
-    setScene(new Scene(vBox));
+    Scene scene = new Scene(vBox);
+    scene.setOnKeyPressed(e -> {
+      if(e.getCode() == KeyCode.ENTER) placeBid.fire();
+    });
+    setScene(scene);
     show();
+  }
+
+  Item getItemToBid()
+  {
+    return itemToBid;
+  }
+
+  Integer getAmount()
+  {
+    while(amount == null)
+    {
+
+    }
+    return amount;
   }
 }

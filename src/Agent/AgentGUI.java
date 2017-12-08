@@ -1,14 +1,18 @@
 package Agent;
 
 import AuctionHouse.AuctionHouse;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,6 +23,7 @@ public class AgentGUI extends Stage
   private String name;
   private int depositAmount;
   private boolean finished = false;
+  private Button proceed;
 
   private int auctionHouse;
   //private boolean housePicked = false;
@@ -33,7 +38,7 @@ public class AgentGUI extends Stage
 
   private VBox connectToBank()
   {
-    Button proceed = new Button("Proceed");
+    proceed = new Button("Proceed");
     TextField hostNameText = new TextField();
     TextField screenNameText = new TextField();
     TextField depositText = new TextField();
@@ -45,7 +50,7 @@ public class AgentGUI extends Stage
       hostname = hostNameText.getText();
       name = screenNameText.getText();
       depositAmount = Integer.parseInt(depositText.getText());
-      finished = true;
+      setFinished(true);
       hide();
       agent.activateBank(hostname, name, depositAmount);
     });
@@ -81,6 +86,7 @@ public class AgentGUI extends Stage
     });
 
     VBox vBox = new VBox(housesList, houseChoice, showItems);
+
     setScene(new Scene(vBox));
     show();
   }
@@ -94,7 +100,11 @@ public class AgentGUI extends Stage
   {
     this.agent = agent;
     setTitle("Agent");
-    setScene(new Scene(connectToBank()));
+    Scene scene = new Scene(connectToBank());
+    scene.setOnKeyPressed(e -> {
+      if(e.getCode() == KeyCode.ENTER) proceed.fire();
+    });
+    setScene(scene);
     show();
   }
 }
