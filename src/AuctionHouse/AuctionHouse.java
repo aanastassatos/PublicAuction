@@ -41,7 +41,7 @@ public class AuctionHouse extends Thread
       reader = new BufferedReader(new InputStreamReader(System.in));
       if(args.length > 0 && args[0].equals("test")) centralAddress = "";
       else centralAddress = reader.readLine();
-      address = centralAddress;
+      address = InetAddress.getLocalHost().toString();
       Random r = new Random();
       char c = (char) (r.nextInt(26) + 'A');
       String name = Character.toString(c) + Integer.toString(r.nextInt(1000) + 1);
