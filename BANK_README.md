@@ -29,9 +29,9 @@ the specified account had more funds availiable than the amount to block request
 
 ## GUI Instructions (Must be enabled manually via HEADLESS field in Bank source)
 Initially only a message stating no agents have registered is displayed.
-Once an agent has created an account, the display format is: AgentName(AccountNumber) FundState
+Once an agent has created an account, the display format is: AgentName(AccountNumber) FundState. 
 Clicking on any agent produces a new window in which the transaction history for said agent is displayed.
-The funds displayed in the initial screen are updated in real time as transactions are processed.
+The funds displayed are updated in real time as transactions are processed.
 
 ## Testing Functionality
 First run Bank, then BankTest. This tests all funcionality through passing messages in a highly
