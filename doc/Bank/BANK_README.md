@@ -7,6 +7,8 @@ Holds agent accounts.
 Accepts requests from auction central to place holds and withdraw funds from accounts.
 
 Replys whether or not hold request are valid to auction central.
+
+Note: Agents registering with the bank must have unique names.
   
 ## Message Interface
 
