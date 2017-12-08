@@ -60,6 +60,12 @@ public class AuctionHouseClient extends Thread
     }
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: Object m
+  //Method's return value : void
+  //Description of what the method does.
+  // - This sends any type of messages to the agent
+  // ************************************************************************************
   void sendMessage(Object m)
   {
     try
@@ -71,6 +77,12 @@ public class AuctionHouseClient extends Thread
     }
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - when the auction house is done, send message to agent to close connection
+  // ************************************************************************************
   private void closeConnection()
   {
     try
@@ -84,6 +96,12 @@ public class AuctionHouseClient extends Thread
     }
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: final AgentInfoMessage message
+  //Method's return value : void
+  //Description of what the method does.
+  // - Register the agent and send the item list to agent
+  // ************************************************************************************
   private void handleMessage(final AgentInfoMessage message)
   {
     try
@@ -96,6 +114,12 @@ public class AuctionHouseClient extends Thread
     }
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: final BidPlacedMessage message
+  //Method's return value : void
+  //Description of what the method does.
+  // - This handles BidPlacedMessage
+  // ************************************************************************************
   private void handleMessage(final BidPlacedMessage message)
   {
     try
@@ -107,48 +131,6 @@ public class AuctionHouseClient extends Thread
     }
   }
 }
-
-
-
-
-//    HashMap<Integer,Integer> itemNBid = new HashMap<>();
-//    itemNBid.put(message.getItemID(),message.getBidAmount());
-//    agentBiddingItem.put(message.getBiddingKey(),itemNBid);
-//
-//    if(!itemList.contains(message.getItemID()))
-//    {
-//      try
-//      {
-//        agent_oos.writeObject(auctionHouse.itemSold(false));
-//      } catch (IOException e)
-//      {
-//        e.printStackTrace();
-//      }
-//    }
-//    else
-//    {
-//      if (highestBid(message.getBidAmount(),message.getItemID(),message.getAuctionHouseID()))
-//      {
-//        //agent_oos.writeObject(auctionHouse.higherBidPlaced(message.getBidAmount(),newBiddingKey,));
-//        currentBid = message.getBidAmount();
-//        try
-//        {
-//          //MAKE A HASHMAP OF PUBLIC ID AND SECRET KEY bc the hold requires the secret key
-//          central_oos.writeObject(new ModifyBlockedFundsMessage(message.getBiddingKey(),message.getBidAmount(), ModifyBlockedFundsMessage.TransactionType.Add, UUID.randomUUID()));
-//        } catch (IOException e)
-//        {
-//          e.printStackTrace();
-//        }
-//      } else
-//        try
-//        {
-//          //check
-//          agent_oos.writeObject(auctionHouse.invalidBid(message.getBiddingKey(),message.getBidAmount(),message.getAuctionHouseID(),message.getItemID()));
-//        } catch (IOException e)
-//        {
-//          e.printStackTrace();
-//        }
-//    }
 
  /*
   private List<Item> itemList;

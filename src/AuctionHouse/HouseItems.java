@@ -24,6 +24,12 @@ class HouseItems
     BOATING_CRUISE
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: int n
+  //Method's return value : void
+  //Description of what the method does.
+  // - Make items
+  // ************************************************************************************
   private void makeItems(int n)
   {
     List<String> totalListItems = Stream.of(ItemsList.values())
@@ -49,8 +55,13 @@ class HouseItems
     }
   }
 
-  //HOW TO GET THE ID FROM THE ITEM LIST???
-  synchronized void updateItemList()
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - update the item list by adding 1 to the current List
+  // ************************************************************************************
+  void updateItemList()
   {
     if(theRestOfTheItemsList.size() > 0)
     {
@@ -62,17 +73,49 @@ class HouseItems
     }
   }
 
-  boolean noMoreItemToSell()
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : boolean
+  //Description of what the method does.
+  // - if no more new items, return true
+  // - else return false
+  // ************************************************************************************
+  boolean noMoreNewItem()
   {
     if(theRestOfTheItemsList.size() <=0) return true;
     else return false;
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : boolean
+  //Description of what the method does.
+  // - if all items are sold, return true
+  // - else return false
+  // ************************************************************************************
+  boolean allItemsAreSold()
+  {
+    if(noMoreNewItem() && currentHouseItems.size()<=0) return true;
+    else return false;
+  }
+
+  //*************************************************************************************
+  //Each parameter's type and name: int itemID
+  //Method's return value : void
+  //Description of what the method does.
+  // - Remove an item when sold
+  // ************************************************************************************
   synchronized void removeItem(int itemID)
   {
     currentHouseItems.remove(itemID);
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value :  HashMap<Integer,Item>
+  //Description of what the method does.
+  // - get the items map from current auction house list
+  // ************************************************************************************
   HashMap<Integer,Item> getCurrentHouseItems()
   {
     return currentHouseItems;

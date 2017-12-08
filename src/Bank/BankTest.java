@@ -94,7 +94,9 @@ public class BankTest
       amount = getVal(rand, initialBalance);
 
       // withdraw funds, cannot fail as to have an overdraw at this point indicates a logic failure
-      // throws exception in case of overdraw
+      // throws exception in case of overdraw, also requires a block for the amount being removed to be in place
+
+      oos.writeObject(new ModifyBlockedFundsMessage(secretKey, amount, ModifyBlockedFundsMessage.TransactionType.Add, transactionId));
       oos.writeObject(new WithdrawFundsMessage(secretKey, amount));
 
       // close connection when finished, ie allowing the server to close the connection rather than the other way

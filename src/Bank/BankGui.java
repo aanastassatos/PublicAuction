@@ -94,7 +94,7 @@ class BankGui extends Stage
 
   private void openHistory(final ListView<AccountNode> boxView)
   {
-    new TransactionHistoryGui(boxView.getSelectionModel().getSelectedItem().getFund().getTransactionHistory());
+    new TransactionHistoryGui(boxView.getSelectionModel().getSelectedItem().getFund());
   }
 
   private void refreshFunds()

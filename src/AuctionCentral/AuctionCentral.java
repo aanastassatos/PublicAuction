@@ -62,9 +62,9 @@ public class AuctionCentral extends Thread
   public AuctionCentral(final String bank_address) throws IOException
   {
     BANK_ADDRESS = bank_address;
-    gui = new AuctionCentralGui();
+//    gui = new AuctionCentralGui();
     auctionCentralSocket = new ServerSocket(PORT);
-    printInfo();
+    System.out.println(printInfo());
   }
   
   private final HashMap<Integer, String> auctionHouseNames = new HashMap<>(); //Stores the auction house names with the public ID of the auction house
@@ -172,17 +172,6 @@ public class AuctionCentral extends Thread
   }
   
   /**
-   * Returns a message with the info required to connect to a requested auction house.
-   * @param msg
-   * @return
-   */
-  synchronized AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(final RequestConnectionToAuctionHouseMessage msg)
-  {
-    AuctionHouseConnectionInfo connectionInfo = auctionHouseConnections.get(auctionHouseKeys.get(msg.getAuctionHouseID()));
-    return new AuctionHouseConnectionInfoMessage(connectionInfo.getAddress(), connectionInfo.getPort());
-  }
-  
-  /**
    * Changes the bidding key in the received "ModifyBlockedFundsMessage" and replaces it with its corresponding
    * bank key. Returns the changed message.
    * @param msg
@@ -205,18 +194,19 @@ public class AuctionCentral extends Thread
   }
   
   /**
-   * Prints the information of the computer that AuctionCentral is running on.
+   * Returns a string representation the information of the computer that AuctionCentral is running on.
    */
-  private void printInfo()
+  String printInfo()
   {
+    String infoString = null;
     try
     {
-      System.out.println("Server Ip: " + InetAddress.getLocalHost());
-      System.out.println("Server host name: " + InetAddress.getLocalHost().getHostName());
+      infoString = "Auction Central Ip: " + InetAddress.getLocalHost() +"\n"+ "Auction Central host name: " + InetAddress.getLocalHost().getHostName();
     }
     catch (UnknownHostException e)
     {
       e.printStackTrace();
     }
+    return infoString;
   }
 }
