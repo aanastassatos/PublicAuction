@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class Item implements Serializable
 {
-  private final int BIDDING_TIME = 3;
+  private final int BIDDING_TIME = 30;
   private final int maxVal = 100;
   private final int minVal = 1;
 
@@ -17,42 +17,51 @@ public class Item implements Serializable
   private int itemPrice;
   private int highestBidderKey = 0;
   private int highestBid;
+  private UUID highestBidTransactionID;
 
   private static Random r = AuctionHouse.rand;
 
   transient private Timer timer;
+  private boolean timerRunning = false;
   private int biddingTimeLeft = BIDDING_TIME;
 
   Item(String item)
   {
-    timer = new Timer();
     this.item = item;
     setPrice();
+    timer = new Timer();
   }
 
-  //********************************************************
-  //Each parameter's type and name: none
-  //Method's return value :  void
-  //Description of what the method does.
-  // - set and get methods for price
-  // *******************************************************
-  private void setPrice()
-  {
-    itemPrice = r.nextInt((maxVal - minVal) + 1) + minVal;
-    highestBid = itemPrice;
-  }
-
-  public Integer getPrice()
+  public int getPrice()
   {
     return itemPrice;
   }
+  
+  public String getItem()
+  {
+    return item;
+  }
+  
+  public int getHighestBid()
+  {
+    return highestBid;
+  }
+  
+  void setHighestBidderKey(int highestBidderKey)
+  {
+    if(!timerRunning)
+    {
+      startTimer();
+    }
+    this.highestBidderKey = highestBidderKey;
+  }
+  
+  void setHighestBid(int highestBid)
+  {
+    this.highestBid = highestBid;
+    biddingTimeLeft = BIDDING_TIME;
+  }
 
-  //******************************************
-  //Each parameter's type and name: none
-  //Method's return value :  void
-  //Description of what the method does.
-  // - start the timer
-  // *****************************************
   void startTimer()
   {
     this.timer.scheduleAtFixedRate(new TimerTask()
@@ -64,115 +73,30 @@ public class Item implements Serializable
       }
     }, 0, 1000);
   }
-
-  //********************************************************
-  //Each parameter's type and name: none
-  //Method's return value :  boolean
-  //Description of what the method does.
-  // - return true if the time is up and false otherwise
-  // *******************************************************
+  
   boolean isTimeUp()
   {
     if(biddingTimeLeft == 0) return true;
     return false;
   }
-
-  //********************************************************
-  //Each parameter's type and name: none
-  //Method's return value :  void
-  //Description of what the method does.
-  // - decrement the time
-  // *******************************************************
+  
+  int getHighestBidderKey()
+  {
+    return highestBidderKey;
+  }
+  
+  private void setPrice()
+  {
+    itemPrice = r.nextInt((maxVal - minVal) + 1) + minVal;
+    highestBid = itemPrice;
+  }
+  
   private void tick()
   {
     if(biddingTimeLeft > 0)
     {
       this.biddingTimeLeft--;
       System.out.println("time left is: " + biddingTimeLeft);
-    }
-  }
-
-  //********************************************************
-  //Each parameter's type and name: none
-  //Method's return value :
-  //Description of what the method does.
-  // - set and get methods for id
-  // *******************************************************
-  void setID(int itemID)
-  {
-    this.itemID = itemID;
-  }
-
-  public int getID()
-  {
-    return itemID;
-  }
-
-  public String getItem()
-  {
-    return item;
-  }
-
-  //********************************************************
-  //Each parameter's type and name: none
-  //Method's return value :
-  //Description of what the method does.
-  // - set and get methods for bidder key
-  // *******************************************************
-  int getHighestBidderKey()
-  {
-    return highestBidderKey;
-  }
-
-  void setHighestBidderKey(int highestBidderKey)
-  {
-    startTimer();
-    this.highestBidderKey = highestBidderKey;
-  }
-
-  //********************************************************
-  //Each parameter's type and name: none
-  //Method's return value :
-  //Description of what the method does.
-  // - set and get methods for highest bid
-  // *******************************************************
-  int getHighestBid()
-  {
-    return highestBid;
-  }
-
-  void setHighestBid(int highestBid)
-  {
-    this.highestBid = highestBid;
-  }
-
-  @Override
-  public String toString()
-  {
-    return " " + getItem() + " ";
-  }
-
-  @Override
-  public int hashCode()
-  {
-    return 31* String.valueOf(item).hashCode();
-  }
-
-  @Override
-  public boolean equals(Object str)
-  {
-    if(this == str)
-    {
-      return true;
-    }
-    if(str instanceof Item)
-    {
-      Item anotherLetter = (Item) str;
-      return (item == anotherLetter.item);
-    }
-    else
-    {
-      return false;
     }
   }
 }

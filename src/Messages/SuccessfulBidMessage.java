@@ -4,20 +4,20 @@ import java.io.Serializable;
 
 public class SuccessfulBidMessage implements Serializable
 {
-  private int itemID;
+  private String itemName;
   private int amount;
   private int biddingKey;
 
-  public SuccessfulBidMessage(int itemID, int amount, int biddingKey)
+  public SuccessfulBidMessage(String itemName, int amount, int biddingKey)
   {
-    this.itemID = itemID;
+    this.itemName = itemName;
     this.amount = amount;
     this.biddingKey = biddingKey;
   }
 
-  public int getItemID()
+  public String getItemName()
   {
-    return itemID;
+    return itemName;
   }
 
   public int getAmount()

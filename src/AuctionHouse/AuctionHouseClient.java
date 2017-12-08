@@ -47,6 +47,7 @@ public class AuctionHouseClient extends Thread
       }
 
       if(o instanceof AgentInfoMessage) handleMessage((AgentInfoMessage) o);
+      else if(o instanceof RequestItemListMessage) handleMessage((RequestItemListMessage) o);
       else if(o instanceof BidPlacedMessage) handleMessage((BidPlacedMessage)o);
       else if(o instanceof CloseConnectionMessage)
       {
@@ -104,14 +105,7 @@ public class AuctionHouseClient extends Thread
   // ************************************************************************************
   private void handleMessage(final AgentInfoMessage message)
   {
-    try
-    {
-      ItemListMessage msg = auctionHouse.registerAgent(message, this);
-      agent_oos.writeObject(msg);
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
+    auctionHouse.registerAgent(message.getBiddingKey(), this);
   }
 
   //*************************************************************************************
@@ -130,4 +124,27 @@ public class AuctionHouseClient extends Thread
       e.printStackTrace();
     }
   }
+  
+  private void handleMessage(final RequestItemListMessage message)
+  {
+    try
+    {
+      agent_oos.writeObject(auctionHouse.sendItemList());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }
+
+ /*
+  private List<Item> itemList;
+
+  private int currentBid;
+
+  private final AtomicInteger highestBid = new AtomicInteger();
+
+  int getCurrentHighestBid(int auctionHouseID, int itemID)
+  {
+    // GO TO THE CURRENT AUCTION HOUSE AND LOOK UP THE ITEM ID TO RETURN THE CURRENT BID
+    return currentBid;
+  }*/

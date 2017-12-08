@@ -4,18 +4,18 @@ import java.io.Serializable;
 
 public class HigherBidPlacedMessage implements Serializable
 {
-  private int itemID;
+  private String itemName;
   private int amount;
 
-  public HigherBidPlacedMessage(int itemID, int amount)
+  public HigherBidPlacedMessage(String itemName, int amount)
   {
-    this.itemID = itemID;
+    this.itemName = itemName;
     this.amount = amount;
   }
 
-  public int getItemID()
+  public String getItemName()
   {
-    return itemID;
+    return itemName;
   }
 
   public int getAmount()
