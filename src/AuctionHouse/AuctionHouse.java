@@ -42,6 +42,7 @@ public class AuctionHouse extends Thread
       if(args.length > 0 && args[0].equals("test")) centralAddress = "";
       else centralAddress = reader.readLine();
       address = InetAddress.getLocalHost().toString();
+      System.out.println("address of auctionHouse is: " +address);
       Random r = new Random();
       char c = (char) (r.nextInt(26) + 'A');
       String name = Character.toString(c) + Integer.toString(r.nextInt(1000) + 1);
