@@ -2,7 +2,6 @@ package AuctionHouse;
 
 import AuctionCentral.AuctionCentral;
 import Messages.*;
-import javafx.application.Platform;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,12 +10,10 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.Buffer;
 import java.util.*;
 
 public class AuctionHouse extends Thread
 {
-  private AuctionHouseGui auctionHouseGui;
   private final int numOfItems = 3;
 
   final static Random rand = new Random();
@@ -58,14 +55,12 @@ public class AuctionHouse extends Thread
 
   private HouseItems items;
 
-  AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
+  private AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
-//    int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
     auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     items = new HouseItems(numOfItems);
     new Thread(() -> checkItem()).start();
-//    Platform.runLater(() -> auctionHouseGui = new AuctionHouseGui(this));
     printInfo();
   }
 
@@ -160,7 +155,7 @@ public class AuctionHouse extends Thread
   // - Send a message to all clients to inform that the item has been sold with the amount.
   // - Send a message to the agent that won the bid
   // ***********************************************************************
-  void bidSucceeded(String itemName, int amount, int biddingKey)
+  private void bidSucceeded(String itemName, int amount, int biddingKey)
   {
     sendMessageToClients(new ItemSoldMessage(itemName, amount));
     System.out.println("Congratulations! Bidding key number: " +biddingKey+ " has won "+itemName+
@@ -175,7 +170,7 @@ public class AuctionHouse extends Thread
   //Description of what the method does.
   // - A place holder to send message to clients
   // ***********************************************************************
-  public synchronized void sendMessageToClients(Object m)
+  private synchronized void sendMessageToClients(Object m)
   {
     Iterator iter = auctionHouseClients.entrySet().iterator();
     while (iter.hasNext())
@@ -195,7 +190,6 @@ public class AuctionHouse extends Thread
   synchronized void registerAgent(int biddingKey, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(biddingKey, auctionHouseClient);
-    //printItemList();
   }
 
   //************************************************************************
@@ -239,7 +233,13 @@ public class AuctionHouse extends Thread
     }
     return null;
   }
-  
+
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // -End the auction when everything is sold and send NoItemLeftMessage
+  // ***********************************************************************
   private void endAuction()
   {
     System.out.println("All items have been sold. Closing Auction House");

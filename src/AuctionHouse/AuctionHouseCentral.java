@@ -50,7 +50,6 @@ public class AuctionHouseCentral extends Thread
       }
 
       if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
-//      else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
   }
@@ -124,21 +123,4 @@ public class AuctionHouseCentral extends Thread
   {
     auctionHouse.storeInfo(message);
   }
-
-//  //*************************************************************************************
-//  //Each parameter's type and name: final RequestConnectionToAuctionHouseMessage message
-//  //Method's return value : void
-//  //Description of what the method does.
-//  // - send the connection info to Auction Central
-//  // ************************************************************************************
-//  private void handleMessage(final RequestConnectionToAuctionHouseMessage message)
-//  {
-//    try
-//    {
-//      central_oos.writeObject(auctionHouse.getConnectionInfo());
-//    } catch (IOException e)
-//    {
-//      e.printStackTrace();
-//    }
-//  }
 }
