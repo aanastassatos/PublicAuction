@@ -17,7 +17,8 @@ public class AuctionHouse extends Thread
   private final int numOfItems = 3;
 
   final static Random rand = new Random();
-  private final static int PORT = rand.nextInt((60000 - 50000) + 1) + 50000;
+  //private final static int PORT = rand.nextInt((60000 - 50000) + 1) + 50000;
+  private final static int PORT = 55557;
   private static String address;
 
   private int secretKey;
@@ -40,7 +41,7 @@ public class AuctionHouse extends Thread
       reader = new BufferedReader(new InputStreamReader(System.in));
       if(args.length > 0 && args[0].equals("test")) centralAddress = "";
       else centralAddress = reader.readLine();
-      address = "localhost";
+      address = centralAddress;
       Random r = new Random();
       char c = (char) (r.nextInt(26) + 'A');
       String name = Character.toString(c) + Integer.toString(r.nextInt(1000) + 1);
