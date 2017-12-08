@@ -62,7 +62,7 @@ public class AuctionCentral extends Thread
   public AuctionCentral(final String bank_address) throws IOException
   {
     BANK_ADDRESS = bank_address;
-    gui = new AuctionCentralGui();
+//    gui = new AuctionCentralGui();
     auctionCentralSocket = new ServerSocket(PORT);
     printInfo();
   }
@@ -207,16 +207,17 @@ public class AuctionCentral extends Thread
   /**
    * Prints the information of the computer that AuctionCentral is running on.
    */
-  private void printInfo()
+  String printInfo()
   {
+    String infoString = null;
     try
     {
-      System.out.println("Server Ip: " + InetAddress.getLocalHost());
-      System.out.println("Server host name: " + InetAddress.getLocalHost().getHostName());
+      infoString = "Server Ip: " + InetAddress.getLocalHost() +"\n"+ "Server host name: " + InetAddress.getLocalHost().getHostName();
     }
     catch (UnknownHostException e)
     {
       e.printStackTrace();
     }
+    return infoString;
   }
 }
