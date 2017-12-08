@@ -48,15 +48,19 @@ public class AuctionHouseCentral extends Thread
         e.printStackTrace();
         return;
       }
-      
-//      if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage)o);
+
       if(o instanceof AuctionHouseInfoMessage) handleMessage((AuctionHouseInfoMessage) o);
       else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else throw new RuntimeException("Received unknown message");
     }
   }
 
-  //ASK THE CENTRAL TO CLOSE THE CONNECTION BECAUSE THERE IS NO MORE ITEMS TO SELL
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - Tell the central to close the connection because there is no more items to sell
+  // ************************************************************************************
   synchronized void closeConnection()
   {
     try
@@ -68,6 +72,12 @@ public class AuctionHouseCentral extends Thread
     }
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: final ModifyBlockedFundsMessage message
+  //Method's return value : BlockFundsResultMessage
+  //Description of what the method does.
+  // - This sends the block fund message to Auction Central
+  // ************************************************************************************
   synchronized BlockFundsResultMessage sendBlockFundsMessage(final ModifyBlockedFundsMessage message)
   {
     try
@@ -86,6 +96,12 @@ public class AuctionHouseCentral extends Thread
     return null;
   }
 
+  //*************************************************************************************
+  //Each parameter's type and name: int biddingKey, int amount
+  //Method's return value : void
+  //Description of what the method does.
+  // - this send a message to central to request money after the item is sold
+  // ************************************************************************************
   synchronized void requestMoney(int biddingKey, int amount)
   {
     try
@@ -98,16 +114,23 @@ public class AuctionHouseCentral extends Thread
     }
   }
 
-  /*private void handleMessage(final BlockFundsResultMessage message)
-  {
-
-  }*/
-
+  //*************************************************************************************
+  //Each parameter's type and name: final AuctionHouseInfoMessage message
+  //Method's return value : void
+  //Description of what the method does.
+  // - This gets the secret key and public ID from central and store them
+  // ************************************************************************************
   private void handleMessage(final AuctionHouseInfoMessage message)
   {
     auctionHouse.storeInfo(message);
   }
-  
+
+  //*************************************************************************************
+  //Each parameter's type and name: final RequestConnectionToAuctionHouseMessage message
+  //Method's return value : void
+  //Description of what the method does.
+  // - send the connection info to Auction Central
+  // ************************************************************************************
   private void handleMessage(final RequestConnectionToAuctionHouseMessage message)
   {
     try

@@ -28,25 +28,43 @@ class AuctionHouseGui extends Stage
   private class ItemNode extends BorderPane
   {
     final private Item item;
-    final private Integer highestBid;
+    final private int highestBid;
 
-    ItemNode(final Item item, Integer highestBid)
+    ItemNode(final Item item, int highestBid)
     {
       this.item = item;
       this.highestBid = highestBid;
     }
 
+    //*************************************************************************************
+    //Each parameter's type and name: none
+    //Method's return value : void
+    //Description of what the method does.
+    // - initialize the item and bid
+    // ************************************************************************************
     void init()
     {
       setLeft(new Text(item.getItem()));
-      setRight(new Text(highestBid.toString()));
+      setRight(new Text(Integer.toString(highestBid)));
     }
 
-    Integer getHighestBid()
+    //*************************************************************************************
+    //Each parameter's type and name:
+    //Method's return value : void
+    //Description of what the method does.
+    // - Returns highest bid
+    // ************************************************************************************
+    int getHighestBid()
     {
       return highestBid;
     }
 
+    //*************************************************************************************
+    //Each parameter's type and name: final BidPlacedMessage message
+    //Method's return value : void
+    //Description of what the method does.
+    // - Update the bid
+    // ************************************************************************************
     void updateBid()
     {
       setRight(new Text(Integer.toString(item.getHighestBid())));
@@ -63,7 +81,6 @@ class AuctionHouseGui extends Stage
   @Override
   void updateBid(){}
   }
-
 
   AuctionHouseGui(final AuctionHouse auctionHouse)
   {
@@ -84,7 +101,12 @@ class AuctionHouseGui extends Stage
     timeline.playFromStart();
   }
 
-
+  //*************************************************************************************
+  //Each parameter's type and name: final Item item
+  //Method's return value : void
+  //Description of what the method does.
+  // - Show items
+  // ************************************************************************************
   void addItem(final Item item)
   {
     if(boxList.contains(placeHolder)) boxList.remove(placeHolder);
@@ -96,7 +118,13 @@ class AuctionHouseGui extends Stage
     boxList.add(box);
   }
 
-
+  //*************************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - refresh to see if there are new bid placed
+  // - HAVE TO CHECK NEW ITEMS ADDED AS WELL
+  // ************************************************************************************
   private void refreshItems()
   {
     boxList.forEach(b -> b.updateBid());

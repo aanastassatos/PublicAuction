@@ -80,6 +80,15 @@ public class AuctionHouse extends Thread
     }
   }
 
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - This loops through the current house item list and check if there is
+  //      any item that time is up.
+  // - If there is an time up item then remove the item from the list
+  //     and inform the winner by calling bidSucceeded method
+  // ***********************************************************************
   private void checkItem()
   {
     while (true)
@@ -95,22 +104,16 @@ public class AuctionHouse extends Thread
       itemsToRemove.forEach(it -> items.removeItem(it.getID()));
       itemsToRemove.forEach(current ->
               bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey()));
-
-
-//      while (iter.hasNext())
-//      {
-//        Map.Entry pair = (Map.Entry) iter.next();
-//        Item current = itemList.get(pair.getKey());
-//        if (current.isTimeUp())
-//        {
-//          bidSucceeded(current.getItem(), current.getID(), current.getHighestBid(), current.getHighestBidderKey());
-//        }
-//      }
     }
   }
 
-  //WHY IS THIS WORKING
- /* void printItemList()
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - What does this do???
+  // ***********************************************************************
+  /*void printItemList()
   {
     HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
     Iterator iter = auctionHouseClients.entrySet().iterator();
@@ -123,24 +126,44 @@ public class AuctionHouse extends Thread
   }*/
 
   //CENTRAL
+  //***************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - This send the auction house info with the address and PORT when called
+  // **************************************************************************
   AuctionHouseConnectionInfoMessage getConnectionInfo()
   {
     return new AuctionHouseConnectionInfoMessage(address, PORT);
   }
   
   // AGENTS
-  synchronized void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
+  //************************************************************************
+  //Each parameter's type and name: String itemName, int itemID, int amount, int biddingKey
+  //Method's return value : void
+  //Description of what the method does.
+  // - When the time for an item is up, this method will request the money
+  //     equals to the cost of the item from Auction Central
+  // - There are 2 lists that holds an auction house items, 1 that only have 3 items
+  //     that being auctioned and the other list holds the rest of the items
+  //   + Checks if the rest of item list is empty, if is not empty, then update currentList
+  //   + Check if there is no items left in both lists, send message to all clients and close
+  //   + If there are only items left in currentList, do nothing
+  // - Send a message to all clients to inform that the item has been sold with the amount.
+  // - Send a message to the agent that won the bid
+  // ***********************************************************************
+  void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
     central.requestMoney(biddingKey, amount);
 
     //If there are more things to sell, update the list, else close
-    if(!items.noMoreItemToSell())
+    if(!items.noMoreNewItem())
     {
       items.updateItemList();
       System.out.println("New list is: " + items.getCurrentHouseItems());
     }
 
-    else
+    else if(!items.allItemsAreSold())
     {
       sendMessageToClients(new NoItemLeftMessage());
       central.closeConnection();
@@ -152,6 +175,12 @@ public class AuctionHouse extends Thread
     auctionHouseClients.get(biddingKey).sendMessage(new SuccessfulBidMessage(itemID, amount, biddingKey));
   }
 
+  //************************************************************************
+  //Each parameter's type and name: Object m
+  //Method's return value : void
+  //Description of what the method does.
+  // - A place holder to send message to clients
+  // ***********************************************************************
   public synchronized void sendMessageToClients(Object m)
   {
     List<Map.Entry> deadClients = new ArrayList<>();
@@ -165,6 +194,13 @@ public class AuctionHouse extends Thread
       auctionHouseClients.remove(c);
   }
 
+  //************************************************************************************************
+  //Each parameter's type and name: AgentInfoMessage message, AuctionHouseClient auctionHouseClien
+  //Method's return value : void
+  //Description of what the method does.
+  // - add the agent to the agent map with the bidding key
+  // - send the item list message to the agent with list of items being auctioned
+  // ***********************************************************************************************
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
@@ -172,6 +208,20 @@ public class AuctionHouse extends Thread
     return new ItemListMessage(items.getCurrentHouseItems(), publicID);
   }
 
+  //************************************************************************
+  //Each parameter's type and name: int itemID, int biddingKey, int amount
+  //Method's return value : BidResultMessage
+  //Description of what the method does.
+  // - This handle the bid that was placed by the agent.
+  //     if the item isnt in the list anymore, send message inform that item is not in stock
+  //     if the bid placed is lower than current highest bid, send message bid too low
+  //     else send message to central to block a fund in the agent account
+  //         wait for the result, if the blocked fund went through:
+  //            reset highest bid and bidderKey,
+  //            send message to clients with updated bid amount
+  //            send message to agent to inform the bid is successfully placed
+  //         if blocked fund failed, send message insufficient funds
+  // ***********************************************************************
   synchronized BidResultMessage placeBid(int itemID, int biddingKey, int amount)
   {
     Item item = items.getCurrentHouseItems().get(itemID);
@@ -194,12 +244,18 @@ public class AuctionHouse extends Thread
           sendMessageToClients(new HigherBidPlacedMessage(itemID, amount));
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }
-        else return new BidResultMessage(BidResultMessage.BidResult.INSUFICIENT_FUNDS);
+        else return new BidResultMessage(BidResultMessage.BidResult.INSUFFICIENT_FUNDS);
       }
     }
     return null;
   }
-  
+
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // -Print the server ip and host name
+  // ***********************************************************************
   private void printInfo()
   {
     try
@@ -222,7 +278,13 @@ public class AuctionHouse extends Thread
   {
     return PORT;
   }
-  
+
+  //************************************************************************
+  //Each parameter's type and name: none
+  //Method's return value : void
+  //Description of what the method does.
+  // - Store the info of the auction house got from central when register
+  // ***********************************************************************
   void storeInfo(AuctionHouseInfoMessage message)
   {
     publicID = message.getPublicID();

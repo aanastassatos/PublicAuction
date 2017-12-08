@@ -55,8 +55,6 @@ public class AgentAuctionHouse extends Thread
           oos.writeObject(new CloseConnectionMessage());
           break;
         }
-        
-        
       }
     }
 
@@ -66,13 +64,26 @@ public class AgentAuctionHouse extends Thread
     }
   }
 
-  void handleMessage(SuccessfulBidMessage message)
+  private void handleMessage(SuccessfulBidMessage message)
   {
-
+    System.out.println("YOUVE WON! Item" + message.getItemID());
   }
 
-  void handleMessage(BidResultMessage message)
+  private void handleMessage(BidResultMessage message)
   {
-
+    BidResultMessage.BidResult bidResult = message.getResult();
+    switch(bidResult)
+    {
+      case BID_IS_TOO_LOW:
+        break;
+      case SUCCESS:
+        break;
+      case INSUFICIENT_FUNDS:
+        break;
+      case NOT_IN_STOCK:
+        break;
+      default:
+        break;
+    }
   }
 }
