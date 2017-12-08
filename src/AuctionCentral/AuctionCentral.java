@@ -64,7 +64,7 @@ public class AuctionCentral extends Thread
     BANK_ADDRESS = bank_address;
 //    gui = new AuctionCentralGui();
     auctionCentralSocket = new ServerSocket(PORT);
-    printInfo();
+    System.out.println(printInfo());
   }
   
   private final HashMap<Integer, String> auctionHouseNames = new HashMap<>(); //Stores the auction house names with the public ID of the auction house
@@ -205,7 +205,7 @@ public class AuctionCentral extends Thread
   }
   
   /**
-   * Prints the information of the computer that AuctionCentral is running on.
+   * Returns a string representation the information of the computer that AuctionCentral is running on.
    */
   String printInfo()
   {
