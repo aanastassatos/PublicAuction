@@ -223,7 +223,7 @@ public class AuctionHouse extends Thread
           item.setHighestBid(amount);
           item.setHighestBidderKey(biddingKey);
 
-          System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
+          System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID).getItem()+
                               "with the amount of: "+amount);
           sendMessageToClients(new HigherBidPlacedMessage(items.getCurrentHouseItems().get(itemID).getItem(), amount));
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);

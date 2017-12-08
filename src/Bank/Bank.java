@@ -35,6 +35,7 @@ public class Bank extends Thread
 
   // static port number
   public final static int PORT = 55555;
+  private final static boolean HEADLESS = true;
 
   // map of secret keys to user accounts, Secret keys are the only method of referencing accounts as it is the
   // only bank information given to AuctionCentral
@@ -51,6 +52,7 @@ public class Bank extends Thread
     try
     {
       bankSocket = new ServerSocket(PORT);
+      if(HEADLESS) return;
       new JFXPanel(); // init jfx
       Platform.runLater(() -> gui = new BankGui(this));
     } catch (IOException e)
@@ -96,7 +98,7 @@ public class Bank extends Thread
     // create bank account and populate map allowing account information and funds to be modified when given a key
     BankAccount account = new BankAccount(new Fund(initialBalance), accountNumber, name);
     keyMap.put(secretKey, account);
-    Platform.runLater(() -> gui.addAccount(account));
+    if(!HEADLESS) Platform.runLater(() -> gui.addAccount(account));
 
     System.out.println("Created bank account " + accountNumber + " for " + name);
     return new BankAccountInfoMessage(accountNumber, secretKey);
