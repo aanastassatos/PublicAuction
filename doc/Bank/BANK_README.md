@@ -27,7 +27,7 @@ Sent to agents, contains the account number as well as their secret bank key.
 Sent to auction central, indicates whether last request to block funds succeded, i.e.
 the specified account had more funds availiable than the amount to block requested.
 
-## GUI Instructions (Must be enabled manually via HEADLESS field in Bank source)
+## GUI Instructions (Requires GUI enabled jar)
 Initially only a message stating no agents have registered is displayed.
 Once an agent has created an account, the display format is: AgentName(AccountNumber) FundState. 
 Clicking on any agent produces a new window in which the transaction history for said agent is displayed.
