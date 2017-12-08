@@ -3,6 +3,7 @@ package AuctionHouse;
 import AuctionCentral.AuctionCentral;
 import Messages.*;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -13,7 +14,6 @@ import java.util.*;
 
 public class AuctionHouse extends Thread
 {
-  private AuctionHouseGui auctionHouseGui;
   private final int maxNumOfItems = 10;
   private final int minNumOfItems = 3;
 
@@ -28,9 +28,7 @@ public class AuctionHouse extends Thread
 
   private AuctionHouseCentral central;
 
-  //The clients have the auctionHouseID and the auction client
   private final HashMap<Integer, AuctionHouseClient> auctionHouseClients = new HashMap<>();
-
 
   public static void main(String[] args)
   {
@@ -52,14 +50,13 @@ public class AuctionHouse extends Thread
 
   private HouseItems items;
 
-  AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
+  private AuctionHouse(String centralAddress, int centralPort, String name, int port) throws IOException
   {
     int randomNumItems = rand.nextInt((maxNumOfItems - minNumOfItems) + 1) + minNumOfItems;
     auctionHouseSocket = new ServerSocket(port);
     this.central = new AuctionHouseCentral(centralAddress, centralPort, name, this);
     items = new HouseItems(randomNumItems);
     new Thread(() -> checkItem()).start();
-    Platform.runLater(() -> auctionHouseGui = new AuctionHouseGui(this));
     printInfo();
   }
 
@@ -107,24 +104,6 @@ public class AuctionHouse extends Thread
     }
   }
 
-  //************************************************************************
-  //Each parameter's type and name: none
-  //Method's return value : void
-  //Description of what the method does.
-  // - What does this do???
-  // ***********************************************************************
-  /*void printItemList()
-  {
-    HashMap<Integer, Item> itemList = items.getCurrentHouseItems();
-    Iterator iter = auctionHouseClients.entrySet().iterator();
-    while (iter.hasNext())
-    {
-      Map.Entry pair = (Map.Entry) iter.next();
-      Item current = itemList.get(pair.getKey());
-      Platform.runLater(() -> auctionHouseGui.addItem(current));
-    }
-  }*/
-
   //CENTRAL
   //***************************************************************************
   //Each parameter's type and name: none
@@ -152,26 +131,32 @@ public class AuctionHouse extends Thread
   // - Send a message to all clients to inform that the item has been sold with the amount.
   // - Send a message to the agent that won the bid
   // ***********************************************************************
-  void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
+  private void bidSucceeded(String itemName, int itemID, int amount, int biddingKey)
   {
     central.requestMoney(biddingKey, amount);
 
-    //If there are more things to sell, update the list, else close
     if(!items.noMoreNewItem())
     {
       items.updateItemList();
       System.out.println("New list is: " + items.getCurrentHouseItems());
     }
 
-    else if(!items.allItemsAreSold())
+    else if(items.allItemsAreSold())
     {
+      Platform.runLater(() -> new Alert(Alert.AlertType.INFORMATION, "Go home. You have no more item to sell.").showAndWait());
+      System.out.println("Go home. You have no more item to sell.");
       sendMessageToClients(new NoItemLeftMessage());
       central.closeConnection();
     }
+    System.out.println("Current list is: " + items.getCurrentHouseItems());
     sendMessageToClients(new ItemSoldMessage(itemID, itemName, amount));
-    System.out.println("HOORAY. New item just arrived and added to the list" + new ItemListMessage(items.getCurrentHouseItems(), publicID));
-    System.out.println("Congratulations! Bidding key number: " +biddingKey+ " has won "+itemName+
-                        " with bidding amount of: " +amount);
+    Item newAddedItem = items.getNewItem();
+    System.out.println("From Auction House number " +publicID+". Bidding key number: " +biddingKey+ " has won " +itemName+
+    " with bidding amount of: " +amount+"\n\nItem " +newAddedItem.getItem()+ " just arrived and added to the list. HURRAY!");
+    Platform.runLater(() -> new Alert(Alert.AlertType.INFORMATION, "From Auction House number "
+            + publicID + ". Bidding key number: " +biddingKey+ " has won "+itemName+
+            " with bidding amount of: " +amount+"\n\nAlso, item " + newAddedItem.getItem()+ " just arrived and added to the list. HOORAY!!").showAndWait());
+
     auctionHouseClients.get(biddingKey).sendMessage(new SuccessfulBidMessage(itemID, amount, biddingKey));
   }
 
@@ -181,17 +166,14 @@ public class AuctionHouse extends Thread
   //Description of what the method does.
   // - A place holder to send message to clients
   // ***********************************************************************
-  public synchronized void sendMessageToClients(Object m)
+  private synchronized void sendMessageToClients(Object m)
   {
-    List<Map.Entry> deadClients = new ArrayList<>();
     Iterator iter = auctionHouseClients.entrySet().iterator();
     while (iter.hasNext())
     {
       Map.Entry pair = (Map.Entry) iter.next();
       auctionHouseClients.get(pair.getKey()).sendMessage(m);
     }
-    for(Map.Entry c: deadClients)
-      auctionHouseClients.remove(c);
   }
 
   //************************************************************************************************
@@ -204,7 +186,6 @@ public class AuctionHouse extends Thread
   synchronized ItemListMessage registerAgent(AgentInfoMessage message, AuctionHouseClient auctionHouseClient)
   {
     auctionHouseClients.put(message.getBiddingKey(), auctionHouseClient);
-    //printItemList();
     return new ItemListMessage(items.getCurrentHouseItems(), publicID);
   }
 
@@ -239,8 +220,9 @@ public class AuctionHouse extends Thread
           item.setHighestBid(amount);
           item.setHighestBidderKey(biddingKey);
 
-          System.out.println("Bidding key number: " +biddingKey+ "has bidded on item "+items.getCurrentHouseItems().get(itemID)+
-                              "with the amount of: "+amount);
+          Platform.runLater(() -> new Alert(Alert.AlertType.INFORMATION, ("Bidding key number: " +biddingKey+ "has successfully bidded on item "+items.getCurrentHouseItems().get(itemID)+
+                              "with the amount of: "+amount)).showAndWait());
+
           sendMessageToClients(new HigherBidPlacedMessage(itemID, amount));
           return new BidResultMessage(BidResultMessage.BidResult.SUCCESS);
         }

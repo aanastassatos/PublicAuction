@@ -17,7 +17,6 @@ public class Item implements Serializable
   private int itemPrice;
   private int highestBidderKey = 0;
   private int highestBid;
-  private UUID highestBidTransactionID;
 
   private static Random r = AuctionHouse.rand;
 
@@ -31,6 +30,12 @@ public class Item implements Serializable
     setPrice();
   }
 
+  //********************************************************
+  //Each parameter's type and name: none
+  //Method's return value :  void
+  //Description of what the method does.
+  // - set and get methods for price
+  // *******************************************************
   private void setPrice()
   {
     itemPrice = r.nextInt((maxVal - minVal) + 1) + minVal;
@@ -42,6 +47,12 @@ public class Item implements Serializable
     return itemPrice;
   }
 
+  //******************************************
+  //Each parameter's type and name: none
+  //Method's return value :  void
+  //Description of what the method does.
+  // - start the timer
+  // *****************************************
   void startTimer()
   {
     this.timer.scheduleAtFixedRate(new TimerTask()
@@ -54,12 +65,24 @@ public class Item implements Serializable
     }, 0, 1000);
   }
 
+  //********************************************************
+  //Each parameter's type and name: none
+  //Method's return value :  boolean
+  //Description of what the method does.
+  // - return true if the time is up and false otherwise
+  // *******************************************************
   boolean isTimeUp()
   {
     if(biddingTimeLeft == 0) return true;
     return false;
   }
 
+  //********************************************************
+  //Each parameter's type and name: none
+  //Method's return value :  void
+  //Description of what the method does.
+  // - decrement the time
+  // *******************************************************
   private void tick()
   {
     if(biddingTimeLeft > 0)
@@ -69,6 +92,12 @@ public class Item implements Serializable
     }
   }
 
+  //********************************************************
+  //Each parameter's type and name: none
+  //Method's return value :
+  //Description of what the method does.
+  // - set and get methods for id
+  // *******************************************************
   void setID(int itemID)
   {
     this.itemID = itemID;
@@ -83,7 +112,13 @@ public class Item implements Serializable
   {
     return item;
   }
-  
+
+  //********************************************************
+  //Each parameter's type and name: none
+  //Method's return value :
+  //Description of what the method does.
+  // - set and get methods for bidder key
+  // *******************************************************
   int getHighestBidderKey()
   {
     return highestBidderKey;
@@ -95,6 +130,12 @@ public class Item implements Serializable
     this.highestBidderKey = highestBidderKey;
   }
 
+  //********************************************************
+  //Each parameter's type and name: none
+  //Method's return value :
+  //Description of what the method does.
+  // - set and get methods for highest bid
+  // *******************************************************
   int getHighestBid()
   {
     return highestBid;
