@@ -35,7 +35,7 @@ public class AuctionHouse extends Thread
   public static void main(String[] args)
   {
     String centralAddress;
-    System.out.print("Enter the bank address (use localhost if server is on same computer as this client): ");
+    System.out.print("Enter the auction central address (use localhost if server is on same computer as this client): ");
     try{
       reader = new BufferedReader(new InputStreamReader(System.in));
       if(args.length > 0 && args[0].equals("test")) centralAddress = "";
