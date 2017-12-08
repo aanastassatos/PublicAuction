@@ -12,12 +12,12 @@ import java.util.HashMap;
 public class AgentAuctionHouse extends Thread
 {
   final Agent agent;
-  HashMap<Integer, Item> items;
+  volatile HashMap<Integer, Item> items;
   private int biddingKey;
   private ObjectOutputStream oos;
   private ObjectInputStream ois;
 
-  private Integer itemToBid;
+  private Item itemToBid;
   private Integer amountToBid;
 
   private String success;
@@ -31,7 +31,7 @@ public class AgentAuctionHouse extends Thread
 
   void setItemToBid(Item item)
   {
-    this.itemToBid = item.getID();
+    this.itemToBid = item;
   }
 
   void setAmountToBid(int bidAmount)
@@ -69,7 +69,7 @@ public class AgentAuctionHouse extends Thread
       {
         if (itemToBid != null)
         {
-          oos.writeObject(new BidPlacedMessage(biddingKey, itemToBid, amountToBid));
+          oos.writeObject(new BidPlacedMessage(biddingKey, itemToBid.getID(), amountToBid));
           itemToBid = null;
         }
         Object readMessage = ois.readObject();

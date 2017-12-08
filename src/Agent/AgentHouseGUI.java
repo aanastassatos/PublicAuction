@@ -46,8 +46,8 @@ public class AgentHouseGUI extends Stage
       int itemNum = Integer.parseInt(item.getText()) - 1;
       itemToBid = itemsArrayList.get(itemNum);
       amount = Integer.parseInt(bidText.getText());
-//    agentAuctionHouse.setItemToBid(itemsArrayList.get(itemNum));
-//      agentAuctionHouse.setAmountToBid(Integer.parseInt(bidText.getText()));
+      agentAuctionHouse.setItemToBid(itemsArrayList.get(itemNum));
+      agentAuctionHouse.setAmountToBid(Integer.parseInt(bidText.getText()));
       //new AgentSuccessGUI("Success!");
     });
 

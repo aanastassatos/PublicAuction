@@ -27,7 +27,6 @@ public class AgentGUI extends Stage
   private Button proceed;
 
   private int auctionHouse;
-  //private boolean housePicked = false;
 
   Agent agent;
 
@@ -97,7 +96,7 @@ public class AgentGUI extends Stage
 
   void openAuctionHouse()
   {
-    Platform.runLater(() -> new AgentHouseGUI(agent.getAgentAuctionHouse(), agent));
+    new AgentHouseGUI(agent.getAgentAuctionHouse(), agent);
   }
 
   AgentGUI(Agent agent)
