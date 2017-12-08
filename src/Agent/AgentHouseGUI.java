@@ -58,6 +58,7 @@ public class AgentHouseGUI extends Stage
       if(e.getCode() == KeyCode.ENTER) placeBid.fire();
     });
     setScene(scene);
+    setAlwaysOnTop(true);
     show();
   }
 

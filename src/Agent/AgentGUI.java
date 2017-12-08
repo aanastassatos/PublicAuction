@@ -87,14 +87,16 @@ public class AgentGUI extends Stage
     });
 
     VBox vBox = new VBox(housesList, houseChoice, showItems);
-
-    setScene(new Scene(vBox));
+    Scene sceneBox = new Scene(vBox);
+    sceneBox.setOnKeyPressed(e -> {
+      if(e.getCode() == KeyCode.ENTER) showItems.fire();
+    });
+    setScene(sceneBox);
     show();
   }
 
   void openAuctionHouse()
   {
-    System.out.println("Here be monsters:");
     Platform.runLater(() -> new AgentHouseGUI(agent.getAgentAuctionHouse(), agent));
   }
 
