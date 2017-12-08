@@ -1,4 +1,4 @@
-package AuctionHouse;
+/*package AuctionHouse;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.awt.*;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 class AuctionHouseGui extends Stage
@@ -44,6 +46,7 @@ class AuctionHouseGui extends Stage
     // ************************************************************************************
     void init()
     {
+      //setCenter(new Text(Integer.toString(item.getTime())));
       setLeft(new Text(item.getItem()));
       setRight(new Text(Integer.toString(highestBid)));
     }
@@ -69,6 +72,13 @@ class AuctionHouseGui extends Stage
     {
       setRight(new Text(Integer.toString(item.getHighestBid())));
     }
+
+    void updateTime()
+    {
+      setCenter(new Text(Integer.toString(item.getTime())));
+    }
+
+    //HOW TO UPDATE ITEM
   }
 
   private class PlaceHolderNode extends ItemNode
@@ -107,15 +117,20 @@ class AuctionHouseGui extends Stage
   //Description of what the method does.
   // - Show items
   // ************************************************************************************
-  void addItem(final Item item)
+  void addItem(final Collection<Item> items)
   {
-    if(boxList.contains(placeHolder)) boxList.remove(placeHolder);
-    int highestBid;
-    if(item.getHighestBid() == item.getPrice()) highestBid = item.getPrice();
-    else highestBid = item.getHighestBid();
-    final ItemNode box = new ItemNode(item, highestBid);
-    box.init();
-    boxList.add(box);
+    Iterator<Item> iter = items.iterator();
+    while (iter.hasNext())
+    {
+      Item item = iter.next();
+      if (boxList.contains(placeHolder)) boxList.remove(placeHolder);
+      int highestBid;
+      if (item.getHighestBid() == item.getPrice()) highestBid = item.getPrice();
+      else highestBid = item.getHighestBid();
+      final ItemNode box = new ItemNode(item, highestBid);
+      box.init();
+      boxList.add(box);
+    }
   }
 
   //*************************************************************************************
@@ -128,5 +143,6 @@ class AuctionHouseGui extends Stage
   private void refreshItems()
   {
     boxList.forEach(b -> b.updateBid());
+   // boxList.forEach(b->b.updateTime());
   }
-}
+}*/

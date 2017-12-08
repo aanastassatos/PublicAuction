@@ -131,16 +131,3 @@ public class AuctionHouseClient extends Thread
     }
   }
 }
-
- /*
-  private List<Item> itemList;
-
-  private int currentBid;
-
-  private final AtomicInteger highestBid = new AtomicInteger();
-
-  int getCurrentHighestBid(int auctionHouseID, int itemID)
-  {
-    // GO TO THE CURRENT AUCTION HOUSE AND LOOK UP THE ITEM ID TO RETURN THE CURRENT BID
-    return currentBid;
-  }*/

@@ -8,6 +8,7 @@ class HouseItems
 {
   private HashMap<Integer, Item> theRestOfTheItemsList = new HashMap<>();
   private HashMap<Integer,Item> currentHouseItems = new HashMap<>();
+  private Item newItem;
 
   HouseItems(int numItems)
   {
@@ -30,7 +31,7 @@ class HouseItems
   //Description of what the method does.
   // - Make items
   // ************************************************************************************
-  private void makeItems(int n)
+  synchronized private void makeItems(int n)
   {
     List<String> totalListItems = Stream.of(ItemsList.values())
             .map(ItemsList::name)
@@ -41,20 +42,19 @@ class HouseItems
     {
       item = new Item(totalListItems.get(i));
       //Item number from 0 -> 2 go to currentHouseItems
-      if(i < 3)
+      if (i < 3)
       {
         item.setID(i);
-        currentHouseItems.put(item.getID(),item);
+        currentHouseItems.put(item.getID(), item);
       }
       //The rest should go to auctionHouseItemList
-      else if(i >= 3)
+      else if (i >= 3)
       {
         item.setID(i);
         theRestOfTheItemsList.put(item.getID(), item);
       }
     }
   }
-
   //*************************************************************************************
   //Each parameter's type and name: none
   //Method's return value : void
@@ -67,9 +67,9 @@ class HouseItems
     {
       Map.Entry<Integer,Item> entry = theRestOfTheItemsList.entrySet().iterator().next();
       Integer itemID = entry.getKey();
-      Item itemName =entry.getValue();
-      currentHouseItems.put(itemID,itemName);
-      theRestOfTheItemsList.remove(itemID,itemName);
+      newItem =entry.getValue();
+      currentHouseItems.put(itemID,newItem);
+      theRestOfTheItemsList.remove(itemID,newItem);
     }
   }
 
@@ -110,74 +110,22 @@ class HouseItems
     currentHouseItems.remove(itemID);
   }
 
-  //*************************************************************************************
+  //********************************************************
   //Each parameter's type and name: none
   //Method's return value :  HashMap<Integer,Item>
   //Description of what the method does.
   // - get the items map from current auction house list
-  // ************************************************************************************
+  // *******************************************************
   HashMap<Integer,Item> getCurrentHouseItems()
   {
     return currentHouseItems;
   }
+
+  Item getNewItem()
+  {
+    return newItem;
+  }
 }
 
 
-/*Iterator iter = auctionHouseItemList.entrySet().iterator();
-    while(iter.hasNext())
-    {
-      Map.Entry pair = (Map.Entry) iter.next();
-      if(pair.getKey().equals(itemID)) auctionHouseItemList.remove(pair.getKey());
-    }*/
-
-  /*HashMap<Integer, Item> getAuctionHouseItemList()
-  {
-    return auctionHouseItemList;
-  }*/
-
-//  String printList(int auctionHouseID)
-//  {
-//    String str = "";
-//    if(auctionHouseItemList.size() > 0)
-//    {
-//      for(int i = 0; i < itemL.size(); i++)
-//      {
-//        Item item = itemL.get(i);
-//        str += "Auction House ID: " +auctionHouseID+ "\nItem ID: " + item.getID() + "Item Name: " +item.getItem() + "Highest Bidder: " +item.getHighestBidderKey()+
-//                " Highest Bid: " +item.getHighestBid()+"\n";
-//      }
-//    }
-//    else str+= "No more Items";
-//    return str;
-//  }
-/*
-
-//  private void setItemNPrice(int numItems)
-//  {
-//    //INITIAL THE ITEMS AND INITIAL PRICES FOR EACH
-//    auctionHouseItemList = getNitems(numItems);
-//    for(int i = 0; i < auctionHouseItemList.size();i ++)
-//    {
-//      Item item = auctionHouseItemList.get(i);
-//      itemNCurrHighestBid.put(item.getID(),item.getPrice());
-//    }
-//  }
-
-  //synchronized?
-  int getCurrentHighestBid(int itemID)
-  {
-    Iterator iter = itemNCurrHighestBid.entrySet().iterator();
-    while (iter.hasNext())
-    {
-      Map.Entry pair = (Map.Entry) iter.next();
-      //equals correctly?
-      if (pair.getKey().equals(itemID))
-      {
-        int bidAmount = itemNCurrHighestBid.get(pair.getKey());
-        return bidAmount;
-      }
-    }
-    return -1;
-  }
- */
 
