@@ -51,7 +51,7 @@ public class AgentGUI extends Stage
       name = screenNameText.getText();
       depositAmount = Integer.parseInt(depositText.getText());
       setFinished(true);
-      hide();
+ //     hide();
       agent.activateBank(hostname, name, depositAmount);
     });
     return new VBox(hostNameLabel, hostNameText, screenNameLabel, screenNameText,
