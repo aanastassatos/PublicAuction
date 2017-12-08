@@ -216,7 +216,7 @@ public class AuctionHouse extends Thread
   {
     Item item = items.getCurrentHouseItems().get(itemID);
     if(item == null) return new BidResultMessage(BidResultMessage.BidResult.NOT_IN_STOCK);
-    else if(item.getHighestBid() > amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
+    else if(item.getHighestBid() >= amount) return new BidResultMessage(BidResultMessage.BidResult.BID_IS_TOO_LOW);
     else
     {
 
