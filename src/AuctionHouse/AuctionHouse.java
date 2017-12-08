@@ -41,14 +41,13 @@ public class AuctionHouse extends Thread
       reader = new BufferedReader(new InputStreamReader(System.in));
       if(args.length > 0 && args[0].equals("test")) centralAddress = "";
       else centralAddress = reader.readLine();
-      address = InetAddress.getLocalHost().toString();
-      System.out.println("address of auctionHouse is: " +address);
+      //how to get the number not the full name
+      address = InetAddress.getLocalHost().getHostName();
       Random r = new Random();
       char c = (char) (r.nextInt(26) + 'A');
       String name = Character.toString(c) + Integer.toString(r.nextInt(1000) + 1);
       AuctionHouse auctionHouse = new AuctionHouse(centralAddress, AuctionCentral.PORT, name, PORT);
       auctionHouse.start();
-
     } catch (IOException e)
     {
       e.printStackTrace();
