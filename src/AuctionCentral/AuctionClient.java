@@ -68,7 +68,7 @@ public class AuctionClient extends Thread
       else if(o instanceof RequestAuctionHouseListMessage) handleMessage((RequestAuctionHouseListMessage) o);
       else if(o instanceof ModifyBlockedFundsMessage) handleMessage((ModifyBlockedFundsMessage) o);
       else if(o instanceof BlockFundsResultMessage) handleMessage((BlockFundsResultMessage) o);
-      else if(o instanceof RequestConnectionToAuctionHouseMessage) System.out.println("Connection to "+((RequestConnectionToAuctionHouseMessage)o).getAuctionHouseID()+" Established");
+      else if(o instanceof RequestConnectionToAuctionHouseMessage) handleMessage((RequestConnectionToAuctionHouseMessage) o);
       else if(o instanceof WithdrawFundsMessage) handleMessage((WithdrawFundsMessage) o);
       else if(o instanceof CloseConnectionMessage)
       {
@@ -157,6 +157,21 @@ public class AuctionClient extends Thread
     try
     {
       client_oos.writeObject(auctionCentral.getAuctionHouseList());
+    } catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * Handles the RequestConnectionToAuctionHouseMessage
+   * @param msg
+   */
+  private void handleMessage(final RequestConnectionToAuctionHouseMessage msg)
+  {
+    try
+    {
+      client_oos.writeObject(auctionCentral.connectClientToAuctionHouse(msg.getAuctionHouseID()));
     } catch (IOException e)
     {
       e.printStackTrace();

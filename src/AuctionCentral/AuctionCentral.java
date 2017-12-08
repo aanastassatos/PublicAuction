@@ -171,6 +171,12 @@ public class AuctionCentral extends Thread
     return new AuctionHouseListMessage(auctionHouseNames);
   }
   
+  AuctionHouseConnectionInfoMessage connectClientToAuctionHouse(int publicID)
+  {
+    AuctionHouseConnectionInfo info = auctionHouseConnections.get(auctionHouseKeys.get(publicID));
+    return new AuctionHouseConnectionInfoMessage(info.getAddress(), info.getPort());
+  }
+  
   /**
    * Changes the bidding key in the received "ModifyBlockedFundsMessage" and replaces it with its corresponding
    * bank key. Returns the changed message.

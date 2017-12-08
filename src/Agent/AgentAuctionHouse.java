@@ -119,7 +119,7 @@ public class AgentAuctionHouse extends Thread
       case SUCCESS:
         result = "Bid Placed!";
         break;
-      case INSUFICIENT_FUNDS:
+      case INSUFFICIENT_FUNDS:
         result = "Insufficient Funds in Your Account :(";
         break;
       case NOT_IN_STOCK:

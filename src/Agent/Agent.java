@@ -28,7 +28,7 @@ public class Agent extends Thread
         return "Bid is too low!";
       case SUCCESS:
         return "Bid Placed!";
-      case INSUFICIENT_FUNDS:
+      case INSUFFICIENT_FUNDS:
         return "Insufficient Funds in Your Account :(";
       case NOT_IN_STOCK:
         return "Item Not In Stock";
