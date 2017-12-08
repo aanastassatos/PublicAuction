@@ -1,6 +1,7 @@
 package Agent;
 
 import AuctionHouse.Item;
+import Messages.BidResultMessage;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 
@@ -8,10 +9,8 @@ import java.util.HashMap;
 
 public class Agent extends Thread
 {
-  HashMap<Integer, Item> auctionHouseItems;
-  Integer itemToBidOn = 1;
-  Integer amountToBid = 111;
   int secretKey;
+  AgentAuctionHouse agentAuctionHouse;
 
   AgentGUI agentGui;
 
@@ -19,6 +18,23 @@ public class Agent extends Thread
   {
     new JFXPanel();
     Platform.runLater(() -> agentGui = new AgentGUI(this));
+  }
+
+  String successMessage(BidResultMessage.BidResult bidResult)
+  {
+    switch(bidResult)
+    {
+      case BID_IS_TOO_LOW:
+        return "Bid is too low!";
+      case SUCCESS:
+        return "Bid Placed!";
+      case INSUFICIENT_FUNDS:
+        return "Insufficient Funds in Your Account :(";
+      case NOT_IN_STOCK:
+        return "Item Not In Stock";
+      default:
+        return "Here Be Monsters";
+    }
   }
 
   public void activateBank(String hostname, String name, int deposit)
@@ -37,7 +53,14 @@ public class Agent extends Thread
     int port = auctionCentral.getPort();
     String address = auctionCentral.getAddress();
     System.out.println("Address = " + address + "port is: " + port);
-    AgentAuctionHouse auctionHouse = new AgentAuctionHouse(biddingKey, address, port, this);
+
+    agentAuctionHouse = new AgentAuctionHouse(biddingKey, address, port, this);
+    agentGui.openAuctionHouse();
+  }
+
+  AgentAuctionHouse getAgentAuctionHouse()
+  {
+    return agentAuctionHouse;
   }
 
   public static void main(String[] args) //throws Exception
@@ -46,23 +69,23 @@ public class Agent extends Thread
     agent.start();
   }
 
-  void setItems(HashMap<Integer, Item> items)
-  {
-    this.auctionHouseItems = items;
-    printItems();
-  }
-
-  void printItems()
-  {
-    for(Item item : auctionHouseItems.values())
-    {
-      System.out.println("Item Name: " + item.getItem() + " Item ID: " + item.getID() + " Price: " + item.getPrice());
-    }
-  }
-
-  Integer getItemToBidOn() { return itemToBidOn; }
-
-  int getAmountBid() { return amountToBid; }
+//  void setItems(HashMap<Integer, Item> items)
+//  {
+//    this.auctionHouseItems = items;
+//    //printItems();
+//  }
+//
+//  void printItems()
+//  {
+//    for(Item item : auctionHouseItems.values())
+//    {
+//      System.out.println("Item Name: " + item.getItem() + " Item ID: " + item.getID() + " Price: " + item.getPrice());
+//    }
+//  }
+//
+//  Integer getItemToBidOn() { return itemToBidOn; }
+//
+//  int getAmountBid() { return amountToBid; }
 
   @Override
   public void run()

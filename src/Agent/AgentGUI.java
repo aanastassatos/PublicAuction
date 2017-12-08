@@ -21,7 +21,7 @@ public class AgentGUI extends Stage
   private boolean finished = false;
 
   private int auctionHouse;
-  private boolean housePicked = false;
+  //private boolean housePicked = false;
 
   Agent agent;
 
@@ -46,8 +46,8 @@ public class AgentGUI extends Stage
       name = screenNameText.getText();
       depositAmount = Integer.parseInt(depositText.getText());
       finished = true;
+      hide();
       agent.activateBank(hostname, name, depositAmount);
-      //hide();
     });
     return new VBox(hostNameLabel, hostNameText, screenNameLabel, screenNameText,
             depositLabel, depositText, proceed);
@@ -62,21 +62,20 @@ public class AgentGUI extends Stage
     HashMap<Integer, String> houseMap = auctionCentral.getHouses();
     setTitle("Auction Houses");
     TextField houseChoice = new TextField();
-    TextArea housesList = new TextArea();
+    Label housesList = new Label();
     Button showItems = new Button("Open House.");
     Collection<String> names = houseMap.values();
     int i = 1;
+    StringBuilder sB = new StringBuilder();
     for(String name : names)
     {
-      housesList.appendText(String.format("Available House %d: ", i));
-      housesList.appendText(name);
-      housesList.appendText("\n");
+      sB.append(String.format("Available House %d: %s\n", i, name));
       i++;
     }
+    housesList.setText(sB.toString());
 
     showItems.setOnAction(e -> {
       auctionHouse = Integer.parseInt(houseChoice.getText()) - 1;
-      housePicked = true;
       auctionCentral.selectHouse(auctionHouse);
       agent.activateHouse(auctionCentral);
     });
@@ -84,6 +83,11 @@ public class AgentGUI extends Stage
     VBox vBox = new VBox(housesList, houseChoice, showItems);
     setScene(new Scene(vBox));
     show();
+  }
+
+  void openAuctionHouse()
+  {
+    new AgentHouseGUI(agent.getAgentAuctionHouse(), agent);
   }
 
   AgentGUI(Agent agent)
