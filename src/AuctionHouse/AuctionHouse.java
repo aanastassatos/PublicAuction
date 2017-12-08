@@ -42,7 +42,8 @@ public class AuctionHouse extends Thread
       if(args.length > 0 && args[0].equals("test")) centralAddress = "";
       else centralAddress = reader.readLine();
       //how to get the number not the full name
-      address = InetAddress.getLocalHost().getHostName();
+      String allAddress = InetAddress.getLocalHost().getHostName();
+      address = allAddress.substring(6);
       System.out.println("address is " +address);
       Random r = new Random();
       char c = (char) (r.nextInt(26) + 'A');
