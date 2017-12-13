@@ -1,3 +1,4 @@
+### Dylan Balata (dbalata), Catherine Wright (cat-wright), Alex Anastassatos (aanastassatos), Phuong Tran (pnt204)
 # PublicAuction
 
 ## General Instructions
