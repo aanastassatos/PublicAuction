@@ -1,4 +1,8 @@
-### Dylan Balata (dbalata), Catherine Wright (cat-wright), Alex Anastassatos (aanastassatos), Phuong Tran (pnt204)
+###### Dylan Balata (dbalata) -- Bank
+###### Alex Anastassatos (aanastassatos) -- Auction Central
+###### Phuong Tran (pnt204) -- Auction House
+###### Catherine Wright (cat-wright) -- Agent
+
 # PublicAuction
 
 ## General Instructions
